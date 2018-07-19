@@ -16,11 +16,11 @@ const ITEM_ADD_SPEED  = 102;
 const ITEM_ADD_POWER  = 103;
 const ITEM_ADD_SCORE  = 104;
 
-const GAME_TIME  = 10;
+const GAME_TIME  = 20;
 
 const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
-const SCORE_FOR_GIFT = 20;
+
 
 module.exports = {
     GROUND:GROUND,
@@ -42,6 +42,5 @@ module.exports = {
     
     GAME_TIME:GAME_TIME,
     SCORE_FOR_WALL:SCORE_FOR_WALL,
-    SCORE_FOR_MAN:SCORE_FOR_MAN,
-    SCORE_FOR_GIFT:SCORE_FOR_GIFT
+    SCORE_FOR_MAN:SCORE_FOR_MAN
 }

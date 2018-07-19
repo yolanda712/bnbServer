@@ -64,6 +64,9 @@ var TDPaopao = function(position, power, role){
         // 炸掉道具
         for(var i =0; i<boomXYArr.length; i++){
             var pos = boomXYArr[i];
+            if(this.map.isPositionAnItem(pos.x,pos.y)){
+                this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y});
+            }
             this.map.setValue(pos.x,pos.y,constants.GROUND);
             //角色死亡判断
             var masterRole = this.game.masterRole;
@@ -93,7 +96,7 @@ var TDPaopao = function(position, power, role){
         result['itemArr'] = itemArr;
 
         console.log(result);
-        var game = this.role.game;
+        var game = this.game;
         game.broadcastMsg("boomInfo",result);
 
     };
@@ -128,7 +131,7 @@ var TDPaopao = function(position, power, role){
                         }else if(mapValue == 100){
                             canGo.Left = false;
                             //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
-                            var nextPaopao = this.role.game.paopaoArr[calcX][caclY];
+                            var nextPaopao = this.game.paopaoArr[calcX][caclY];
                             var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                             if(nextResult){
                                 boomXYArr = uniquePosArray(boomXYArr.concat(nextResult.boomXYArr));
@@ -158,7 +161,7 @@ var TDPaopao = function(position, power, role){
                         }else if(mapValue == 100){
                             canGo.Right = false;
                             //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
-                            var nextPaopao = this.role.game.paopaoArr[calcX][caclY];
+                            var nextPaopao = this.game.paopaoArr[calcX][caclY];
                             var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                             if(nextResult){
                                 boomXYArr = uniquePosArray(boomXYArr.concat(nextResult.boomXYArr));
@@ -188,7 +191,7 @@ var TDPaopao = function(position, power, role){
                         }else if(mapValue == 100){
                             canGo.Up = false;
                             //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
-                            var nextPaopao = this.role.game.paopaoArr[calcX][caclY];
+                            var nextPaopao = this.game.paopaoArr[calcX][caclY];
                             var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                             if(nextResult){
                                 boomXYArr = uniquePosArray(boomXYArr.concat(nextResult.boomXYArr));
@@ -218,7 +221,7 @@ var TDPaopao = function(position, power, role){
                         }else if(mapValue == 100){
                             canGo.Down = false;
                             //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
-                            var nextPaopao = this.role.game.paopaoArr[calcX][caclY];
+                            var nextPaopao = this.game.paopaoArr[calcX][caclY];
                             var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                             if(nextResult){
                                 boomXYArr = uniquePosArray(boomXYArr.concat(nextResult.boomXYArr));
