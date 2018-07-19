@@ -65,6 +65,7 @@ var TDPaopao = function(position, power, role){
         for(var i =0; i<boomXYArr.length; i++){
             var pos = boomXYArr[i];
             if(this.map.isPositionAnItem(pos.x,pos.y)){
+                console.log("itemEaten"+ pos);
                 this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y});
             }
             this.map.setValue(pos.x,pos.y,constants.GROUND);
@@ -86,7 +87,7 @@ var TDPaopao = function(position, power, role){
         for(var i =0; i<boomBoxArr.length; i++){
             var pos = boomBoxArr[i];
             if(this.map.getValue(pos.x,pos.y)==constants.GIFT_WALL && this.calcItemPosibility()){
-                var itemCode = 101 + parseInt(Math.random()*4);
+                var itemCode = 101 + parseInt(Math.random()*3);
                 this.map.setValue(pos.x,pos.y,itemCode);
                 itemArr.push({x:pos.x,y:pos.y,itemCode:itemCode});
             }else{

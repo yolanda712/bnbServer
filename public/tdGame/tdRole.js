@@ -14,7 +14,7 @@ var Direction = {
 
 var Role = function(name,game,point){
 
-    this.FPS = 30;
+    this.FPS = 45;
 
     this.currentDirection = Direction.None;
     this.isKeyDown = false;
@@ -23,9 +23,9 @@ var Role = function(name,game,point){
     this.game = game;
     this.position = new Point.Point(0,0);
     // this.Direction = 1; //down
-    this.moveStep = 4;
+    this.moveStep = 2;
     // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border的一半，或者movestep的2倍
-    this.threshold = 8;
+    this.threshold = 15;
 
     //用来检测旁边块是否可以移动
     this.roleBorder = 15.9;
@@ -37,7 +37,11 @@ var Role = function(name,game,point){
     this.curPaopaoCount = 0;
     this.paopaoPower = 1;
     this.score = 0;
-    this.itemMoveStep = 4;
+    this.itemMoveStep = 1;
+
+    this.limitPaopaoCount = 5;
+    this.limitMoveStep = 6;
+    this.limitPaopaoPower = 5;
 
 
 
@@ -221,9 +225,9 @@ var Role = function(name,game,point){
     }
 
     this.getItem = function(itemCode){
-        if(itemCode == constants.ITEM_ADD_PAOPAO) this.maxPaopaoCount++;
-        else if(itemCode == constants.ITEM_ADD_POWER) this.paopaoPower++;
-        else if(itemCode == constants.ITEM_ADD_SPEED) this.moveStep+=this.itemMoveStep;
+        if(itemCode == constants.ITEM_ADD_PAOPAO && this.maxPaopaoCount<this.limitPaopaoCount) this.maxPaopaoCount++;
+        else if(itemCode == constants.ITEM_ADD_POWER && this.paopaoPower<this.limitPaopaoPower) this.paopaoPower++;
+        else if(itemCode == constants.ITEM_ADD_SPEED && this.moveStep<this.limitMoveStep) this.moveStep+=this.itemMoveStep;
         else if(itemCode == constants.ITEM_ADD_SCORE) this.score+=500;
     }
 

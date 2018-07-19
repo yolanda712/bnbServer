@@ -16,7 +16,7 @@ const ITEM_ADD_SPEED  = 102;
 const ITEM_ADD_POWER  = 103;
 const ITEM_ADD_SCORE  = 104;
 
-const GAME_TIME  = 20;
+const GAME_TIME  = 120;
 
 const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
