@@ -9,8 +9,6 @@ var serverConfig = require('./public/config').serverConfig;
 
 var Direction = require('./public/tdGame/tdRole').Direction
 
-// var Role = require('./public/tdGame/tdRole').Role
-// var TDMap = require('./public/tdGame/tdMap').TDMap
 var TDGame = require('./public/tdGame/tdGame')
 
 app.engine('html', swig.renderFile);
@@ -24,11 +22,6 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 var rooms = {};
-// var role1 = new Role('master');
-// role1.setPosition(20,20);
-// role1.Move(1);
-// var role2 = new Role('challenger');
-// role2.setPosition(400,400);
 
 var clientCallback = function(roomname){
     var msg = [];
@@ -75,6 +68,8 @@ io.on('connection', function (socket) {
             game.gameInfoInterval = setInterval(function(){
                 clientCallback(roomname);
             },20);
+
+            moveByKeyCode(68, game.masterRole);
 
             game.startGame();       
         }
@@ -126,11 +121,8 @@ io.on('connection', function (socket) {
         if (game) {
             if (socket.role === 'master') {
                 moveByKeyCode(data,game.masterRole);
-                // room.masterRole.Move();
-                // room.challenger.emit("KD", data);
             } else {
                 moveByKeyCode(data,game.challengerRole);
-                // room.master.emit("KD", data);
             }
         }
     });
@@ -148,8 +140,6 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function(){
         var game = rooms[socket.roomname];
         if (game) {
-            // var other = (room.challenger == socket)?room.master:room.challenger;
-            // other.emit('err', "Other Player Disconnected!");
             socket.leave(socket.roomname);
             clearInterval(game.gameInfoInterval);
             delete game;
@@ -160,9 +150,6 @@ io.on('connection', function (socket) {
 });
 
 server.listen(4000, function(){
-    // var host = server.address().address;
-    // var port = server.address().port;
-    
     console.log('App listening at http://%s:%s', serverConfig.host, serverConfig.port);
 });
 

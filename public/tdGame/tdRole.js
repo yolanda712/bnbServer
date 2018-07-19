@@ -58,8 +58,7 @@ var Role = function(name,game,point){
         return this.position;
     }
 
-    animateInterval = 0;
-    moveInterval = 0;
+    this.moveInterval = 0;
 
     //角色移动函数
     this.move = function(directionnum) {
@@ -77,14 +76,9 @@ var Role = function(name,game,point){
 
         //先移动一步
         // this.MoveOneStop(directionnum);
-       
-        //动画线程
-        animateInterval = setInterval(function() {
-            
-        }, 500);
 
         //移动线程
-        moveInterval = setInterval(function() {
+        this.moveInterval = setInterval(function() {
             // console.log('move');
             self.moveOneStop(directionnum);
         }, 1000/self.FPS);
@@ -188,8 +182,7 @@ var Role = function(name,game,point){
         }
         this.isKeyDown = false;
         this.currentDirection = Direction.None;
-        clearInterval(animateInterval);
-        clearInterval(moveInterval);
+        clearInterval(this.moveInterval);
     }
 
     this.getMapLocation = function(x,y){

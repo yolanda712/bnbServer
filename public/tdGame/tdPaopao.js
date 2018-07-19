@@ -70,12 +70,12 @@ var TDPaopao = function(position, power, role){
             var challengerRole = this.game.challengerRole;
             var masterMapPos = masterRole.getMapLocation(masterRole.position.x,masterRole.position.y);
             var challengerMapPos = challengerRole.getMapLocation(challengerRole.position.x,challengerRole.position.y);
-            if(this.position.x = masterMapPos.x && this.position.y == masterMapPos.y) {
+            if(pos.x == masterMapPos.x && pos.y == masterMapPos.y) {
                 challengerRole.score += constants.SCORE_FOR_MAN;
                 masterRole.die();
             }
-            if(this.position.x = challengerMapPos.x && this.position.y == challengerMapPos.y){
-                masterRole.score += constants.SCORE_FOR_GIFT;
+            if(pos.x == challengerMapPos.x && pos.y == challengerMapPos.y){
+                masterRole.score += constants.SCORE_FOR_MAN;
                 challengerRole.die();
             } 
         }
