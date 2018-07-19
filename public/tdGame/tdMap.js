@@ -31,12 +31,19 @@ var backGroundMap = [
     [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1 ]
  ];
 
+ var copyMap = function(mapArr){
+    var newMap = [];
+    for(var i=0; i<mapArr.length; i++){
+        newMap.push(mapArr[i].concat());
+    }
+    return newMap;
+ }
 
 
 
  var TDMap = function(mapName){
 
-    this.map = backGroundMap;
+    this.map = copyMap(backGroundMap);
 
     this.getXLen = function(){
         return this.map[0].length;
