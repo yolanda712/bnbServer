@@ -240,8 +240,19 @@ var Role = function(name,game,point){
             if(!this.game.paopaoArr[position.x])
                 this.game.paopaoArr[position.x]=[];
             this.game.paopaoArr[position.x][position.y] = paopao;
-            console.log(this.game.paopaoArr);
+            // console.log(this.game.paopaoArr);
+
+            paopaoCreatedInfo = {
+                name:this.name,
+                position:{
+                    x:position.x,
+                    y:position.y
+                }
+            }
+            console.log(paopaoCreatedInfo);
+            this.game.broadcastMsg('paopaoCreated',paopaoCreatedInfo);
         }
+
     }
 
     this.createPaopaoAtPos = function(x,y){

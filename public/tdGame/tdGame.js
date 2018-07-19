@@ -36,7 +36,13 @@ var TDGame = function (serverIO, roomName) {
     }
 
     this.startGame = function(){
-        this.io.to(this.roomName).emit('start',{});
+        var mapInfo = {
+            mapName:'basicMap',
+            arr: this.tdMap.map
+        };
+        this.io.to(this.roomName).emit('start',mapInfo);
+        console.log(mapInfo);
+        // this.broadcastMsg("mapInfo",mapInfo);
         var self = this;
         this.timer = setInterval(function(){
             self.countTime();
