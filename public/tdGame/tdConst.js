@@ -21,6 +21,14 @@ const GAME_TIME  = 120;
 const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
 
+const KEY_CODE = {
+    W: 87,
+    A: 65,
+    S: 83,
+    D: 68,
+    J: 74
+}
+
 
 module.exports = {
     GROUND:GROUND,
@@ -42,5 +50,6 @@ module.exports = {
     
     GAME_TIME:GAME_TIME,
     SCORE_FOR_WALL:SCORE_FOR_WALL,
-    SCORE_FOR_MAN:SCORE_FOR_MAN
+    SCORE_FOR_MAN:SCORE_FOR_MAN,
+    KEY_CODE:KEY_CODE
 }

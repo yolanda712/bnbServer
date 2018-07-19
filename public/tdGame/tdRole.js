@@ -4,7 +4,7 @@ var TDPaopao = require('./tdPaopao')
 var constants = require('./tdConst')
 
 //物体移动方向枚举
-var Direction = {
+const Direction = {
     None: -1,
     Up: 0,
     Down: 1,

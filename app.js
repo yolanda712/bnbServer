@@ -7,9 +7,10 @@ var io = require('socket.io')(server);
 var swig = require('swig');
 var serverConfig = require('./public/config').serverConfig;
 
-var Direction = require('./public/tdGame/tdRole').Direction
+var TDGame = require('./public/tdGame/tdGame');
 
-var TDGame = require('./public/tdGame/tdGame')
+var Rooms = require('./public/tdGame/tdRoom');
+var TDRoom = Rooms.TDRoom();
 
 app.engine('html', swig.renderFile);
 
@@ -21,32 +22,6 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
-var rooms = {};
-
-var clientCallback = function(roomname){
-    var msg = [];
-    var game = rooms[roomname];
-    if(game){
-        for(index in game.roleArr){
-            role = game.roleArr[index];
-            msg.push(
-                {
-                    name:role.name,
-                    position:{
-                        x:role.position.x,
-                        y:role.position.y
-                    },
-                    gameTime:game.gameTime,
-                    score:role.score
-                })
-        }
-        io.to(roomname).emit("roleInfo",msg);
-        // console.log(msg);
-    }else{
-        delete rooms[roomname];
-        clearInterval(this);
-    }
-};
 
 app.get('/', function (req, res) {
     res.render('index');
@@ -56,95 +31,69 @@ io.on('connection', function (socket) {
     var clientIp = socket.request.connection.remoteAddress;
     console.log('New connection from ' + clientIp);
 
-    socket.on('joinRoom', function (roomname) {
-        var game = rooms[roomname];
-        if (!game) {
+    socket.on('joinRoom', function (roomName) {
+        if(!TDRoom.isRoomExisted(roomName)){
             socket.emit('joinRoom', {ret: 0, err: 'no such room'});
-        } else {
-            socket.roomname = roomname;
+        }else{
+            socket.roomName = roomName;
             socket.role = 'challenger';
-            socket.join(roomname);
+            socket.join(roomName);
 
-            game.gameInfoInterval = setInterval(function(){
-                clientCallback(roomname);
-            },20);
-
-            moveByKeyCode(68, game.masterRole);
-
-            game.startGame();       
+            var game = TDRoom.getRoom(roomName);
+            game.startGame(); 
         }
 
     });
 
     socket.on('getRooms', function(data) {
-        var msg = {'ret': 1, 'data': Object.keys(rooms)};
+        // TODO 数据格式需要改动
+        var msg = {'ret': 1, 'data': TDRoom.getRooms()};
         socket.emit('getRooms', msg);
     });
 
     socket.on('newRoom', function(data) {
-        var roomname = data['name'];
-        var msg;
-        if (roomname in rooms) {
-            msg = {'ret': 0, 'err': 'room already existed'}
-        } else {
-            msg = {'ret': 1};
-            socket.roomname = roomname;
+        var roomName = data['name'];
+        var msg = {code:0,msg:'failed'};
+        if(!TDRoom.isRoomExisted(roomName)){
+            socket.roomName = roomName;
             socket.role = 'master';
-            socket.join(roomname);
+            socket.join(roomName);            
 
-            var game = new TDGame.TDGame(io,roomname);
-            game.createMasterRole(32,32);
-            game.createChallengerRole(32*11,32*9);
-
-            rooms[roomname] = game;
+            var game = new TDGame.TDGame(io,roomName);
+            msg = TDRoom.createRoom(roomName,game);
         }
         socket.emit('newRooms', msg);
     });
 
-    socket.on('KeyUp', function (data) {
-        var game = rooms[socket.roomname];
+    socket.on('KeyUp', function (keyCode) {
+        var game = TDRoom.getRoom(socket.roomName);
         if(game){
             if (socket.role === 'master') {
-                // room.masterRole.Stop();
-                stopByKeyCode(data,game.masterRole);
-                // room.challenger.emit("KU", data);
+                game.stopByKeyCode(keyCode,game.masterRole);
             } else {
-                // room.challengerRole.Stop(data);
-                stopByKeyCode(data,game.challengerRole);
-                // room.master.emit("KU", data);
+                game.stopByKeyCode(keyCode,game.challengerRole);
             }
         }
     });
 
-    socket.on('KeyDown', function (data) {
-        var game = rooms[socket.roomname];
+    socket.on('KeyDown', function (keyCode) {
+        var game = TDRoom.getRoom(socket.roomName);
         if (game) {
             if (socket.role === 'master') {
-                moveByKeyCode(data,game.masterRole);
+                game.moveByKeyCode(keyCode,game.masterRole);
             } else {
-                moveByKeyCode(data,game.challengerRole);
+                game.moveByKeyCode(keyCode,game.challengerRole);
             }
         }
     });
 
     socket.on('end', function (data) {
-        var game = rooms[socket.roomname];
-        clearInterval(game.gameInfoInterval);
-
-        var winner = data;        
-        io.to(socket.roomname).emit('end', {ret: 1, data: winner});
-        delete game;
-        delete rooms[socket.roomname];
+        console.log("server on end");
     });
 
     socket.on('disconnect', function(){
-        var game = rooms[socket.roomname];
-        if (game) {
-            socket.leave(socket.roomname);
-            clearInterval(game.gameInfoInterval);
-            delete game;
-            delete rooms[socket.roomname];
-        }
+        TDRoom.deleteRoom(socket.roomName);
+        socket.leave(socket.roomName);
     })
 
 });
@@ -152,45 +101,3 @@ io.on('connection', function (socket) {
 server.listen(4000, function(){
     console.log('App listening at http://%s:%s', serverConfig.host, serverConfig.port);
 });
-
-
-var moveByKeyCode = function(key, role){
-    switch (key) {
-        //W键,向上移动     
-        case 87:
-            role.move(Direction.Up);
-            break;
-        //A键,向左移动
-        case 65:
-            role.move(Direction.Left);
-            break;
-            //S键,向下移动
-        case 83:
-            role.move(Direction.Down);
-            break;
-        //D键,向右移动
-        case 68:
-            role.move(Direction.Right);
-            break;
-        case 74:
-            role.createPaopao();
-            break;
-    }
-}
-
-var stopByKeyCode = function(key, role){
-    switch (key) {  
-        case 87:
-            role.stop(Direction.Up);
-            break;
-        case 65:
-            role.stop(Direction.Left);
-            break;
-        case 83:
-            role.stop(Direction.Down);
-            break;
-        case 68:
-            role.stop(Direction.Right);
-            break;
-    }
-}
