@@ -66,7 +66,7 @@ var TDPaopao = function(position, power, role){
             var pos = boomXYArr[i];
             if(this.map.isPositionAnItem(pos.x,pos.y)){
                 console.log("itemEaten"+ pos);
-                this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y});
+                this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y,role:'null'});
             }
             this.map.setValue(pos.x,pos.y,constants.GROUND);
             //角色死亡判断

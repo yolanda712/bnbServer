@@ -90,8 +90,18 @@ var TDGame = function (serverIO, roomName) {
     this.stopGame = function(data){
         console.log('end');
         // console.log(data);
+        var socketRoom = this.io.sockets.adapter.rooms[this.roomName];
+        var sockets = socketRoom.sockets;
+        var socketIds = Object.keys(sockets);
+        
         Rooms.TDRoom().deleteRoom(this.roomName);
         this.io.to(this.roomName).emit('end');
+
+        // TODO socket退出房间，之后要换位置
+        for(var i=0;i<socketIds.length;i++){
+            var socket = this.io.sockets.sockets[socketIds[i]];
+            socket.leave(this.roomName);
+        }
     }
 
     this.broadcastMsg = function(msg, data){
@@ -99,7 +109,7 @@ var TDGame = function (serverIO, roomName) {
     }
 
     this.countTime = function(){
-        if(this.gameTime >= 0){
+        if(this.gameTime > 0){
             console.log(this.gameTime);
             this.gameTime--;
            

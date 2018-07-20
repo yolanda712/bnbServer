@@ -109,7 +109,7 @@ var Role = function(name,game,point){
                         var mapPosition = this.getMapLocation(this.position.x,this.position.y);
                         this.getItem(this.getMap().getValue(mapPosition.x,mapPosition.y));
                         this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
-                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y});
+                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name});
                     }
                 }
                 break;
@@ -128,7 +128,7 @@ var Role = function(name,game,point){
                         var mapPosition = this.getMapLocation(this.position.x,this.position.y);
                         this.getItem(this.getMap().getValue(mapPosition.x,mapPosition.y));
                         this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
-                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y});
+                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name});
                     }
                 }
                 break;
@@ -147,7 +147,7 @@ var Role = function(name,game,point){
                         var mapPosition = this.getMapLocation(this.position.x,this.position.y);
                         this.getItem(this.getMap().getValue(mapPosition.x,mapPosition.y));
                         this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
-                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y});
+                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name});
                     }
                 }
                 break;
@@ -166,7 +166,7 @@ var Role = function(name,game,point){
                         var mapPosition = this.getMapLocation(this.position.x,this.position.y);
                         this.getItem(this.getMap().getValue(mapPosition.x,mapPosition.y));
                         this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
-                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y});
+                        this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name});
                     }
                 }
                 break;
