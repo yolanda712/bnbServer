@@ -66,7 +66,7 @@ var TDPaopao = function(position, power, role){
             var pos = boomXYArr[i];
             if(this.map.isPositionAnItem(pos.x,pos.y)){
                 console.log("itemEaten"+ pos);
-                this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y});
+                this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y,role:'null'});
             }
             this.map.setValue(pos.x,pos.y,constants.GROUND);
             //角色死亡判断
@@ -145,7 +145,7 @@ var TDPaopao = function(position, power, role){
                     }
                 }
                 //向右
-                if(currentMapLocation.y+i < this.map.getYLen()){
+                if(currentMapLocation.y+i < this.map.getXLen()){
                     if(canGo.Right){
                         var calcX = currentMapLocation.x;
                         var caclY = currentMapLocation.y+i;
@@ -205,7 +205,7 @@ var TDPaopao = function(position, power, role){
                     }
                 }
                 //向下
-                if(currentMapLocation.x+i < this.map.getXLen()){
+                if(currentMapLocation.x+i < this.map.getYLen()){
                     if(canGo.Down){
                         var calcX = currentMapLocation.x+i;
                         var caclY = currentMapLocation.y;
