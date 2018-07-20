@@ -96,6 +96,12 @@ io.on('connection', function (socket) {
         socket.leave(socket.roomName);
     })
 
+    socket.on('error',function(){
+        console.log('server websocket error');
+    })
+
+    // socket.on('')
+
 });
 
 server.listen(4000, function(){
