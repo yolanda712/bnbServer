@@ -43,6 +43,8 @@ var Role = function(name,game,point){
     this.limitMoveStep = 3;
     this.limitPaopaoPower = 5;
 
+    this.isDeath = false;
+
 
 
     this.getMap = function(){
@@ -66,26 +68,31 @@ var Role = function(name,game,point){
 
     //角色移动函数
     this.move = function(directionnum) {
-        if (directionnum < 0 || directionnum > 3) return;
-        // this.Stop();
-        if(directionnum==this.currentDirection &&
-            this.isKeyDown) return;
+        if(!this.isDeath){
+            if (directionnum < 0 || directionnum > 3) return;
+            // this.Stop();
+            if(directionnum==this.currentDirection &&
+                this.isKeyDown) return;
+            
+            this.stop();
+
+            this.currentDirection = directionnum;
+            this.isKeyDown = true;
+            
+            var self = this;
+
+            //先移动一步
+            // this.MoveOneStop(directionnum);
+
+            //移动线程
+            this.moveInterval = setInterval(function() {
+                // console.log('move');
+                self.moveOneStop(directionnum);
+            }, 1000/self.FPS);
+        }else{
+            return;
+        }
         
-        this.stop();
-
-        this.currentDirection = directionnum;
-        this.isKeyDown = true;
-        
-        var self = this;
-
-        //先移动一步
-        // this.MoveOneStop(directionnum);
-
-        //移动线程
-        this.moveInterval = setInterval(function() {
-            // console.log('move');
-            self.moveOneStop(directionnum);
-        }, 1000/self.FPS);
     }
 
     this.moveOneStop = function(directionnum){
@@ -237,7 +244,7 @@ var Role = function(name,game,point){
 
     this.createPaopao = function(){
         var position = this.getMapLocation(this.position.x,this.position.y);
-        if(this.getMap().isPositionPassable(position.x,position.y) 
+        if(!this.isDeath && this.getMap().isPositionPassable(position.x,position.y) 
            && this.curPaopaoCount<this.maxPaopaoCount){
             this.curPaopaoCount++;
             var paopao = new TDPaopao.TDPaopao(position,this.paopaoPower,this);
@@ -280,9 +287,18 @@ var Role = function(name,game,point){
         console.log(this.game.paopaoArr);
         // console.log(this.score);
     }
+
+    this.roleBoom = function(){
+        console.log('loser: '+this.name);
+        var self = this;
+        this.isDeath = true;
+        var roleBoomTime = setTimeout(function(){
+            self.die();
+        },3000);
+    }
     
     this.die = function(){
-        console.log('loser: '+this.name);
+        // console.log('loser: '+this.name);
         this.game.stopGame({loser:this.name});
     }
 

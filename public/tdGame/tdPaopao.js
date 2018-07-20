@@ -76,11 +76,13 @@ var TDPaopao = function(position, power, role){
             var challengerMapPos = challengerRole.getMapLocation(challengerRole.position.x,challengerRole.position.y);
             if(pos.x == masterMapPos.x && pos.y == masterMapPos.y) {
                 challengerRole.score += constants.SCORE_FOR_MAN;
-                masterRole.die();
+                masterRole.roleBoom();
+                this.game.broadcastMsg("roleBoom",{x:pos.x,y:pos.y,role:this.role.name});
             }
             if(pos.x == challengerMapPos.x && pos.y == challengerMapPos.y){
                 masterRole.score += constants.SCORE_FOR_MAN;
-                challengerRole.die();
+                challengerRole.roleBoom();
+                this.game.broadcastMsg("roleBoom",{x:pos.x,y:pos.y,role:this.role.name});
             } 
         }
         // 生成道具
