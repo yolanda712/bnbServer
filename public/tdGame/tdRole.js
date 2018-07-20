@@ -40,7 +40,7 @@ var Role = function(name,game,point){
     this.itemMoveStep = 0.5;
 
     this.limitPaopaoCount = 5;
-    this.limitMoveStep = 4;
+    this.limitMoveStep = 3;
     this.limitPaopaoPower = 5;
 
 
