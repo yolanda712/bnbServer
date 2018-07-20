@@ -14,7 +14,7 @@ const Direction = {
 
 var Role = function(name,game,point){
 
-    this.FPS = 45;
+    this.FPS = 90;
 
     this.currentDirection = Direction.None;
     this.isKeyDown = false;
@@ -23,7 +23,7 @@ var Role = function(name,game,point){
     this.game = game;
     this.position = new Point.Point(0,0);
     // this.Direction = 1; //down
-    this.moveStep = 2;
+    this.moveStep = 1;
     // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border的一半，或者movestep的2倍
     this.threshold = 15;
 
@@ -37,10 +37,10 @@ var Role = function(name,game,point){
     this.curPaopaoCount = 0;
     this.paopaoPower = 1;
     this.score = 0;
-    this.itemMoveStep = 1;
+    this.itemMoveStep = 0.5;
 
     this.limitPaopaoCount = 5;
-    this.limitMoveStep = 6;
+    this.limitMoveStep = 4;
     this.limitPaopaoPower = 5;
 
 

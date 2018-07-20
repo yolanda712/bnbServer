@@ -67,7 +67,7 @@ var TDGame = function (serverIO, roomName) {
     this.startGame = function(){
         this.gameInfoInterval = setInterval(function(){
             clientCallback(self);
-        },20);
+        },1000/90);
 
         var mapInfo = {
             mapName:'basicMap',
