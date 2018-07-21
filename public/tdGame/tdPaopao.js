@@ -70,18 +70,18 @@ var TDPaopao = function(position, power, role){
             }
             this.map.setValue(pos.x,pos.y,constants.GROUND);
             //角色死亡判断
-            var masterRole = this.game.masterRole;
-            var challengerRole = this.game.challengerRole;
+            var masterRole = this.game.roleArr[0];
+            var challengerRole = this.game.roleArr[1];
             var masterMapPos = masterRole.getMapLocation(masterRole.position.x,masterRole.position.y);
             var challengerMapPos = challengerRole.getMapLocation(challengerRole.position.x,challengerRole.position.y);
             if(pos.x == masterMapPos.x && pos.y == masterMapPos.y) {
                 challengerRole.score += constants.SCORE_FOR_MAN;
-                masterRole.roleBoom();
+                masterRole.roleBoom();                
                 this.game.broadcastMsg("roleBoom",{x:pos.x,y:pos.y,role:this.role.name});
             }
             if(pos.x == challengerMapPos.x && pos.y == challengerMapPos.y){
                 masterRole.score += constants.SCORE_FOR_MAN;
-                challengerRole.roleBoom();
+                challengerRole.roleBoom();                
                 this.game.broadcastMsg("roleBoom",{x:pos.x,y:pos.y,role:this.role.name});
             } 
         }

@@ -29,6 +29,15 @@ const KEY_CODE = {
     J: 74
 }
 
+//物体移动方向枚举
+const Direction = {
+    None: -1,
+    Up: 0,
+    Down: 1,
+    Left: 2,
+    Right: 3
+}
+
 
 module.exports = {
     GROUND:GROUND,
@@ -51,5 +60,6 @@ module.exports = {
     GAME_TIME:GAME_TIME,
     SCORE_FOR_WALL:SCORE_FOR_WALL,
     SCORE_FOR_MAN:SCORE_FOR_MAN,
-    KEY_CODE:KEY_CODE
+    KEY_CODE:KEY_CODE,
+    Direction:Direction
 }

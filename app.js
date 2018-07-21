@@ -1,31 +1,13 @@
-var express = require('express'),
-    bodyParser = require('body-parser');
+var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-var swig = require('swig');
 var serverConfig = require('./public/config').serverConfig;
 
 var TDGame = require('./public/tdGame/tdGame');
-
 var Rooms = require('./public/tdGame/tdRoom');
-var TDRoom = Rooms.TDRoom();
-
-app.engine('html', swig.renderFile);
-
-app.set('view engine', 'html');
-app.set('views', __dirname + '/templates');
-app.use(express.static('public'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-    extended: true
-}));
-
-
-app.get('/', function (req, res) {
-    res.render('index');
-});
+var TDRoom = Rooms.TDRoom;
 
 io.on('connection', function (socket) {
     var clientIp = socket.request.connection.remoteAddress;
@@ -39,7 +21,8 @@ io.on('connection', function (socket) {
             socket.role = 'challenger';
             socket.join(roomName);
 
-            var game = TDRoom.getRoom(roomName);
+            var game = TDRoom.getRoom(roomName);            
+            game.addPlayerNum();
             game.startGame(); 
         }
 
@@ -59,7 +42,8 @@ io.on('connection', function (socket) {
             socket.role = 'master';
             socket.join(roomName);            
 
-            var game = new TDGame.TDGame(io,roomName);
+            var game = new TDGame(io,roomName);
+            game.addPlayerNum();
             msg = TDRoom.createRoom(roomName,game);
         }
         socket.emit('newRooms', msg);
@@ -69,9 +53,9 @@ io.on('connection', function (socket) {
         var game = TDRoom.getRoom(socket.roomName);
         if(game){
             if (socket.role === 'master') {
-                game.stopByKeyCode(keyCode,game.masterRole);
+                game.stopARoleByKeyCode(keyCode,game.roleArr[0]);
             } else {
-                game.stopByKeyCode(keyCode,game.challengerRole);
+                game.stopARoleByKeyCode(keyCode,game.roleArr[1]);
             }
         }
     });
@@ -80,9 +64,9 @@ io.on('connection', function (socket) {
         var game = TDRoom.getRoom(socket.roomName);
         if (game) {
             if (socket.role === 'master') {
-                game.moveByKeyCode(keyCode,game.masterRole);
+                game.moveARoleByKeyCode(keyCode,game.roleArr[0]);
             } else {
-                game.moveByKeyCode(keyCode,game.challengerRole);
+                game.moveARoleByKeyCode(keyCode,game.roleArr[1]);
             }
         }
     });

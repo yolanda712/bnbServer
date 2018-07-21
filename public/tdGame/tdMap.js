@@ -31,6 +31,11 @@ var backGroundMap = [
     [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1 ]
  ];
 
+ var roleStartPointArr = [
+     {x:9, y:1},
+     {x:1, y:11},
+ ]
+
  var copyMap = function(mapArr){
     var newMap = [];
     for(var i=0; i<mapArr.length; i++){
@@ -42,41 +47,40 @@ var backGroundMap = [
 
 
  var TDMap = function(mapName){
-
+    this.mapName = mapName;
     this.map = copyMap(backGroundMap);
-
-    this.getXLen = function(){
-        return this.map[0].length;
-    }
-
-    this.getYLen = function(){
-        return this.map.length;
-    }
-
-    this.getValue = function(x,y){
-        return this.map[x][y];
-    }
-
-    this.setValue = function(x,y,value){
-        this.map[x][y] = value;
-    }
-
-    this.isPositionPassable = function(x,y){
-        if(this.getValue(x,y)==0 || this.getValue(x,y)>100) return true;
-        return false;
-    }
-
-    this.isPositionAnItem = function(x,y){
-        if(this.getValue(x,y)>100) return true;
-        return false;
-    }
-
-    this.isPositionAPaopao = function(x,y){
-        if(this.getValue(x,y)==100) return true;
-        return false;
-    }
+    this.roleStartPointArr = roleStartPointArr.concat();
  }
 
- module.exports = {
-     TDMap : TDMap
- }
+TDMap.prototype.getXLen = function(){
+    return this.map[0].length;
+}
+
+TDMap.prototype.getYLen = function(){
+    return this.map.length;
+}
+
+TDMap.prototype.getValue = function(x,y){
+    return this.map[x][y];
+}
+
+TDMap.prototype.setValue = function(x,y,value){
+    this.map[x][y] = value;
+}
+
+TDMap.prototype.isPositionPassable = function(x,y){
+    if(this.getValue(x,y)==0 || this.getValue(x,y)>100) return true;
+    return false;
+}
+
+TDMap.prototype.isPositionAnItem = function(x,y){
+    if(this.getValue(x,y)>100) return true;
+    return false;
+}
+
+TDMap.prototype.isPositionAPaopao = function(x,y){
+    if(this.getValue(x,y)==100) return true;
+    return false;
+}
+
+ module.exports = TDMap;
