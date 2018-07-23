@@ -20,7 +20,7 @@ var Role = function(roleIndex,name,game){
     this.threshold = 7.9;
 
     //用来检测旁边块是否可以移动
-    this.roleBorder = 15.9;
+    this.roleBorder = 14.9;
     this.borderStep = 32;
 
     this.tdMap = null;
@@ -60,6 +60,84 @@ Role.prototype.setPosition = function(x, y){
 
 Role.prototype.getPosition = function(){
     return this.position;
+}
+
+//角色通过手机遥感移动
+Role.prototype.mobileMove = function(angle){
+    var self = this;
+    this.mobileStop();
+
+    //移动线程
+    this.moveInterval = setInterval(function() {
+        // console.log('move');
+        self.mobileMoveOneStep(angle);
+    }, 1000/self.FPS);
+}
+
+Role.prototype.mobileMoveOneStep = function(angle){
+    var x_offset = Math.cos(angle * (Math.PI/180)) * this.moveStep;
+    var y_offset = Math.sin(angle * (Math.PI/180)) * this.moveStep;
+
+    var x_able = this.mobileCheckXOffset(x_offset);
+    var y_able = this.mobileCheckYOffset(y_offset);
+
+    if(x_able && y_able){
+        this.setPosition(this.position.x+x_offset, this.position.y+y_offset);
+    }else if(x_able){
+        this.setPosition(this.position.x+x_offset, this.position.y);
+    }else if(y_able){
+        this.setPosition(this.position.x, this.position.y+y_offset);
+    }
+
+}
+
+Role.prototype.mobileCheckXOffset = function(x_offset){
+    var movedPos = new Point(this.position.x + x_offset, this.position.y);
+    if(x_offset>0){
+        var rightTopPos = new Point(movedPos.x + this.roleBorder, movedPos.y + this.roleBorder);
+        var rightBottomPos = new Point(movedPos.x + this.roleBorder, movedPos.y - this.roleBorder);
+        if(this.isPositionPassable(rightTopPos.x,rightTopPos.y)
+            && this.isPositionPassable(rightBottomPos.x,rightBottomPos.y)){
+                return true;
+        }
+        return false;
+    }else{
+        var leftTopPos = new Point(movedPos.x - this.roleBorder, movedPos.y + this.roleBorder);
+        var leftBottomPos = new Point(movedPos.x - this.roleBorder, movedPos.y - this.roleBorder);
+        if(this.isPositionPassable(leftTopPos.x,leftTopPos.y) 
+            && this.isPositionPassable(leftBottomPos.x,leftBottomPos.y)){
+                return true;
+        }
+        return false;
+    }
+}
+
+Role.prototype.mobileCheckYOffset = function(y_offset){
+    var movedPos = new Point(this.position.x, this.position.y + y_offset);
+
+    if(y_offset>0){
+        var leftTopPos = new Point(movedPos.x - this.roleBorder, movedPos.y + this.roleBorder);
+        var rightTopPos = new Point(movedPos.x + this.roleBorder, movedPos.y + this.roleBorder);
+        if(this.isPositionPassable(leftTopPos.x,leftTopPos.y) 
+            && this.isPositionPassable(rightTopPos.x,rightTopPos.y)){
+                return true;
+        }
+        return false;
+    }else{
+        var leftBottomPos = new Point(movedPos.x - this.roleBorder, movedPos.y - this.roleBorder);
+        var rightBottomPos = new Point(movedPos.x + this.roleBorder, movedPos.y - this.roleBorder);
+        if(this.isPositionPassable(leftBottomPos.x,leftBottomPos.y)
+            && this.isPositionPassable(rightBottomPos.x,rightBottomPos.y)){
+                return true;
+        }
+        return false;
+    }
+}
+
+Role.prototype.mobileStop = function(){
+    this.isKeyDown = false;
+    this.currentDirection = Direction.None;
+    clearInterval(this.moveInterval);
 }
 
 //角色移动函数
