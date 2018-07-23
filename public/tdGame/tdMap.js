@@ -47,6 +47,21 @@ var backGroundMap = [
     [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1 ]
  ];
 
+ var backGroundMap3 = [ 
+    [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1 ], 
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,    G_W,    G_W, GROUND, GROUND, GROUND, GROUND, GROUND,    G_W, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1, GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND, GROUND, GROUND, GROUND,    G_W, GROUND, GROUND,  S_W_1 ],
+    [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1 ]
+ ];
+
  var roleStartPointArr = [
      new Point(9,1),
      new Point(1,11),
@@ -62,7 +77,7 @@ var backGroundMap = [
 
  var TDMap = function(mapName){
     this.mapName = mapName;
-    this.map = copyMap(backGroundMap2);
+    this.map = copyMap(backGroundMap3);
     this.roleStartPointArr = roleStartPointArr.concat();
  }
 
