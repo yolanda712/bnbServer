@@ -6,10 +6,12 @@ var uniquePosArray = function(arr){
     var resultArr = [];
     for(var i=0; i<arr.length; i++){
         var obj = arr[i];
+        key = base*obj.x+obj.y;
         // 去重
-        if(hash[(base*obj.x+obj.y)]){
+        if(hash[key]){
             continue;
         }
+        hash[key] = 1;
         resultArr.push(obj);
     }
     return resultArr;
@@ -38,7 +40,7 @@ TDPaopao.prototype.clearBoomTimeout = function(){
 }
 
 TDPaopao.prototype.calcItemPosibility = function(){
-    // return parseInt(Math.round());
+    // return parseInt(Math.random());
     return 1;
 }
 
@@ -68,20 +70,13 @@ TDPaopao.prototype.boom = function(){
         }
         this.map.setValue(pos.x,pos.y,constants.GROUND);
         //角色死亡判断
-        var masterRole = this.game.roleArr[0];
-        var challengerRole = this.game.roleArr[1];
-        var masterMapPos = masterRole.getMapLocation(masterRole.position.x,masterRole.position.y);
-        var challengerMapPos = challengerRole.getMapLocation(challengerRole.position.x,challengerRole.position.y);
-        if(pos.x == masterMapPos.x && pos.y == masterMapPos.y) {
-            challengerRole.score += constants.SCORE_FOR_MAN;
-            masterRole.roleBoom();                
-            this.game.broadcastMsg("roleBoom",{x:pos.x,y:pos.y,role:this.role.name});
+        for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
+            var curRole = this.game.roleArr[rIndex];
+            var roleMapPos = curRole.getMapLocation(curRole.position.x, curRole.position.y);
+            if(roleMapPos.equals(pos)){
+                curRole.roleBoom();
+            }
         }
-        if(pos.x == challengerMapPos.x && pos.y == challengerMapPos.y){
-            masterRole.score += constants.SCORE_FOR_MAN;
-            challengerRole.roleBoom();                
-            this.game.broadcastMsg("roleBoom",{x:pos.x,y:pos.y,role:this.role.name});
-        } 
     }
     // 生成道具
     for(var i =0; i<boomBoxArr.length; i++){

@@ -16,10 +16,8 @@ var Role = function(roleIndex,name,game){
     this.game = game;
     this.position = new Point(0,0);
     
-    //移动步伐大小
-    this.moveStep = 1;
     // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border的一半，或者movestep的2倍
-    this.threshold = 15;
+    this.threshold = 7.9;
 
     //用来检测旁边块是否可以移动
     this.roleBorder = 15.9;
@@ -28,15 +26,17 @@ var Role = function(roleIndex,name,game){
     this.tdMap = null;
 
     //角色初始信息设置
+    //移动步伐大小
+    this.moveStep = 1;
     this.maxPaopaoCount = 2;
     this.curPaopaoCount = 0;
     this.paopaoPower = 1;
     this.score = 0;
-    this.itemMoveStep = 0.5;
+    this.itemMoveStep = 0.3;
 
     //最大道具限制
     this.limitPaopaoCount = 5;
-    this.limitMoveStep = 3;
+    this.limitMoveStep = 2.5;
     this.limitPaopaoPower = 5;
 
     //角色是否死亡
@@ -276,6 +276,7 @@ Role.prototype.roleBoom = function(){
     var roleBoomTime = setTimeout(function(){
         self.die();
     },3000);
+    this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, role:this.name});
 }
 
 Role.prototype.die = function(){
