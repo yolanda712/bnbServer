@@ -3,14 +3,16 @@ var TDMap = require('./tdMap')
 var constants = require('./tdConst')
 var Direction = constants.Direction;
 
-var TDMonster = function(name,game){
+var TDMonster = function(game){
     this.currentDirection = Direction.None;
-    this.name = name;
+    this.game = game;
     this.isDead = false;
     this.moveStep = 32;
     this.tdMap = null;
     this.position = new Point.Point(0,0);
-    this.FPS = 5;
+    this.FPS = 20;
+    this.roleBorder = 15.9;
+
     var self = this;
 
     
@@ -21,7 +23,7 @@ var TDMonster = function(name,game){
         }
     },1000/self.FPS);
     
-
+    
 }
 TDMonster.prototype.getMap = function(){
     return this.tdMap;
@@ -41,24 +43,38 @@ TDMonster.prototype.getPosition = function(){
 }
 
 TDMonster.prototype.move = function(directionnum){
+    var leftBorder,rightBorder,upBorder,downBorder;
+    var targetX,targetY;
     switch (directionnum) {
         case Direction.Up:
-            if(this.isPositionPassable(this.position.x,this.position.y + this.moveStep)){
+            leftBorder = this.position.x - this.roleBorder;
+            rightBorder = this.position.x + this.roleBorder;
+            targetY = this.position.y + this.roleBorder + this.moveStep;
+            if(this.isPositionPassable(leftBorder,targetY)&& this.isPositionPassable(rightBorder,targetY)){
                 this.position.y += this.moveStep;
             }
         break;
         case Direction.Down:
-            if(this.isPositionPassable(this.position.x,this.position.y - this.moveStep)){
-                this.position.y -= this.moveStep;
+            leftBorder = this.position.x - this.roleBorder;
+            rightBorder = this.position.x + this.roleBorder;
+            targetY = this.position.y - this.roleBorder - this.moveStep;
+            if(this.isPositionPassable(leftBorder,targetY) && this.isPositionPassable(rightBorder,targetY)){
+                    this.position.y -= this.moveStep;
             }
         break;
         case Direction.Left:
-            if(this.isPositionPassable(this.position.x - this.moveStep,this.position.y)){
+            downBorder = this.position.y - this.roleBorder;
+            upBorder = this.position.y + this.roleBorder;
+            targetX = this.position.x - this.roleBorder - this.moveStep;
+            if(this.isPositionPassable(targetX, upBorder)&& this.isPositionPassable(targetX,downBorder)){
                 this.position.x -= this.moveStep;
             }
         break;
         case Direction.Right:
-            if(this.isPositionPassable(this.position.x + this.moveStep,this.position.y)){
+            downBorder = this.position.y - this.roleBorder;
+            upBorder = this.position.y + this.roleBorder;
+            targetX = this.position.x + this.roleBorder + this.moveStep;
+            if(this.isPositionPassable(targetX, upBorder) && this.isPositionPassable(targetX,downBorder)){
                 this.position.x += this.moveStep;
             }
         break;

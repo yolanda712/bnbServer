@@ -72,7 +72,7 @@ TDGame.prototype.createANewRole = function(){
 }
 
 TDGame.prototype.createMonster = function(){
-    this.tdMonster = new TDMonster();
+    this.tdMonster = new TDMonster(this);
     this.tdMonster.setMap(this.tdMap);
     var cocosPosition =  this.tdMonster.startCocosPosition();
     this.tdMonster.setPosition(cocosPosition.x, cocosPosition.y);
@@ -104,8 +104,8 @@ TDGame.prototype.startGame = function(){
 
     this.monstereInfoInterval = setInterval(function(){
         self.broadcastMsg('monsterInfo',{x:self.tdMonster.position.x,y:self.tdMonster.position.y});
-        // console.log("!!!!!!!!"+self.tdMonster.position.x+"!!!!!"+self.tdMonster.position.y);
-    },200);
+        console.log("!!!!!!!!"+self.tdMonster.position.x+"!!!!!"+self.tdMonster.position.y);
+    },50);
 }
 
 TDGame.prototype.stopGameIntervals = function(){
