@@ -88,6 +88,12 @@ Role.prototype.mobileMoveOneStep = function(angle){
     }else if(y_able){
         this.setPosition(this.position.x, this.position.y+y_offset);
     }
+    
+    // 吃道具检测
+    if(this.isPositionAnItem(this.position.x,this.position.y)){
+        var mapPosition = this.getMapLocation(this.position.x,this.position.y);
+        this.getItem(mapPosition);
+    }
 
 }
 

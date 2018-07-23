@@ -77,7 +77,7 @@ var backGroundMap = [
 
  var TDMap = function(mapName){
     this.mapName = mapName;
-    this.map = copyMap(backGroundMap3);
+    this.map = copyMap(backGroundMap);
     this.roleStartPointArr = roleStartPointArr.concat();
  }
 
