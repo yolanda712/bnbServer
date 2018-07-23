@@ -13,6 +13,7 @@ var clientCallback = function(game){
             role = game.roleArr[index];
             msg.push(
                 {
+                    roleIndex: role.roleIndex,
                     name:role.name,
                     position:{
                         x:role.position.x,
@@ -36,8 +37,8 @@ var convertMapIndexToCocosAxis = function (yMapLen,x,y) {
 };
 
 //主游戏入口
-var TDGame = function (serverIO, roomName) {
-    this.io = serverIO;
+var TDGame = function (serverSocketIO, roomName) {
+    this.io = serverSocketIO;
     this.roomName = roomName;
     this.tdMap = new TDMap();
     this.roleArr = [];
@@ -68,7 +69,7 @@ TDGame.prototype.createANewRole = function(){
        }else{
            role = 'challenger';
        }
-       var newRole = new Role(role,this);
+       var newRole = new Role(existedRoleNum,role,this);
        newRole.setPosition(cocosPosition.x, cocosPosition.y);
        newRole.setMap(this.tdMap);
        this.roleArr.push(newRole);

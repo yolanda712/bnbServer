@@ -1,4 +1,5 @@
 var constants = require('./tdConst')
+var Point = require('./tdPoint')
 
 var GROUND = constants.GROUND;
 var NG_W_1 = constants.NO_GIFT_WALL_1;
@@ -32,8 +33,8 @@ var backGroundMap = [
  ];
 
  var roleStartPointArr = [
-     {x:9, y:1},
-     {x:1, y:11},
+     new Point(9,1),
+     new Point(1,11),
  ]
 
  var copyMap = function(mapArr){
@@ -43,8 +44,6 @@ var backGroundMap = [
     }
     return newMap;
  }
-
-
 
  var TDMap = function(mapName){
     this.mapName = mapName;
