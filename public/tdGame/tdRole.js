@@ -179,18 +179,12 @@ var Role = function(name,game,point){
     }
 
     this.getMapLocation = function(x,y){
-
-        xIndex = Math.round(x/32);
-        yIndex = Math.round(y/32);
-
         var tdMap = this.getMap();
-
         if(tdMap ==null){
             console.log('map not set');
             return {}
         }
-
-        return {x: tdMap.getYLen()-1-yIndex, y: xIndex};
+        return tdMap.getMapLocation(x,y);
     }
 
     this.isPositionPassable = function(x,y){

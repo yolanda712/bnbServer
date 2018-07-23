@@ -83,4 +83,11 @@ TDMap.prototype.isPositionAPaopao = function(x,y){
     return false;
 }
 
+TDMap.prototype.getMapLocation = function(x,y){
+
+    xIndex = Math.round(x/32);
+    yIndex = Math.round(y/32);
+    return {x: this.getYLen()-1-yIndex, y: xIndex};
+}
+
  module.exports = TDMap;
