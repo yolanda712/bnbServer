@@ -1,5 +1,4 @@
 var Point = require('./tdPoint')
-var TDMap = require('./tdMap')
 var constants = require('./tdConst')
 var Direction = constants.Direction;
 
@@ -9,7 +8,7 @@ var TDMonster = function(game){
     this.isDead = false;
     this.moveStep = 1;
     this.tdMap = null;
-    this.position = new Point.Point(0,0);
+    this.position = new Point(0,0);
     this.FPS = 90;
     this.roleBorder = 15.9;
 

@@ -14,6 +14,7 @@ var clientCallback = function(game){
             role = game.roleArr[index];
             msg.push(
                 {
+                    roleIndex: role.roleIndex,
                     name:role.name,
                     position:{
                         x:role.position.x,
@@ -29,8 +30,8 @@ var clientCallback = function(game){
 };
 
 //主游戏入口
-var TDGame = function (serverIO, roomName) {
-    this.io = serverIO;
+var TDGame = function (serverSocketIO, roomName) {
+    this.io = serverSocketIO;
     this.roomName = roomName;
     this.tdMap = new TDMap();
     this.roleArr = [];
@@ -63,7 +64,7 @@ TDGame.prototype.createANewRole = function(){
        }else{
            role = 'challenger';
        }
-       var newRole = new Role(role,this);
+       var newRole = new Role(existedRoleNum,role,this);
        newRole.setPosition(cocosPosition.x, cocosPosition.y);
        newRole.setMap(this.tdMap);
        this.roleArr.push(newRole);
@@ -159,23 +160,31 @@ TDGame.prototype.countTime = function(){
 
 }
 
+TDGame.prototype.moveARoleByAngle = function(angle,role){
+    role.mobileMove(angle);
+}
+
 TDGame.prototype.moveARoleByKeyCode = function(key, role){
     switch (key) {
         //W键,向上移动     
         case constants.KEY_CODE.W:
-            role.move(Direction.Up);
+            // role.move(Direction.Up);
+            role.mobileMove(90);
             break;
         //A键,向左移动
         case constants.KEY_CODE.A:
-            role.move(Direction.Left);
+            // role.move(Direction.Left);
+            role.mobileMove(180);
             break;
             //S键,向下移动
         case constants.KEY_CODE.S:
-            role.move(Direction.Down);
+            // role.move(Direction.Down);
+            role.mobileMove(-90);
             break;
         //D键,向右移动
         case constants.KEY_CODE.D:
-            role.move(Direction.Right);
+            // role.move(Direction.Right);
+            role.mobileMove(0);
             break;
         case constants.KEY_CODE.J:
             role.createPaopao();
@@ -184,18 +193,19 @@ TDGame.prototype.moveARoleByKeyCode = function(key, role){
 }
 
 TDGame.prototype.stopARoleByKeyCode = function(key, role){
+    role.mobileStop();
     switch (key) {  
         case constants.KEY_CODE.W:
-            role.stop(Direction.Up);
+            // role.stop(Direction.Up);
             break;
         case constants.KEY_CODE.A:
-            role.stop(Direction.Left);
+            // role.stop(Direction.Left);
             break;
         case constants.KEY_CODE.S:
-            role.stop(Direction.Down);
+            // role.stop(Direction.Down);
             break;
         case constants.KEY_CODE.D:
-            role.stop(Direction.Right);
+            // role.stop(Direction.Right);
             break;
     }
 }

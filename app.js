@@ -71,6 +71,17 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('MoveByAngle', function (angle) {
+        var game = TDRoom.getRoom(socket.roomName);
+        if (game) {
+            if (socket.role === 'master') {
+                game.moveARoleByAngle(angle,game.roleArr[0]);
+            } else {
+                game.moveARoleByAngle(angle,game.roleArr[1]);
+            }
+        }
+    });
+
     socket.on('end', function (data) {
         console.log("server on end");
     });
