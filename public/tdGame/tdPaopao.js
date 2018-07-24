@@ -77,6 +77,17 @@ TDPaopao.prototype.boom = function(){
                 curRole.roleBoom();
             }
         }
+        //是否炸到小怪物
+        for(var mIndex=0; mIndex<this.game.monsterArr.length; mIndex++){
+            var curMonster = this.game.monsterArr[mIndex];
+            var monsterMapPos = curMonster.getMapLocation(curMonster.position.x,curMonster.position.y);
+            if(monsterMapPos.equals(pos)){
+                //炸掉小怪物的得分
+                this.role.score += constants.SCORE_FOR_MONSTER;
+                curMonster.die();
+            }
+        }
+
     }
     // 生成道具
     for(var i =0; i<boomBoxArr.length; i++){

@@ -2,16 +2,17 @@ var Point = require('./tdPoint')
 var constants = require('./tdConst')
 var Direction = constants.Direction;
 
-var TDMonster = function(game){
+var TDMonster = function(monsterIndex,name,game){
     this.currentDirection = Direction.None;
     this.game = game;
     this.isDead = false;
-    this.moveStep = 1;
+    this.moveStep = 0.5;
     this.tdMap = null;
     this.position = new Point(0,0);
     this.FPS = 90;
-    this.roleBorder = 15.9;
-
+    this.monsterBorder = 15.9;
+    this.monsterIndex = monsterIndex;
+    this.name = name;
     this.moveInterval = null;
      
 }
@@ -34,14 +35,14 @@ TDMonster.prototype.getPosition = function(){
 
 TDMonster.prototype.findDirection = function(){
     var leftBorder,rightBorder,upBorder,downBorder,targetYUp,targetYDown,targetXLeft,targetXRight;
-    leftBorder = this.position.x - this.roleBorder;
-    rightBorder = this.position.x + this.roleBorder;
-    downBorder = this.position.y - this.roleBorder;
-    upBorder = this.position.y + this.roleBorder;
-    targetYUp = this.position.y + this.roleBorder + this.moveStep;
-    targetYDown = this.position.y - this.roleBorder - this.moveStep;
-    targetXLeft = this.position.x - this.roleBorder - this.moveStep;
-    targetXRight = this.position.x + this.roleBorder + this.moveStep;
+    leftBorder = this.position.x - this.monsterBorder;
+    rightBorder = this.position.x + this.monsterBorder;
+    downBorder = this.position.y - this.monsterBorder;
+    upBorder = this.position.y + this.monsterBorder;
+    targetYUp = this.position.y + this.monsterBorder + this.moveStep;
+    targetYDown = this.position.y - this.monsterBorder - this.moveStep;
+    targetXLeft = this.position.x - this.monsterBorder - this.moveStep;
+    targetXRight = this.position.x + this.monsterBorder + this.moveStep;
     var direcArr = [];
     var self = this;
     if(this.isPositionPassable(leftBorder,targetYUp)&& this.isPositionPassable(rightBorder,targetYUp))
@@ -63,7 +64,8 @@ TDMonster.prototype.move = function(){
         var directionnum = this.findDirection();
         var self = this;
         this.moveInterval = setInterval(function(){
-            self.touchRole();
+            // self.touchRole();
+            self.game.monsterMeetRole();
             self.moveOneDirection(directionnum);
         },1000/self.FPS);
     }
@@ -71,20 +73,20 @@ TDMonster.prototype.move = function(){
 
 TDMonster.prototype.moveOneDirection = function(directionnum){
     var leftBorder,rightBorder,upBorder,downBorder,targetYUp,targetYDown,targetXLeft,targetXRight;
-    leftBorder = this.position.x - this.roleBorder;
-    rightBorder = this.position.x + this.roleBorder;
-    downBorder = this.position.y - this.roleBorder;
-    upBorder = this.position.y + this.roleBorder;
-    targetYUp = this.position.y + this.roleBorder + this.moveStep;
-    targetYDown = this.position.y - this.roleBorder - this.moveStep;
-    targetXLeft = this.position.x - this.roleBorder - this.moveStep;
-    targetXRight = this.position.x + this.roleBorder + this.moveStep;
+    leftBorder = this.position.x - this.monsterBorder;
+    rightBorder = this.position.x + this.monsterBorder;
+    downBorder = this.position.y - this.monsterBorder;
+    upBorder = this.position.y + this.monsterBorder;
+    targetYUp = this.position.y + this.monsterBorder + this.moveStep;
+    targetYDown = this.position.y - this.monsterBorder - this.moveStep;
+    targetXLeft = this.position.x - this.monsterBorder - this.moveStep;
+    targetXRight = this.position.x + this.monsterBorder + this.moveStep;
     switch (directionnum) {
         case Direction.Up:
             if(this.isPositionPassable(leftBorder,targetYUp)&& this.isPositionPassable(rightBorder,targetYUp)){
                 this.position.y += this.moveStep;
-                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
             }else{
                 clearInterval(this.moveInterval);
                 this.move();
@@ -94,8 +96,8 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
         case Direction.Down:
             if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown)){
                 this.position.y -= this.moveStep;
-                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
             }else{
                 clearInterval(this.moveInterval);
                 this.move();
@@ -105,8 +107,8 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
         case Direction.Left:
             if(this.isPositionPassable(targetXLeft, upBorder)&& this.isPositionPassable(targetXLeft,downBorder)){
                 this.position.x -= this.moveStep;
-                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
             }else{
                  clearInterval(this.moveInterval);
                  this.move();
@@ -116,8 +118,8 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
         case Direction.Right:
             if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder)){
                 this.position.x += this.moveStep;
-                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
             }else{
                 clearInterval(this.moveInterval);
                 this.move();
@@ -128,7 +130,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
 TDMonster.prototype.isPositionPassable = function(x,y){
     if(this.isDead) return false;
     var tdMap = this.getMap();
-    var location = tdMap.getMapLocation(x,y);
+    var location = this.getMapLocation(x,y);
     return tdMap.isPositionPassable(location.x,location.y);
 }
 
@@ -141,20 +143,30 @@ TDMonster.prototype.startCocosPosition = function(){
 
 TDMonster.prototype.die = function(){
     this.isDead = true;
-    var monsterBoomTime = setTimeout(function(){
-        var cocosPosition =this.startCocosPosition();
-        this.setPosition(cocosPosition.x, cocosPosition.y);
-        this.isDead = false;
-    },1500);
+    var self = this;
+    var cocosPosition =self.startCocosPosition();
     clearInterval(this.moveInterval);
+    var monsterBoomTime = setTimeout(function(){
+        self.setPosition(cocosPosition.x, cocosPosition.y);
+        self.isDead = false;
+        self.move();
+    },1500); 
 }
 
-TDMonster.prototype.touchRole = function(){
-    for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
-        var curRole = this.game.roleArr[rIndex];
-        curRole.touchMonster();
+TDMonster.prototype.getMapLocation = function(x,y){
+    var tdMap = this.getMap();
+    if(tdMap ==null){
+        console.log('map not set');
+        return {}
     }
+    return new Point(tdMap.getMapLocation(x,y).x, tdMap.getMapLocation(x,y).y);
 }
+// TDMonster.prototype.touchRole = function(){
+//     for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
+//         var curRole = this.game.roleArr[rIndex];
+//         curRole.touchMonster();
+//     }
+// }
 
 module.exports = TDMonster;
 
