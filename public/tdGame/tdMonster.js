@@ -7,23 +7,14 @@ var TDMonster = function(game){
     this.currentDirection = Direction.None;
     this.game = game;
     this.isDead = false;
-    this.moveStep = 32;
+    this.moveStep = 1;
     this.tdMap = null;
     this.position = new Point.Point(0,0);
-    this.FPS = 20;
+    this.FPS = 90;
     this.roleBorder = 15.9;
 
-    var self = this;
-
-    
-    this.monsterMoveInterval = setInterval(function(){
-        if(!this.isDead){
-            var directionnum = Math.floor(Math.random()*4);
-            self.move(directionnum);
-        }
-    },1000/self.FPS);
-    
-    
+    this.moveInterval = null;
+     
 }
 TDMonster.prototype.getMap = function(){
     return this.tdMap;
@@ -42,40 +33,94 @@ TDMonster.prototype.getPosition = function(){
     return this.position;
 }
 
-TDMonster.prototype.move = function(directionnum){
-    var leftBorder,rightBorder,upBorder,downBorder;
-    var targetX,targetY;
+TDMonster.prototype.findDirection = function(){
+    var leftBorder,rightBorder,upBorder,downBorder,targetYUp,targetYDown,targetXLeft,targetXRight;
+    leftBorder = this.position.x - this.roleBorder;
+    rightBorder = this.position.x + this.roleBorder;
+    downBorder = this.position.y - this.roleBorder;
+    upBorder = this.position.y + this.roleBorder;
+    targetYUp = this.position.y + this.roleBorder + this.moveStep;
+    targetYDown = this.position.y - this.roleBorder - this.moveStep;
+    targetXLeft = this.position.x - this.roleBorder - this.moveStep;
+    targetXRight = this.position.x + this.roleBorder + this.moveStep;
+    var direcArr = [];
+    var self = this;
+    if(this.isPositionPassable(leftBorder,targetYUp)&& this.isPositionPassable(rightBorder,targetYUp))
+        direcArr.push(0);
+    if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown))
+        direcArr.push(1);
+    if(this.isPositionPassable(targetXLeft, upBorder)&& this.isPositionPassable(targetXLeft,downBorder))
+        direcArr.push(2);
+    if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder))
+        direcArr.push(3);
+    var randomIndex = Math.floor(Math.random()*direcArr.length);
+    var directionnum = direcArr[randomIndex];
+    console.log('!!!!!!!directionnum'+directionnum);
+    return directionnum;
+}
+
+TDMonster.prototype.move = function(){
+    if(!this.isDead){
+        var directionnum = this.findDirection();
+        var self = this;
+        this.moveInterval = setInterval(function(){
+            self.moveOneDirection(directionnum);
+        },1000/self.FPS);
+    }
+}
+
+TDMonster.prototype.moveOneDirection = function(directionnum){
+    var leftBorder,rightBorder,upBorder,downBorder,targetYUp,targetYDown,targetXLeft,targetXRight;
+    leftBorder = this.position.x - this.roleBorder;
+    rightBorder = this.position.x + this.roleBorder;
+    downBorder = this.position.y - this.roleBorder;
+    upBorder = this.position.y + this.roleBorder;
+    targetYUp = this.position.y + this.roleBorder + this.moveStep;
+    targetYDown = this.position.y - this.roleBorder - this.moveStep;
+    targetXLeft = this.position.x - this.roleBorder - this.moveStep;
+    targetXRight = this.position.x + this.roleBorder + this.moveStep;
     switch (directionnum) {
         case Direction.Up:
-            leftBorder = this.position.x - this.roleBorder;
-            rightBorder = this.position.x + this.roleBorder;
-            targetY = this.position.y + this.roleBorder + this.moveStep;
-            if(this.isPositionPassable(leftBorder,targetY)&& this.isPositionPassable(rightBorder,targetY)){
+            if(this.isPositionPassable(leftBorder,targetYUp)&& this.isPositionPassable(rightBorder,targetYUp)){
                 this.position.y += this.moveStep;
+                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+            }else{
+                clearInterval(this.moveInterval);
+                this.move();
             }
         break;
+
         case Direction.Down:
-            leftBorder = this.position.x - this.roleBorder;
-            rightBorder = this.position.x + this.roleBorder;
-            targetY = this.position.y - this.roleBorder - this.moveStep;
-            if(this.isPositionPassable(leftBorder,targetY) && this.isPositionPassable(rightBorder,targetY)){
-                    this.position.y -= this.moveStep;
+            if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown)){
+                this.position.y -= this.moveStep;
+                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+            }else{
+                clearInterval(this.moveInterval);
+                this.move();
             }
         break;
+
         case Direction.Left:
-            downBorder = this.position.y - this.roleBorder;
-            upBorder = this.position.y + this.roleBorder;
-            targetX = this.position.x - this.roleBorder - this.moveStep;
-            if(this.isPositionPassable(targetX, upBorder)&& this.isPositionPassable(targetX,downBorder)){
+            if(this.isPositionPassable(targetXLeft, upBorder)&& this.isPositionPassable(targetXLeft,downBorder)){
                 this.position.x -= this.moveStep;
+                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+            }else{
+                 clearInterval(this.moveInterval);
+                 this.move();
             }
         break;
+
         case Direction.Right:
-            downBorder = this.position.y - this.roleBorder;
-            upBorder = this.position.y + this.roleBorder;
-            targetX = this.position.x + this.roleBorder + this.moveStep;
-            if(this.isPositionPassable(targetX, upBorder) && this.isPositionPassable(targetX,downBorder)){
+            if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder)){
                 this.position.x += this.moveStep;
+                this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
+                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+            }else{
+                clearInterval(this.moveInterval);
+                this.move();
             }
         break;
     }
@@ -101,7 +146,7 @@ TDMonster.prototype.die = function(){
         this.setPosition(cocosPosition.x, cocosPosition.y);
         this.isDead = false;
     },1500);
-    clearInterval(monsterBoomTime);
+    clearInterval(this.moveInterval);
 }
 
 module.exports = TDMonster;

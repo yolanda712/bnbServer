@@ -102,16 +102,13 @@ TDGame.prototype.startGame = function(){
         clientCallback(self);
     },1000/this.FPS);
 
-    this.monstereInfoInterval = setInterval(function(){
-        self.broadcastMsg('monsterInfo',{x:self.tdMonster.position.x,y:self.tdMonster.position.y});
-        console.log("!!!!!!!!"+self.tdMonster.position.x+"!!!!!"+self.tdMonster.position.y);
-    },50);
+    this.tdMonster.move();
 }
 
 TDGame.prototype.stopGameIntervals = function(){
     clearInterval(this.timer);
     clearInterval(this.gameInfoInterval);
-    clearInterval(this.monstereInfoInterval);
+    clearInterval(this.tdMonster.moveInterval)
 }
 
 TDGame.prototype.stopGame = function(data){
