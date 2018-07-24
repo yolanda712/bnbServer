@@ -134,9 +134,9 @@ TDMonster.prototype.isPositionPassable = function(x,y){
     return tdMap.isPositionPassable(location.x,location.y);
 }
 
-TDMonster.prototype.startCocosPosition = function(){
+TDMonster.prototype.startCocosPosition = function(monsterIndex){
     var tdMap = this.getMap();
-    var startPosition = tdMap.monsterStartPointArr[0];
+    var startPosition = tdMap.monsterStartPointArr[monsterIndex];
     var cocosPosition = tdMap.convertMapIndexToCocosAxis(tdMap.getYLen(), startPosition.x, startPosition.y);
     return cocosPosition;
 }
@@ -144,7 +144,7 @@ TDMonster.prototype.startCocosPosition = function(){
 TDMonster.prototype.die = function(){
     this.isDead = true;
     var self = this;
-    var cocosPosition =self.startCocosPosition();
+    var cocosPosition =self.startCocosPosition(this.monsterIndex);
     clearInterval(this.moveInterval);
     var monsterBoomTime = setTimeout(function(){
         self.setPosition(cocosPosition.x, cocosPosition.y);

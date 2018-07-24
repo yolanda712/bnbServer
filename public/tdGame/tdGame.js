@@ -102,7 +102,7 @@ TDGame.prototype.createMonster = function(){
     var monsterName = "monster"+this.monsterArr.length;
     var newMonster = new TDMonster(monsterIndex,monsterName,this);
     newMonster.setMap(this.tdMap);
-    var cocosPosition =  newMonster.startCocosPosition();
+    var cocosPosition =  newMonster.startCocosPosition(monsterIndex);
     newMonster.setPosition(cocosPosition.x, cocosPosition.y);
     this.monsterArr.push(newMonster);
 }

@@ -68,7 +68,8 @@ var backGroundMap = [
  ]
 
  var monsterStartPointArr = [
-    {x:9, y:11},
+    new Point(9,11),
+    new Point(1,1),
  ]
 
  var copyMap = function(mapArr){

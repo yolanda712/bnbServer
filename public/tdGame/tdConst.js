@@ -22,7 +22,7 @@ const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
 const SCORE_FOR_MONSTER = 20;
 
-const MONSTER_COUNT = 1;
+const MONSTER_COUNT = 2;
 
 const KEY_CODE = {
     W: 87,
