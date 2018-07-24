@@ -63,6 +63,7 @@ TDMonster.prototype.move = function(){
         var directionnum = this.findDirection();
         var self = this;
         this.moveInterval = setInterval(function(){
+            self.touchRole();
             self.moveOneDirection(directionnum);
         },1000/self.FPS);
     }
@@ -146,6 +147,13 @@ TDMonster.prototype.die = function(){
         this.isDead = false;
     },1500);
     clearInterval(this.moveInterval);
+}
+
+TDMonster.prototype.touchRole = function(){
+    for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
+        var curRole = this.game.roleArr[rIndex];
+        curRole.touchMonster();
+    }
 }
 
 module.exports = TDMonster;
