@@ -67,6 +67,10 @@ var backGroundMap = [
      new Point(1,11),
  ]
 
+ var monsterStartPointArr = [
+    {x:9, y:11},
+ ]
+
  var copyMap = function(mapArr){
     var newMap = [];
     for(var i=0; i<mapArr.length; i++){
@@ -79,6 +83,7 @@ var backGroundMap = [
     this.mapName = mapName;
     this.map = copyMap(backGroundMap);
     this.roleStartPointArr = roleStartPointArr.concat();
+    this.monsterStartPointArr = monsterStartPointArr.concat();
  }
 
 TDMap.prototype.getXLen = function(){
@@ -111,5 +116,20 @@ TDMap.prototype.isPositionAPaopao = function(x,y){
     if(this.getValue(x,y)==100) return true;
     return false;
 }
+
+TDMap.prototype.getMapLocation = function(x,y){
+
+    xIndex = Math.round(x/32);
+    yIndex = Math.round(y/32);
+    return {x: this.getYLen()-1-yIndex, y: xIndex};
+}
+
+// 将二维地图索引转换为cocos坐标
+TDMap.prototype.convertMapIndexToCocosAxis = function (yMapLen,x,y) {
+    var cocosPos ={};
+    cocosPos.x = 32*y;
+    cocosPos.y = 32*(yMapLen-x-1);
+    return cocosPos;
+};
 
  module.exports = TDMap;

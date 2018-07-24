@@ -286,18 +286,12 @@ Role.prototype.stop = function(directionnum) {
 }
 
 Role.prototype.getMapLocation = function(x,y){
-
-    xIndex = Math.round(x/32);
-    yIndex = Math.round(y/32);
-
     var tdMap = this.getMap();
-
     if(tdMap ==null){
         console.log('map not set');
         return {}
     }
-
-    return new Point(tdMap.getYLen()-1-yIndex, xIndex);
+    return new Point(tdMap.getMapLocation(x,y).x, tdMap.getMapLocation(x,y).y);
 }
 
 Role.prototype.isPositionPassable = function(x,y){

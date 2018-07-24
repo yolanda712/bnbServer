@@ -2,6 +2,7 @@ var TDMap = require('./tdMap')
 var Role = require('./tdRole')
 var constants = require('./tdConst')
 var Rooms = require('./tdRoom')
+var TDMonster = require('./tdMonster')
 var TDRoom = Rooms.TDRoom;
 var Direction = constants.Direction;
 
@@ -28,14 +29,6 @@ var clientCallback = function(game){
     }
 };
 
-// 将二维地图索引转换为cocos坐标
-var convertMapIndexToCocosAxis = function (yMapLen,x,y) {
-    var cocosPos ={};
-    cocosPos.x = 32*y;
-    cocosPos.y = 32*(yMapLen-x-1);
-    return cocosPos;
-};
-
 //主游戏入口
 var TDGame = function (serverSocketIO, roomName) {
     this.io = serverSocketIO;
@@ -52,6 +45,8 @@ var TDGame = function (serverSocketIO, roomName) {
 
     this.gameInfoInterval = null;
     this.timer = null;
+
+    this.tdMonster = null;
 }
 
 TDGame.prototype.addPlayerNum = function(){
@@ -62,7 +57,7 @@ TDGame.prototype.createANewRole = function(){
     var existedRoleNum = this.roleArr.length;
     if(this.tdMap.roleStartPointArr.length > existedRoleNum){
        var startPosition = this.tdMap.roleStartPointArr[existedRoleNum];
-       var cocosPosition = convertMapIndexToCocosAxis(this.tdMap.getYLen(), startPosition.x, startPosition.y);
+       var cocosPosition = this.tdMap.convertMapIndexToCocosAxis(this.tdMap.getYLen(), startPosition.x, startPosition.y);
        var role = null;
        if(existedRoleNum == 0){
            role = 'master';
@@ -77,11 +72,20 @@ TDGame.prototype.createANewRole = function(){
     
 }
 
+TDGame.prototype.createMonster = function(){
+    this.tdMonster = new TDMonster(this);
+    this.tdMonster.setMap(this.tdMap);
+    var cocosPosition =  this.tdMonster.startCocosPosition();
+    this.tdMonster.setPosition(cocosPosition.x, cocosPosition.y);
+}
+
 TDGame.prototype.startGame = function(){
     //create player roles
     for(var i=0; i<this.palyerCount; i++){
         this.createANewRole();
     }
+
+    this.createMonster();
 
     var mapInfo = {
         mapName:'basicMap',
@@ -98,11 +102,14 @@ TDGame.prototype.startGame = function(){
     this.gameInfoInterval = setInterval(function(){
         clientCallback(self);
     },1000/this.FPS);
+
+    this.tdMonster.move();
 }
 
 TDGame.prototype.stopGameIntervals = function(){
     clearInterval(this.timer);
     clearInterval(this.gameInfoInterval);
+    clearInterval(this.tdMonster.moveInterval)
 }
 
 TDGame.prototype.stopGame = function(data){
