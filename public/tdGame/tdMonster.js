@@ -44,29 +44,42 @@ TDMonster.prototype.findDirection = function(){
     targetXLeft = this.position.x - this.monsterBorder - this.moveStep;
     targetXRight = this.position.x + this.monsterBorder + this.moveStep;
     var direcArr = [];
-    var self = this;
-    if(this.isPositionPassable(leftBorder,targetYUp)&& this.isPositionPassable(rightBorder,targetYUp))
+    if(this.isPositionPassable(leftBorder,targetYUp) && this.isPositionPassable(rightBorder,targetYUp) && this.reverseDirection(this.currentDirection)!=0)
         direcArr.push(0);
-    if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown))
+    if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown) && this.reverseDirection(this.currentDirection)!=1)
         direcArr.push(1);
-    if(this.isPositionPassable(targetXLeft, upBorder)&& this.isPositionPassable(targetXLeft,downBorder))
+    if(this.isPositionPassable(targetXLeft, upBorder) && this.isPositionPassable(targetXLeft,downBorder) && this.reverseDirection(this.currentDirection)!=2)
         direcArr.push(2);
-    if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder))
+    if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder) && this.reverseDirection(this.currentDirection)!=3)
         direcArr.push(3);
+    if(direcArr.length == 0)
+        direcArr.push(this.reverseDirection(this.currentDirection));
     var randomIndex = Math.floor(Math.random()*direcArr.length);
     var directionnum = direcArr[randomIndex];
-    console.log('!!!!!!!directionnum'+directionnum);
+    // console.log(this.name+"!!!!!!condir"+this.currentDirection+'!!!!!!!directionnum'+directionnum+"!!!!!"+direcArr);
     return directionnum;
 }
 
+TDMonster.prototype.reverseDirection = function(directionnum){
+    switch (directionnum) {
+        case Direction.Up:
+             return Direction.Down;
+        case Direction.Down:
+             return Direction.Up;
+        case Direction.Left:
+             return Direction.Right;
+        case Direction.Right:
+             return Direction.Left;
+    }
+}
+
 TDMonster.prototype.move = function(){
+    // this.currentDirection = this.findDirection();
     if(!this.isDead){
-        var directionnum = this.findDirection();
         var self = this;
         this.moveInterval = setInterval(function(){
-            // self.touchRole();
             self.game.monsterMeetRole();
-            self.moveOneDirection(directionnum);
+            self.moveOneDirection(self.currentDirection);
         },1000/self.FPS);
     }
 }
@@ -85,48 +98,53 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
         case Direction.Up:
             if(this.isPositionPassable(leftBorder,targetYUp)&& this.isPositionPassable(rightBorder,targetYUp)){
                 this.position.y += this.moveStep;
-                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
-            }else{
-                clearInterval(this.moveInterval);
-                this.move();
+                var randomDirection = this.findDirection();
+                if(randomDirection!=this.currentDirection){
+                    clearInterval(this.moveInterval);
+                    this.currentDirection = randomDirection;
+                    this.move();
+                }
             }
         break;
 
         case Direction.Down:
             if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown)){
                 this.position.y -= this.moveStep;
-                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
-            }else{
-                clearInterval(this.moveInterval);
-                this.move();
+                var randomDirection = this.findDirection();
+                if(randomDirection!=this.currentDirection){
+                    clearInterval(this.moveInterval);
+                    this.currentDirection = randomDirection;
+                    this.move();
+                }
             }
         break;
 
         case Direction.Left:
             if(this.isPositionPassable(targetXLeft, upBorder)&& this.isPositionPassable(targetXLeft,downBorder)){
                 this.position.x -= this.moveStep;
-                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
-            }else{
-                 clearInterval(this.moveInterval);
-                 this.move();
+                var randomDirection = this.findDirection();
+                if(randomDirection!=this.currentDirection){
+                    clearInterval(this.moveInterval);
+                    this.currentDirection = randomDirection;
+                    this.move();
+                }
             }
         break;
 
         case Direction.Right:
             if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder)){
                 this.position.x += this.moveStep;
-                // this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
-            }else{
-                clearInterval(this.moveInterval);
-                this.move();
+                var randomDirection = this.findDirection();
+                if(randomDirection!=this.currentDirection){
+                    clearInterval(this.moveInterval);
+                    this.currentDirection = randomDirection;
+                    this.move();
+                }
             }
         break;
     }
 }
+
 TDMonster.prototype.isPositionPassable = function(x,y){
     if(this.isDead) return false;
     var tdMap = this.getMap();
@@ -134,23 +152,11 @@ TDMonster.prototype.isPositionPassable = function(x,y){
     return tdMap.isPositionPassable(location.x,location.y);
 }
 
-TDMonster.prototype.startCocosPosition = function(monsterIndex){
-    var tdMap = this.getMap();
-    var startPosition = tdMap.monsterStartPointArr[monsterIndex];
-    var cocosPosition = tdMap.convertMapIndexToCocosAxis(tdMap.getYLen(), startPosition.x, startPosition.y);
-    return cocosPosition;
-}
 
 TDMonster.prototype.die = function(){
     this.isDead = true;
-    var self = this;
-    var cocosPosition =self.startCocosPosition(this.monsterIndex);
     clearInterval(this.moveInterval);
-    var monsterBoomTime = setTimeout(function(){
-        self.setPosition(cocosPosition.x, cocosPosition.y);
-        self.isDead = false;
-        self.move();
-    },1500); 
+    this.game.broadcastMsg("monsterBoom",{x:this.position.x,y:this.position.y,name:this.name});
 }
 
 TDMonster.prototype.getMapLocation = function(x,y){
@@ -161,12 +167,7 @@ TDMonster.prototype.getMapLocation = function(x,y){
     }
     return new Point(tdMap.getMapLocation(x,y).x, tdMap.getMapLocation(x,y).y);
 }
-// TDMonster.prototype.touchRole = function(){
-//     for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
-//         var curRole = this.game.roleArr[rIndex];
-//         curRole.touchMonster();
-//     }
-// }
+
 
 module.exports = TDMonster;
 

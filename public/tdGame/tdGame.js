@@ -47,7 +47,7 @@ var monsterCallback = function(game){
                 })
         }
         game.broadcastMsg("monsterInfo",monsterMsg);
-        // console.log(msg);
+        // console.log(monsterMsg);
     }
 };
 
@@ -102,7 +102,8 @@ TDGame.prototype.createMonster = function(){
     var monsterName = "monster"+this.monsterArr.length;
     var newMonster = new TDMonster(monsterIndex,monsterName,this);
     newMonster.setMap(this.tdMap);
-    var cocosPosition =  newMonster.startCocosPosition(monsterIndex);
+    var startPosition = this.tdMap.monsterStartPointArr[monsterIndex];
+    var cocosPosition = this.tdMap.convertMapIndexToCocosAxis(this.tdMap.getYLen(), startPosition.x, startPosition.y);
     newMonster.setPosition(cocosPosition.x, cocosPosition.y);
     this.monsterArr.push(newMonster);
 }
@@ -135,9 +136,10 @@ TDGame.prototype.startGame = function(){
     },1000/this.FPS);
 
     for(var k=0; k<this.monsterArr.length; k++){
+        this.monsterArr[k].currentDirection = this.monsterArr[k].findDirection();
         this.monsterArr[k].move();
     }
-    // this.tdMonster.move();
+    // this.monsterArr[0].move();
 }
 
 TDGame.prototype.stopGameIntervals = function(){
@@ -251,7 +253,7 @@ TDGame.prototype.monsterMeetRole = function(){
         for(var j=0; j<this.roleArr.length ;j++){
             var monsterPos = this.monsterArr[i].getMapLocation(this.monsterArr[i].position.x,this.monsterArr[i].position.y);
             var rolePos = this.roleArr[i].getMapLocation(this.roleArr[j].position.x,this.roleArr[j].position.y);
-            if(monsterPos.equals(rolePos)){
+            if(!this.monsterArr[i].isDead && monsterPos.equals(rolePos)){
                  for(var k=0; k<this.monsterArr.length; k++){
                         clearInterval(this.monsterArr[k].moveInterval)
                     }

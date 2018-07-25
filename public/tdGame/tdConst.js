@@ -20,7 +20,7 @@ const GAME_TIME  = 1200;
 
 const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
-const SCORE_FOR_MONSTER = 20;
+const SCORE_FOR_MONSTER = 100;
 
 const MONSTER_COUNT = 2;
 
