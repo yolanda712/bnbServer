@@ -75,11 +75,27 @@ Role.prototype.mobileMove = function(angle){
 }
 
 Role.prototype.mobileMoveOneStep = function(angle){
+    // 角度模糊判断
+    if(60<angle && angle<120) angle = 90;
+    if(-30<angle && angle<30) angle = 0;
+    if(150<angle && angle<-150) angle = 180;
+    if(-120<angle && angle<-60) angle = -90;
+
     var x_offset = Math.cos(angle * (Math.PI/180)) * this.moveStep;
     var y_offset = Math.sin(angle * (Math.PI/180)) * this.moveStep;
 
-    var x_able = this.mobileCheckXOffset(x_offset);
-    var y_able = this.mobileCheckYOffset(y_offset);
+    var x_able = false;
+    var y_able = false;
+    if(-0.1<x_offset && x_offset<0.1){
+        x_offset = 0;
+    } else{
+        x_able = this.mobileCheckXOffset(x_offset,0);
+    }
+    if(-0.1<y_offset && y_offset<0.1){
+        y_offset = 0;
+    } else{
+        y_able = this.mobileCheckYOffset(y_offset,0);
+    }
 
     if(x_able && y_able){
         this.setPosition(this.position.x+x_offset, this.position.y+y_offset);
@@ -87,6 +103,14 @@ Role.prototype.mobileMoveOneStep = function(angle){
         this.setPosition(this.position.x+x_offset, this.position.y);
     }else if(y_able){
         this.setPosition(this.position.x, this.position.y+y_offset);
+    }else{
+        //threshold辅助玩家移动
+        var mobileThreshold = this.threshold;
+        if(x_offset && this.mobileCheckXOffset(x_offset,mobileThreshold)){
+            this.setPosition(this.position.x+x_offset, this.getNormPosition(this.position.x,this.position.y).y);
+        }else if(y_offset && this.mobileCheckYOffset(y_offset,mobileThreshold)){
+            this.setPosition(this.getNormPosition(this.position.x,this.position.y).x, this.position.y+y_offset);
+        }
     }
     
     // 吃道具检测
@@ -97,19 +121,19 @@ Role.prototype.mobileMoveOneStep = function(angle){
 
 }
 
-Role.prototype.mobileCheckXOffset = function(x_offset){
+Role.prototype.mobileCheckXOffset = function(x_offset, threshold){
     var movedPos = new Point(this.position.x + x_offset, this.position.y);
     if(x_offset>0){
-        var rightTopPos = new Point(movedPos.x + this.roleBorder, movedPos.y + this.roleBorder);
-        var rightBottomPos = new Point(movedPos.x + this.roleBorder, movedPos.y - this.roleBorder);
+        var rightTopPos = new Point(movedPos.x + this.roleBorder, movedPos.y + this.roleBorder - threshold);
+        var rightBottomPos = new Point(movedPos.x + this.roleBorder, movedPos.y - this.roleBorder + threshold);
         if(this.isPositionPassable(rightTopPos.x,rightTopPos.y)
             && this.isPositionPassable(rightBottomPos.x,rightBottomPos.y)){
                 return true;
         }
         return false;
     }else{
-        var leftTopPos = new Point(movedPos.x - this.roleBorder, movedPos.y + this.roleBorder);
-        var leftBottomPos = new Point(movedPos.x - this.roleBorder, movedPos.y - this.roleBorder);
+        var leftTopPos = new Point(movedPos.x - this.roleBorder, movedPos.y + this.roleBorder - threshold);
+        var leftBottomPos = new Point(movedPos.x - this.roleBorder, movedPos.y - this.roleBorder + threshold);
         if(this.isPositionPassable(leftTopPos.x,leftTopPos.y) 
             && this.isPositionPassable(leftBottomPos.x,leftBottomPos.y)){
                 return true;
@@ -118,20 +142,20 @@ Role.prototype.mobileCheckXOffset = function(x_offset){
     }
 }
 
-Role.prototype.mobileCheckYOffset = function(y_offset){
+Role.prototype.mobileCheckYOffset = function(y_offset, threshold){
     var movedPos = new Point(this.position.x, this.position.y + y_offset);
 
     if(y_offset>0){
-        var leftTopPos = new Point(movedPos.x - this.roleBorder, movedPos.y + this.roleBorder);
-        var rightTopPos = new Point(movedPos.x + this.roleBorder, movedPos.y + this.roleBorder);
+        var leftTopPos = new Point(movedPos.x - this.roleBorder + threshold, movedPos.y + this.roleBorder);
+        var rightTopPos = new Point(movedPos.x + this.roleBorder - threshold, movedPos.y + this.roleBorder);
         if(this.isPositionPassable(leftTopPos.x,leftTopPos.y) 
             && this.isPositionPassable(rightTopPos.x,rightTopPos.y)){
                 return true;
         }
         return false;
     }else{
-        var leftBottomPos = new Point(movedPos.x - this.roleBorder, movedPos.y - this.roleBorder);
-        var rightBottomPos = new Point(movedPos.x + this.roleBorder, movedPos.y - this.roleBorder);
+        var leftBottomPos = new Point(movedPos.x - this.roleBorder + threshold, movedPos.y - this.roleBorder);
+        var rightBottomPos = new Point(movedPos.x + this.roleBorder - threshold, movedPos.y - this.roleBorder);
         if(this.isPositionPassable(leftBottomPos.x,leftBottomPos.y)
             && this.isPositionPassable(rightBottomPos.x,rightBottomPos.y)){
                 return true;
