@@ -77,8 +77,8 @@ Role.prototype.mobileMove = function(angle){
 Role.prototype.mobileMoveOneStep = function(angle){
     // 角度模糊判断
     if(60<angle && angle<120) angle = 90;
-    if(-30<angle && angle<30) angle = 0;
-    if(150<angle && angle<-150) angle = 180;
+    if(-35<angle && angle<35) angle = 0;
+    if(145<angle || angle<-145) angle = 180;
     if(-120<angle && angle<-60) angle = -90;
 
     var x_offset = Math.cos(angle * (Math.PI/180)) * this.moveStep;

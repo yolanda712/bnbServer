@@ -94,7 +94,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
             if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown)){
                 this.position.y -= this.moveStep;
                 this.game.broadcastMsg('monsterInfo',{x:this.position.x,y:this.position.y});
-                console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
+                // console.log("!!!!!!!!"+this.position.x+"!!!!!"+this.position.y);
             }else{
                 clearInterval(this.moveInterval);
                 this.move();
