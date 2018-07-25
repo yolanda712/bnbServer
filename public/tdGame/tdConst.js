@@ -20,6 +20,7 @@ const GAME_TIME  = 1200;
 
 const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
+const SCORE_FOR_MONSTER = 100;
 
 const KEY_CODE = {
     W: 87,
@@ -60,6 +61,8 @@ module.exports = {
     GAME_TIME:GAME_TIME,
     SCORE_FOR_WALL:SCORE_FOR_WALL,
     SCORE_FOR_MAN:SCORE_FOR_MAN,
+    SCORE_FOR_MONSTER:SCORE_FOR_MONSTER,
     KEY_CODE:KEY_CODE,
-    Direction:Direction
+    Direction:Direction,
+
 }
