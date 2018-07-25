@@ -22,8 +22,6 @@ const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
 const SCORE_FOR_MONSTER = 100;
 
-const MONSTER_COUNT = 2;
-
 const KEY_CODE = {
     W: 87,
     A: 65,
@@ -67,5 +65,4 @@ module.exports = {
     KEY_CODE:KEY_CODE,
     Direction:Direction,
 
-    MONSTER_COUNT:MONSTER_COUNT
 }

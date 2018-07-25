@@ -65,7 +65,7 @@ var TDGame = function (serverSocketIO, roomName) {
     this.palyerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;
-    this.monsterCount = constants.MONSTER_COUNT;
+    this.monsterCount = this.tdMap.monsterStartPointArr.length;
 
     this.gameInfoInterval = null;
     this.timer = null;

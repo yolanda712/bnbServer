@@ -362,13 +362,4 @@ Role.prototype.die = function(){
     this.game.stopGame({loser:this.name});
 }
 
-// Role.prototype.touchMonster = function(){
-//     var rolePosition = this.getMapLocation(this.position.x,this.position.y);
-//     var monsterPosition = this.getMapLocation(this.game.tdMonster.position.x,this.game.tdMonster.position.y);
-//     if(rolePosition.x == monsterPosition.x && rolePosition.y == monsterPosition.y){
-//         //角色碰到小怪物
-//         return this.roleBoom();
-//     }
-// }
-
 module.exports = Role

@@ -44,14 +44,22 @@ TDMonster.prototype.findDirection = function(){
     targetXLeft = this.position.x - this.monsterBorder - this.moveStep;
     targetXRight = this.position.x + this.monsterBorder + this.moveStep;
     var direcArr = [];
-    if(this.isPositionPassable(leftBorder,targetYUp) && this.isPositionPassable(rightBorder,targetYUp) && this.reverseDirection(this.currentDirection)!=0)
-        direcArr.push(0);
-    if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown) && this.reverseDirection(this.currentDirection)!=1)
-        direcArr.push(1);
-    if(this.isPositionPassable(targetXLeft, upBorder) && this.isPositionPassable(targetXLeft,downBorder) && this.reverseDirection(this.currentDirection)!=2)
-        direcArr.push(2);
-    if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder) && this.reverseDirection(this.currentDirection)!=3)
-        direcArr.push(3);
+    if(this.isPositionPassable(leftBorder,targetYUp) 
+      && this.isPositionPassable(rightBorder,targetYUp) 
+      && this.reverseDirection(this.currentDirection)!=Direction.Up)
+        direcArr.push(Direction.Up);
+    if(this.isPositionPassable(leftBorder,targetYDown)
+      && this.isPositionPassable(rightBorder,targetYDown) 
+      && this.reverseDirection(this.currentDirection)!=Direction.Down)
+        direcArr.push(Direction.Down);
+    if(this.isPositionPassable(targetXLeft, upBorder) 
+      && this.isPositionPassable(targetXLeft,downBorder) 
+      && this.reverseDirection(this.currentDirection)!=Direction.Left)
+        direcArr.push(Direction.Left);
+    if(this.isPositionPassable(targetXRight, upBorder) 
+      && this.isPositionPassable(targetXRight,downBorder) 
+      && this.reverseDirection(this.currentDirection)!=Direction.Right)
+        direcArr.push(Direction.Right);
     if(direcArr.length == 0)
         direcArr.push(this.reverseDirection(this.currentDirection));
     var randomIndex = Math.floor(Math.random()*direcArr.length);
