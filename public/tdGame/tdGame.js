@@ -16,6 +16,8 @@ var clientCallback = function(game){
                 {
                     roleIndex: role.roleIndex,
                     name:role.name,
+                    nickName: role.nickName,
+                    // avatarUrl: role.avatarUrl,
                     position:{
                         x:role.position.x,
                         y:role.position.y
@@ -25,7 +27,7 @@ var clientCallback = function(game){
                 })
         }
         game.broadcastMsg("roleInfo",msg);
-        // console.log(msg);
+        console.log(msg);
     }
 };
 
@@ -55,6 +57,7 @@ var monsterCallback = function(game){
 var TDGame = function (serverSocketIO, roomName) {
     this.io = serverSocketIO;
     this.roomName = roomName;
+    this.userInfos = [];
     this.tdMap = new TDMap();
     this.roleArr = [];
     this.paopaoArr = [];
@@ -73,11 +76,12 @@ var TDGame = function (serverSocketIO, roomName) {
     // this.tdMonster = null;
 }
 
-TDGame.prototype.addPlayerNum = function(){
+TDGame.prototype.addPlayer = function(userInfo){
+    this.userInfos.push(userInfo);
     this.palyerCount++;
 }
 
-TDGame.prototype.createANewRole = function(){
+TDGame.prototype.createANewRole = function(userInfo){
     var existedRoleNum = this.roleArr.length;
     if(this.tdMap.roleStartPointArr.length > existedRoleNum){
        var startPosition = this.tdMap.roleStartPointArr[existedRoleNum];
@@ -88,7 +92,7 @@ TDGame.prototype.createANewRole = function(){
        }else{
            role = 'challenger';
        }
-       var newRole = new Role(existedRoleNum,role,this);
+       var newRole = new Role(existedRoleNum,role,this,userInfo);
        newRole.setPosition(cocosPosition.x, cocosPosition.y);
        newRole.setMap(this.tdMap);
        this.roleArr.push(newRole);
@@ -111,7 +115,7 @@ TDGame.prototype.createMonster = function(){
 TDGame.prototype.startGame = function(){
     //create player roles
     for(var i=0; i<this.palyerCount; i++){
-        this.createANewRole();
+        this.createANewRole(this.userInfos[i]);
     }
 
     for(var j=0; j<this.monsterCount; j++){
@@ -122,7 +126,10 @@ TDGame.prototype.startGame = function(){
         mapName:'basicMap',
         arr: this.tdMap.map
     };
-    this.broadcastMsg('start',mapInfo);
+    this.broadcastMsg('start',{
+        mapInfo: mapInfo,
+        userInfos: this.userInfos
+    });
     console.log(mapInfo);
 
     var self = this;

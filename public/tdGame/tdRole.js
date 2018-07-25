@@ -4,9 +4,12 @@ var constants = require('./tdConst')
 var Direction = constants.Direction;
 
 
-var Role = function(roleIndex,name,game){
+var Role = function(roleIndex,name,game,userInfo){
 
     this.FPS = 90;
+    this.nickName = userInfo.nickName;
+    this.gender = userInfo.gender;
+    this.avatarUrl = userInfo.avatarUrl;
 
     this.currentDirection = Direction.None;
     this.isKeyDown = false;

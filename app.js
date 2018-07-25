@@ -13,7 +13,9 @@ io.on('connection', function (socket) {
     var clientIp = socket.request.connection.remoteAddress;
     console.log('New connection from ' + clientIp);
 
-    socket.on('joinRoom', function (roomName) {
+    socket.on('joinRoom', function (data) {
+        var roomName = data.roomId;
+        var userInfo = data.userInfo;
         if(!TDRoom.isRoomExisted(roomName)){
             socket.emit('joinRoom', {ret: 0, err: 'no such room'});
         }else{
@@ -22,7 +24,7 @@ io.on('connection', function (socket) {
             socket.join(roomName);
 
             var game = TDRoom.getRoom(roomName);            
-            game.addPlayerNum();
+            game.addPlayer(userInfo);
             game.startGame(); 
         }
 
@@ -36,6 +38,7 @@ io.on('connection', function (socket) {
 
     socket.on('newRoom', function(data) {
         var roomName = data['name'];
+        var userInfo = data['userInfo'];
         var msg = {code:0,msg:'failed'};
         if(!TDRoom.isRoomExisted(roomName)){
             socket.roomName = roomName;
@@ -43,7 +46,7 @@ io.on('connection', function (socket) {
             socket.join(roomName);            
 
             var game = new TDGame(io,roomName);
-            game.addPlayerNum();
+            game.addPlayer(userInfo);
             msg = TDRoom.createRoom(roomName,game);
         }
         socket.emit('newRooms', msg);
