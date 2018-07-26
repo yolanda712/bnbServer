@@ -19,6 +19,29 @@ var I_SPEED = constants.ITEM_ADD_SPEED;
 
 //背景地图
 var backGroundMap = [ 
+    [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,   S_W_1,  S_W_1,   S_W_1,  S_W_1,  S_W_1,    S_W_1,  S_W_1,  S_W_1,   S_W_1, S_W_1,   S_W_1,  S_W_1, S_W_1,  S_W_1,  S_W_1,   S_W_1,  S_W_1 ], 
+    [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND,  GROUND, GROUND,  S_W_1,  GROUND, GROUND,    G_W,      G_W, GROUND, GROUND,   S_W_1,GROUND,  GROUND, GROUND,GROUND,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W,    G_W,    G_W,  GROUND, GROUND,    G_W,  GROUND,  S_W_1,  GROUND,  GROUND,  S_W_1, GROUND,    G_W, GROUND,  GROUND,   G_W,    G_W,    G_W,  S_W_1,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W,  S_W_1, GROUND,   S_W_1,    G_W,    G_W,     G_W, GROUND,  GROUND,  GROUND, GROUND,    G_W,    G_W,    G_W,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND,   S_W_1, GROUND, GROUND,  GROUND, GROUND,     G_W,     G_W, GROUND, GROUND, GROUND, GROUND,  S_W_1, GROUND, GROUND,    G_W, GROUND,     G_W,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W, GROUND,    G_W,  GROUND,    G_W,  S_W_1,     G_W,  S_W_1,  GROUND,  GROUND,  S_W_1,    G_W,  S_W_1,    G_W, GROUND,    G_W, GROUND,    G_W,  S_W_1,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W,    G_W, GROUND,   S_W_1, GROUND,    G_W,  GROUND, GROUND,  GROUND,  GROUND, GROUND, GROUND,    G_W, GROUND,  S_W_1, GROUND,    G_W,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W,  S_W_1, GROUND,   S_W_1, GROUND,    G_W,  GROUND, GROUND,     G_W,     G_W, GROUND, GROUND,    G_W, GROUND,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W, GROUND,    G_W,  GROUND, GROUND,  S_W_1,  GROUND,  S_W_1,  GROUND,  GROUND,  S_W_1, GROUND,  S_W_1, GROUND, GROUND,    G_W, GROUND,    G_W,  S_W_1,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND,    G_W,    G_W,     G_W, GROUND,  GROUND,  GROUND, GROUND,    G_W,    G_W,    G_W, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND,    G_W,    G_W,     G_W, GROUND,  GROUND,  GROUND, GROUND,    G_W,    G_W,    G_W, GROUND, GROUND, GROUND, GROUND, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W, GROUND,    G_W,  GROUND, GROUND,  S_W_1,  GROUND, S_W_1,   GROUND,  GROUND,  S_W_1, GROUND,  S_W_1, GROUND, GROUND,    G_W, GROUND,    G_W,  S_W_1,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W,    G_W, GROUND,   S_W_1, GROUND,    G_W,  GROUND, GROUND,     G_W,     G_W, GROUND, GROUND,    G_W, GROUND,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W,  S_W_1, GROUND,   S_W_1, GROUND,    G_W,  GROUND, GROUND,  GROUND,  GROUND, GROUND, GROUND,    G_W, GROUND,  S_W_1, GROUND,    G_W,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W, GROUND,    G_W,  GROUND,    G_W,  S_W_1,     G_W,  S_W_1,  GROUND,  GROUND,  S_W_1,    G_W,  S_W_1, GROUND, GROUND,    G_W, GROUND,    G_W,  S_W_1,  GROUND,  S_W_1 ],
+    [  S_W_1,    G_W, GROUND,    G_W, GROUND, GROUND,   S_W_1, GROUND, GROUND,  GROUND, GROUND,     G_W,     G_W, GROUND, GROUND, GROUND,    G_W,  S_W_1, GROUND, GROUND,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W,    G_W, GROUND,   S_W_1,    G_W,    G_W,     G_W, GROUND,  GROUND,  GROUND, GROUND,    G_W,    G_W, GROUND,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND,  S_W_1,    G_W,  S_W_1,    G_W,  GROUND, GROUND,    G_W,  GROUND,  S_W_1,  GROUND,  GROUND,  S_W_1, GROUND,    G_W,    G_W, GROUND,    G_W,    G_W,    G_W,  S_W_1,  GROUND,  S_W_1 ],
+    [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND,  GROUND, GROUND,  S_W_1,  GROUND, GROUND,     G_W,     G_W, GROUND, GROUND,  S_W_1, GROUND, GROUND, GROUND, GROUND,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,   S_W_1,  S_W_1,  S_W_1,   S_W_1,   S_W_1,   S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,   S_W_1,  S_W_1 ],
+ ];
+
+var backGroundMap1 = [ 
     [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1 ], 
     [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND, GROUND, GROUND, GROUND,    G_W, GROUND, GROUND,  S_W_1 ],
     [  S_W_1, GROUND,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1,    G_W,  S_W_1, GROUND,  S_W_1 ],
@@ -63,12 +86,12 @@ var backGroundMap = [
  ];
 
  var roleStartPointArr = [
-     new Point(9,1),
-     new Point(1,11),
+     new Point(18,1),
+     new Point(1,22),
  ]
 
  var monsterStartPointArr = [
-    new Point(9,11),
+    new Point(18,22),
     new Point(1,1),
  ]
 

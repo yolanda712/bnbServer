@@ -14,6 +14,8 @@ var TDMonster = function(monsterIndex,name,game){
     this.monsterIndex = monsterIndex;
     this.name = name;
     this.moveInterval = null;
+    this.tempMoveStep = 0;
+    this.oneMoveStep = 30;
      
 }
 TDMonster.prototype.getMap = function(){
@@ -85,6 +87,7 @@ TDMonster.prototype.move = function(){
     // this.currentDirection = this.findDirection();
     if(!this.isDead){
         var self = this;
+        this.tempMoveStep = 0;
         this.moveInterval = setInterval(function(){
             self.game.monsterMeetRole();
             self.moveOneDirection(self.currentDirection);
@@ -102,52 +105,86 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
     targetYDown = this.position.y - this.monsterBorder - this.moveStep;
     targetXLeft = this.position.x - this.monsterBorder - this.moveStep;
     targetXRight = this.position.x + this.monsterBorder + this.moveStep;
+    // var tempMoveStep = 0;
+    var randomDirection = -1;
     switch (directionnum) {
         case Direction.Up:
             if(this.isPositionPassable(leftBorder,targetYUp)&& this.isPositionPassable(rightBorder,targetYUp)){
                 this.position.y += this.moveStep;
-                var randomDirection = this.findDirection();
-                if(randomDirection!=this.currentDirection){
-                    clearInterval(this.moveInterval);
-                    this.currentDirection = randomDirection;
-                    this.move();
+                this.tempMoveStep += this.moveStep;
+                if(this.tempMoveStep >= this.oneMoveStep){
+                    randomDirection = this.findDirection();
+                    if(randomDirection!=this.currentDirection){
+                        clearInterval(this.moveInterval);
+                        this.currentDirection = randomDirection;
+                        this.move();
+                    }
                 }
+            }else{
+                clearInterval(this.moveInterval);
+                randomDirection = this.findDirection();
+                this.currentDirection = randomDirection;
+                this.move();
             }
         break;
 
         case Direction.Down:
             if(this.isPositionPassable(leftBorder,targetYDown) && this.isPositionPassable(rightBorder,targetYDown)){
                 this.position.y -= this.moveStep;
-                var randomDirection = this.findDirection();
-                if(randomDirection!=this.currentDirection){
-                    clearInterval(this.moveInterval);
-                    this.currentDirection = randomDirection;
-                    this.move();
+                this.tempMoveStep += this.moveStep;
+                if(this.tempMoveStep >= this.oneMoveStep){
+                    randomDirection = this.findDirection();
+                    if(randomDirection!=this.currentDirection){
+                        clearInterval(this.moveInterval);
+                        this.currentDirection = randomDirection;
+                        this.move();
+                    }
                 }
+            }else{
+                clearInterval(this.moveInterval);
+                randomDirection = this.findDirection();
+                this.currentDirection = randomDirection;
+                this.move();
             }
         break;
 
         case Direction.Left:
             if(this.isPositionPassable(targetXLeft, upBorder)&& this.isPositionPassable(targetXLeft,downBorder)){
                 this.position.x -= this.moveStep;
-                var randomDirection = this.findDirection();
-                if(randomDirection!=this.currentDirection){
-                    clearInterval(this.moveInterval);
-                    this.currentDirection = randomDirection;
-                    this.move();
+                this.tempMoveStep += this.moveStep;
+                if(this.tempMoveStep >= this.oneMoveStep){
+                    randomDirection = this.findDirection();
+                    if(randomDirection!=this.currentDirection){
+                        clearInterval(this.moveInterval);
+                        this.currentDirection = randomDirection;
+                        this.move();
+                    }
                 }
+            }else{
+                clearInterval(this.moveInterval);
+                randomDirection = this.findDirection();
+                this.currentDirection = randomDirection;
+                this.move();
             }
         break;
 
         case Direction.Right:
             if(this.isPositionPassable(targetXRight, upBorder) && this.isPositionPassable(targetXRight,downBorder)){
                 this.position.x += this.moveStep;
-                var randomDirection = this.findDirection();
-                if(randomDirection!=this.currentDirection){
-                    clearInterval(this.moveInterval);
-                    this.currentDirection = randomDirection;
-                    this.move();
+                this.tempMoveStep += this.moveStep;
+                if(this.tempMoveStep >= this.oneMoveStep){
+                    randomDirection = this.findDirection();
+                    if(randomDirection!=this.currentDirection){
+                        clearInterval(this.moveInterval);
+                        this.currentDirection = randomDirection;
+                        this.move();
+                    }
                 }
+            }else{
+                clearInterval(this.moveInterval);
+                randomDirection = this.findDirection();
+                this.currentDirection = randomDirection;
+                this.move();
             }
         break;
     }
