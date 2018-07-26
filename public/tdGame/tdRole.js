@@ -327,7 +327,7 @@ Role.prototype.isPositionAnItem = function(x,y){
 Role.prototype.getItem = function(mapPosition){
     var itemCode = this.getMap().getValue(mapPosition.x,mapPosition.y);
     this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
-    this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name});
+    this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name,itemCode:itemCode});
 
     if(itemCode == constants.ITEM_ADD_PAOPAO && this.maxPaopaoCount<this.limitPaopaoCount) this.maxPaopaoCount++;
     else if(itemCode == constants.ITEM_ADD_POWER && this.paopaoPower<this.limitPaopaoPower) this.paopaoPower++;
