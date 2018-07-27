@@ -4,7 +4,6 @@ var constants = require('./tdConst')
 var Rooms = require('./tdRoom')
 var TDMonster = require('./tdMonster')
 var TDRoom = Rooms.TDRoom;
-var Direction = constants.Direction;
 
 // 根据FPS向客户端发送人物角色信息的回调
 var clientCallback = function(game){
@@ -15,7 +14,7 @@ var clientCallback = function(game){
             msg.push(
                 {
                     roleIndex: role.roleIndex,
-                    name:role.name,
+                    name: role.name,
                     nickName: role.nickName,
                     // avatarUrl: role.avatarUrl,
                     position:{
@@ -64,8 +63,8 @@ var TDGame = function (serverSocketIO, roomName) {
     this.itemArr = [];
     this.monsterArr = [];
 
-    this.FPS = 90;
-    this.palyerCount = 0;
+    this.FPS = 30;
+    this.playerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;
     this.monsterCount = this.tdMap.monsterStartPointArr.length;
@@ -78,7 +77,7 @@ var TDGame = function (serverSocketIO, roomName) {
 
 TDGame.prototype.addPlayer = function(userInfo){
     this.userInfos.push(userInfo);
-    this.palyerCount++;
+    this.playerCount++;
 }
 
 TDGame.prototype.createANewRole = function(userInfo){
@@ -114,7 +113,7 @@ TDGame.prototype.createMonster = function(){
 
 TDGame.prototype.startGame = function(){
     //create player roles
-    for(var i=0; i<this.palyerCount; i++){
+    for(var i=0; i<this.playerCount; i++){
         this.createANewRole(this.userInfos[i]);
     }
 
@@ -127,6 +126,7 @@ TDGame.prototype.startGame = function(){
         arr: this.tdMap.map
     };
     this.broadcastMsg('start',{
+        FPS: this.FPS,
         mapInfo: mapInfo,
         userInfos: this.userInfos
     });
@@ -157,10 +157,10 @@ TDGame.prototype.stopGameIntervals = function(){
     // }
 }
 
-TDGame.prototype.stopGame = function(data){
+TDGame.prototype.stopGame = function(winner){
     console.log('end');
     //客户端结束
-    this.broadcastMsg('end');
+    this.broadcastMsg('end',winner);
 
     try{
         var socketRoom = this.io.sockets.adapter.rooms[this.roomName];
@@ -194,11 +194,11 @@ TDGame.prototype.countTime = function(){
         var masterRole = this.roleArr[0];
         var challengerRole = this.roleArr[1];
         if(masterRole.score > challengerRole.score){
-            winner = '房主获胜';
+            winner = masterRole.nickName + ' 获胜!';
         }else if(masterRole.score == challengerRole.score){
-            winner = '平局';
+            winner = '平局!';
         }else{
-            winner = '挑战者获胜';
+            winner = challengerRole.nickName + ' 获胜!';
         }
         this.stopGame(winner);
     }
@@ -268,6 +268,10 @@ TDGame.prototype.monsterMeetRole = function(){
             }
         }
     }
+}
+
+TDGame.prototype.isGameFullOfPlayers = function(){
+    return this.playerCount>=this.tdMap.roleStartPointArr.length;
 }
 
 module.exports = TDGame;

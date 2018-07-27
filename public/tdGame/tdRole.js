@@ -39,7 +39,7 @@ var Role = function(roleIndex,name,game,userInfo){
 
     //最大道具限制
     this.limitPaopaoCount = 5;
-    this.limitMoveStep = 2.5;
+    this.limitMoveStep = 2;
     this.limitPaopaoPower = 5;
 
     //角色是否死亡

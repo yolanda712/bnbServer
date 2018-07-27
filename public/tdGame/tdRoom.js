@@ -6,7 +6,18 @@ var TDRoom = function(){
 }
 
 TDRoom.prototype.getRooms = function(){
-    return Object.keys(this.rooms);
+    result = [];
+    for(roomName in this.rooms){
+        result.push(
+            {
+                roomName:roomName,
+                playerCount:this.rooms[roomName].playerCount,
+                isFull: this.rooms[roomName].isGameFullOfPlayers()
+            }
+        );
+    }
+    console.log(result);
+    return result;
 }
 
 TDRoom.prototype.getRoom = function(roomName){
