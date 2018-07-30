@@ -386,7 +386,8 @@ Role.prototype.roleBoom = function(){
 
 Role.prototype.die = function(){
     // console.log('loser: '+this.name);
-    this.game.stopGame({loser:this.name});
+    // this.game.stopGame({loser:this.name});
+    this.game.stopGame();
 }
 
 module.exports = Role
