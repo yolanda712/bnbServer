@@ -18,6 +18,7 @@ var TDMonster = function(monsterIndex,name,game){
     this.oneMoveStep = 30;
      
 }
+
 TDMonster.prototype.getMap = function(){
     return this.tdMap;
 }

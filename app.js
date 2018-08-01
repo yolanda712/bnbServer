@@ -52,6 +52,29 @@ io.on('connection', function (socket) {
         socket.emit('newRooms', msg);
     });
 
+    socket.on('playAgain', function(data) {
+        var roomName = socket.roomName;
+        var userInfo = data['userInfo'];
+        var msg = {code:0,msg:'failed'};
+        if(!TDRoom.isRoomExisted(roomName)){
+            socket.role = 'master';
+            socket.join(roomName);            
+
+            var game = new TDGame(io,roomName);
+            game.addPlayer(userInfo);
+            msg = TDRoom.createRoom(roomName,game);
+        }else{
+            socket.role = 'challenger';
+            socket.join(roomName);
+
+            var game = TDRoom.getRoom(roomName);            
+            game.addPlayer(userInfo);
+            game.startGame(); 
+            msg ={code:1,msg:'success'};
+        }
+        socket.emit('playAgain', msg);
+    });
+
     socket.on('KeyUp', function (keyCode) {
         var game = TDRoom.getRoom(socket.roomName);
         if(game){

@@ -179,6 +179,7 @@ TDGame.prototype.stopGame = function(){
     }
     // console.log("!!!!!!!!!!"+winner);
     this.broadcastMsg('end',winner);
+
     try{
         var socketRoom = this.io.sockets.adapter.rooms[this.roomName];
         var sockets = socketRoom.sockets;
@@ -205,21 +206,9 @@ TDGame.prototype.countTime = function(){
     if(this.gameTime > 0){
         console.log(this.gameTime);
         this.gameTime--;
-       
     }else{
-        // var winner = null;
-        // var masterRole = this.roleArr[0];
-        // var challengerRole = this.roleArr[1];
-        // if(masterRole.score > challengerRole.score){
-        //     winner = masterRole.nickName + ' 获胜!';
-        // }else if(masterRole.score == challengerRole.score){
-        //     winner = '平局!';
-        // }else{
-        //     winner = challengerRole.nickName + ' 获胜!';
-        // }
         this.stopGame();
     }
-
 }
 
 TDGame.prototype.moveARoleByAngle = function(angle,role){
