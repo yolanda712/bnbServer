@@ -14,7 +14,8 @@ var clientCallback = function(game){
             msg.push(
                 {
                     roleIndex: role.roleIndex,
-                    name: role.name,
+                    // name: role.name,
+                    guid: role.guid,
                     nickName: role.nickName,
                     // avatarUrl: role.avatarUrl,
                     position:{
@@ -59,6 +60,7 @@ var TDGame = function (serverSocketIO, roomName) {
     this.userInfos = [];
     this.tdMap = new TDMap();
     this.roleArr = [];
+    this.guidRoleIndexMap = {};
     this.paopaoArr = [];
     this.itemArr = [];
     this.monsterArr = [];
@@ -85,16 +87,13 @@ TDGame.prototype.createANewRole = function(userInfo){
     if(this.tdMap.roleStartPointArr.length > existedRoleNum){
        var startPosition = this.tdMap.roleStartPointArr[existedRoleNum];
        var cocosPosition = this.tdMap.convertMapIndexToCocosAxis(this.tdMap.getYLen(), startPosition.x, startPosition.y);
-       var role = null;
-       if(existedRoleNum == 0){
-           role = 'master';
-       }else{
-           role = 'challenger';
-       }
-       var newRole = new Role(existedRoleNum,role,this,userInfo);
+     
+       var newRole = new Role(existedRoleNum,userInfo.guid,this,userInfo);
        newRole.setPosition(cocosPosition.x, cocosPosition.y);
        newRole.setMap(this.tdMap);
        this.roleArr.push(newRole);
+
+       this.guidRoleIndexMap[userInfo.guid] = this.roleArr.length-1;
     }
     
 }
@@ -161,22 +160,22 @@ TDGame.prototype.stopGame = function(){
     console.log('end');
     //客户端结束
     var winner = null;
-    var masterRole = this.roleArr[0];
-    var challengerRole = this.roleArr[1];
-    if((masterRole.isDead && challengerRole.isDead) || 
-    (!masterRole.isDead && !challengerRole.isDead)){
-        if(masterRole.score > challengerRole.score){
-            winner = masterRole.nickName + ' 获胜!';
-        }else if(masterRole.score == challengerRole.score){
-            winner = '平局!';
-        }else{
-            winner = challengerRole.nickName + ' 获胜!';
-        }
-    }else if(!masterRole.isDead && challengerRole.isDead){
-        winner = masterRole.nickName + ' 获胜!';
-    }else if(masterRole.isDead && !challengerRole.isDead){
-        winner = challengerRole.nickName + ' 获胜!';
-    }
+    // var masterRole = this.roleArr[0];
+    // var challengerRole = this.roleArr[1];
+    // if((masterRole.isDead && challengerRole.isDead) || 
+    // (!masterRole.isDead && !challengerRole.isDead)){
+    //     if(masterRole.score > challengerRole.score){
+    //         winner = masterRole.nickName + ' 获胜!';
+    //     }else if(masterRole.score == challengerRole.score){
+    //         winner = '平局!';
+    //     }else{
+    //         winner = challengerRole.nickName + ' 获胜!';
+    //     }
+    // }else if(!masterRole.isDead && challengerRole.isDead){
+    //     winner = masterRole.nickName + ' 获胜!';
+    // }else if(masterRole.isDead && !challengerRole.isDead){
+    //     winner = challengerRole.nickName + ' 获胜!';
+    // }
     // console.log("!!!!!!!!!!"+winner);
     this.broadcastMsg('end',winner);
 

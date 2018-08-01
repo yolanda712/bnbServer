@@ -4,9 +4,10 @@ var constants = require('./tdConst')
 var Direction = constants.Direction;
 
 
-var Role = function(roleIndex,name,game,userInfo){
+var Role = function(roleIndex,guid,game,userInfo){
 
     this.FPS = 90;
+    this.guid = guid;
     this.nickName = userInfo.nickName;
     this.gender = userInfo.gender;
     this.avatarUrl = userInfo.avatarUrl;
@@ -15,7 +16,6 @@ var Role = function(roleIndex,name,game,userInfo){
     this.isKeyDown = false;
 
     this.roleIndex = roleIndex;
-    this.name = name;
     this.game = game;
     this.position = new Point(0,0);
     
@@ -327,7 +327,7 @@ Role.prototype.isPositionAnItem = function(x,y){
 Role.prototype.getItem = function(mapPosition){
     var itemCode = this.getMap().getValue(mapPosition.x,mapPosition.y);
     this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
-    this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name,itemCode:itemCode});
+    this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,guid:this.guid,itemCode:itemCode});
 
     if(itemCode == constants.ITEM_ADD_PAOPAO && this.maxPaopaoCount<this.limitPaopaoCount) this.maxPaopaoCount++;
     else if(itemCode == constants.ITEM_ADD_POWER && this.paopaoPower<this.limitPaopaoPower) this.paopaoPower++;
@@ -354,7 +354,7 @@ Role.prototype.createPaopao = function(){
         // console.log(this.game.paopaoArr);
 
         paopaoCreatedInfo = {
-            name:this.name,
+            guid:this.guid,
             position:{
                 x:position.x,
                 y:position.y
@@ -375,18 +375,16 @@ Role.prototype.deletePaopao = function(paopao){
 }
 
 Role.prototype.roleBoom = function(){
-    console.log('loser: '+this.name);
+    console.log('loser: '+this.guid);
     var self = this;
     this.isDead = true;
     var roleBoomTime = setTimeout(function(){
         self.die();
     },3000);
-    this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, role:this.name});
+    this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, guid:this.guid});
 }
 
 Role.prototype.die = function(){
-    // console.log('loser: '+this.name);
-    // this.game.stopGame({loser:this.name});
     this.game.stopGame();
 }
 
