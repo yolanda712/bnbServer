@@ -9,6 +9,8 @@ var TDGame = require('./public/tdGame/tdGame');
 var Rooms = require('./public/tdGame/tdRoom');
 var TDRoom = Rooms.TDRoom;
 
+var utils = require('./public/utils');
+
 io.on('connection', function (socket) {
     var clientIp = socket.request.connection.remoteAddress;
     console.log('New connection from ' + clientIp);
@@ -56,6 +58,20 @@ io.on('connection', function (socket) {
             game.broadcastMsg('roomInfo', msg);
         }
 
+    });
+
+    socket.on('deleteRoom', function () {
+        var roomName = socket.roomName;
+        var msg = {code:0,msg:'failed'};
+
+        if(!TDRoom.isRoomExisted(roomName)){
+            socket.emit('deleteRoom', msg);
+        }else{
+            var game = TDRoom.getRoom(roomName);
+            game.broadcastMsg('deleteRoom',{code:1,msg:'success'}); 
+            TDRoom.deleteRoom(roomName);           
+            utils.clearSocketsByRoomName(io,roomName);
+        }
     });
 
     socket.on('startGame', function() {

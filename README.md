@@ -11,6 +11,26 @@ socket.on(msg,function(data){
 });
 
 ```js
+// 删除房间，用户emit deleteRoom后，后端自动获得所在房间并删除所属房间
+msg = "deleteRoom"
+data = {
+    code:1,
+    msg:'success'
+}
+
+// 广播房间信息
+msg = "roomInfo"
+data = {
+    code:1,
+    userInfos:[
+        {
+            nickName:a,
+            avatarUrl:'a',
+            gender:1
+        }
+    ]
+}
+
 // 服务端按FPS向客户端发送游戏当前信息
 msg = "roleInfo"
 data = [{

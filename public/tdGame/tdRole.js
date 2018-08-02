@@ -89,6 +89,7 @@ Role.prototype.mobileMoveOneStep = function(angle){
 
     var x_able = false;
     var y_able = false;
+    // 为了实现threshold，将极微小的移动置为无法移动
     if(-0.1<x_offset && x_offset<0.1){
         x_offset = 0;
     } else{
@@ -124,6 +125,7 @@ Role.prototype.mobileMoveOneStep = function(angle){
 
 }
 
+// 检测是否可以沿X轴横向移动
 Role.prototype.mobileCheckXOffset = function(x_offset, threshold){
     var movedPos = new Point(this.position.x + x_offset, this.position.y);
     if(x_offset>0){
@@ -145,6 +147,7 @@ Role.prototype.mobileCheckXOffset = function(x_offset, threshold){
     }
 }
 
+// 检测是否可以沿Y轴纵向移动
 Role.prototype.mobileCheckYOffset = function(y_offset, threshold){
     var movedPos = new Point(this.position.x, this.position.y + y_offset);
 
@@ -186,9 +189,6 @@ Role.prototype.move = function(directionnum) {
     this.isKeyDown = true;
     
     var self = this;
-
-    //先移动一步
-    // this.MoveOneStop(directionnum);
 
     //移动线程
     this.moveInterval = setInterval(function() {
@@ -386,7 +386,6 @@ Role.prototype.roleBoom = function(){
 
 Role.prototype.die = function(){
     // console.log('loser: '+this.name);
-    // this.game.stopGame({loser:this.name});
     this.game.stopGame();
 }
 

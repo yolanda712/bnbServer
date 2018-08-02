@@ -1,56 +1,11 @@
-var TDMap = require('./tdMap')
-var Role = require('./tdRole')
+var TDMap = require('./tdMap');
+var Role = require('./tdRole');
 var constants = require('./tdConst')
-var Rooms = require('./tdRoom')
-var TDMonster = require('./tdMonster')
+var Direction = constants.Direction;
+var Rooms = require('./tdRoom');
+var TDMonster = require('./tdMonster');
 var TDRoom = Rooms.TDRoom;
 
-// 根据FPS向客户端发送人物角色信息的回调
-var clientCallback = function(game){
-    if(game){
-        var msg = [];
-        for(index in game.roleArr){
-            role = game.roleArr[index];
-            msg.push(
-                {
-                    roleIndex: role.roleIndex,
-                    name: role.name,
-                    nickName: role.nickName,
-                    // avatarUrl: role.avatarUrl,
-                    position:{
-                        x:role.position.x,
-                        y:role.position.y
-                    },
-                    gameTime:game.gameTime,
-                    score:role.score
-                })
-        }
-        game.broadcastMsg("roleInfo",msg);
-        console.log(msg);
-    }
-};
-
-//根据FPS向客户端发送monster信息的回调
-var monsterCallback = function(game){
-    if(game){
-        var monsterMsg = [];
-        for(index in game.monsterArr){
-            monster = game.monsterArr[index];
-            monsterMsg.push(
-                {
-                    monsterIndex: monster.monsterIndex,
-                    name:monster.name,
-                    position:{
-                        x:monster.position.x,
-                        y:monster.position.y
-                    },
-                   
-                })
-        }
-        game.broadcastMsg("monsterInfo",monsterMsg);
-        // console.log(monsterMsg);
-    }
-};
 
 //主游戏入口
 var TDGame = function (serverSocketIO, roomName) {
@@ -71,8 +26,6 @@ var TDGame = function (serverSocketIO, roomName) {
 
     this.gameInfoInterval = null;
     this.timer = null;
-
-    // this.tdMonster = null;
 }
 
 TDGame.prototype.addPlayer = function(userInfo){
@@ -153,9 +106,6 @@ TDGame.prototype.startGame = function(){
 TDGame.prototype.stopGameIntervals = function(){
     clearInterval(this.timer);
     clearInterval(this.gameInfoInterval);
-    // for(var i=0; i<this.monsterArr.length; i++){
-    //     clearInterval(this.monsterArr[i].moveInterval)
-    // }
 }
 
 TDGame.prototype.stopGame = function(){
@@ -166,7 +116,7 @@ TDGame.prototype.stopGame = function(){
     var challengerRole = this.roleArr[1];
     // TODO 角色不应该写死个数
     if(!challengerRole) challengerRole = masterRole;
-    
+
     if((masterRole.isDead && challengerRole.isDead) || 
     (!masterRole.isDead && !challengerRole.isDead)){
         if(masterRole.score > challengerRole.score){
@@ -198,7 +148,6 @@ TDGame.prototype.stopGame = function(){
         console.log(error);
     }
     
-
     TDRoom.deleteRoom(this.roomName);
 }
 
@@ -223,23 +172,19 @@ TDGame.prototype.moveARoleByKeyCode = function(key, role){
     switch (key) {
         //W键,向上移动     
         case constants.KEY_CODE.W:
-            // role.move(Direction.Up);
-            role.mobileMove(90);
+            role.move(Direction.Up);
             break;
         //A键,向左移动
         case constants.KEY_CODE.A:
-            // role.move(Direction.Left);
-            role.mobileMove(180);
+            role.move(Direction.Left);
             break;
-            //S键,向下移动
+        //S键,向下移动
         case constants.KEY_CODE.S:
-            // role.move(Direction.Down);
-            role.mobileMove(-90);
+            role.move(Direction.Down);
             break;
         //D键,向右移动
         case constants.KEY_CODE.D:
-            // role.move(Direction.Right);
-            role.mobileMove(0);
+            role.move(Direction.Right);
             break;
         case constants.KEY_CODE.J:
             role.createPaopao();
@@ -248,19 +193,19 @@ TDGame.prototype.moveARoleByKeyCode = function(key, role){
 }
 
 TDGame.prototype.stopARoleByKeyCode = function(key, role){
-    role.mobileStop();
+    // role.mobileStop();
     switch (key) {  
         case constants.KEY_CODE.W:
-            // role.stop(Direction.Up);
+            role.stop(Direction.Up);
             break;
         case constants.KEY_CODE.A:
-            // role.stop(Direction.Left);
+            role.stop(Direction.Left);
             break;
         case constants.KEY_CODE.S:
-            // role.stop(Direction.Down);
+            role.stop(Direction.Down);
             break;
         case constants.KEY_CODE.D:
-            // role.stop(Direction.Right);
+            role.stop(Direction.Right);
             break;
     }
 }
@@ -283,5 +228,52 @@ TDGame.prototype.monsterMeetRole = function(){
 TDGame.prototype.isGameFullOfPlayers = function(){
     return this.playerCount>=this.tdMap.roleStartPointArr.length;
 }
+
+// 根据FPS向客户端发送人物角色信息的回调
+var clientCallback = function(game){
+    if(game){
+        var msg = [];
+        for(index in game.roleArr){
+            role = game.roleArr[index];
+            msg.push(
+                {
+                    roleIndex: role.roleIndex,
+                    name: role.name,
+                    nickName: role.nickName,
+                    // avatarUrl: role.avatarUrl,
+                    position:{
+                        x:role.position.x,
+                        y:role.position.y
+                    },
+                    gameTime:game.gameTime,
+                    score:role.score
+                })
+        }
+        game.broadcastMsg("roleInfo",msg);
+        console.log(msg);
+    }
+};
+
+//根据FPS向客户端发送monster信息的回调
+var monsterCallback = function(game){
+    if(game){
+        var monsterMsg = [];
+        for(index in game.monsterArr){
+            monster = game.monsterArr[index];
+            monsterMsg.push(
+                {
+                    monsterIndex: monster.monsterIndex,
+                    name:monster.name,
+                    position:{
+                        x:monster.position.x,
+                        y:monster.position.y
+                    },
+                   
+                })
+        }
+        game.broadcastMsg("monsterInfo",monsterMsg);
+        // console.log(monsterMsg);
+    }
+};
 
 module.exports = TDGame;
