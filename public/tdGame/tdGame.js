@@ -117,6 +117,7 @@ TDGame.prototype.startGame = function(){
         this.createANewRole(this.userInfos[i]);
     }
 
+    this.monsterArr = [];
     for(var j=0; j<this.monsterCount; j++){
         this.createMonster();
     }
@@ -163,6 +164,9 @@ TDGame.prototype.stopGame = function(){
     var winner = null;
     var masterRole = this.roleArr[0];
     var challengerRole = this.roleArr[1];
+    // TODO 角色不应该写死个数
+    if(!challengerRole) challengerRole = masterRole;
+    
     if((masterRole.isDead && challengerRole.isDead) || 
     (!masterRole.isDead && !challengerRole.isDead)){
         if(masterRole.score > challengerRole.score){
@@ -265,7 +269,7 @@ TDGame.prototype.monsterMeetRole = function(){
     for(var i=0; i<this.monsterArr.length ;i++){
         for(var j=0; j<this.roleArr.length ;j++){
             var monsterPos = this.monsterArr[i].getMapLocation(this.monsterArr[i].position.x,this.monsterArr[i].position.y);
-            var rolePos = this.roleArr[i].getMapLocation(this.roleArr[j].position.x,this.roleArr[j].position.y);
+            var rolePos = this.roleArr[j].getMapLocation(this.roleArr[j].position.x,this.roleArr[j].position.y);
             if(!this.monsterArr[i].isDead && monsterPos.equals(rolePos)){
                  for(var k=0; k<this.monsterArr.length; k++){
                         clearInterval(this.monsterArr[k].moveInterval)

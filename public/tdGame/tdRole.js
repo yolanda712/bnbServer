@@ -20,7 +20,7 @@ var Role = function(roleIndex,name,game,userInfo){
     this.position = new Point(0,0);
     
     // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border的一半，或者movestep的2倍
-    this.threshold = 7.9;
+    this.threshold = 14.9;
 
     //用来检测旁边块是否可以移动
     this.roleBorder = 14.9;
@@ -30,7 +30,7 @@ var Role = function(roleIndex,name,game,userInfo){
 
     //角色初始信息设置
     //移动步伐大小
-    this.moveStep = 1;
+    this.moveStep = 1.3;
     this.maxPaopaoCount = 2;
     this.curPaopaoCount = 0;
     this.paopaoPower = 1;
