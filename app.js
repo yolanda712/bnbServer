@@ -13,29 +13,6 @@ io.on('connection', function (socket) {
     var clientIp = socket.request.connection.remoteAddress;
     console.log('New connection from ' + clientIp);
 
-    socket.on('joinRoom', function (data) {
-        var roomName = data.roomId;
-        var userInfo = data.userInfo;
-        if(!TDRoom.isRoomExisted(roomName)){
-            socket.emit('joinRoom', {ret: 0, err: 'no such room'});
-        }else{
-            socket.roomName = roomName;
-            socket.role = 'challenger';
-            socket.join(roomName);
-
-            var game = TDRoom.getRoom(roomName);            
-            game.addPlayer(userInfo);
-            game.startGame(); 
-        }
-
-    });
-
-    socket.on('getRooms', function(data) {
-        // TODO 数据格式需要改动
-        var msg = {'ret': 1, 'data': TDRoom.getRooms()};
-        socket.emit('getRooms', msg);
-    });
-
     socket.on('newRoom', function(data) {
         var roomName = data['name'];
         var userInfo = data['userInfo'];
@@ -48,8 +25,43 @@ io.on('connection', function (socket) {
             var game = new TDGame(io,roomName);
             game.addPlayer(userInfo);
             msg = TDRoom.createRoom(roomName,game);
+            if(msg.code==1){
+                msg = {code:1,userInfos:game.userInfos};
+            }
         }
-        socket.emit('newRooms', msg);
+        socket.emit('roomInfo', msg);
+    });
+
+    socket.on('getRooms', function() {
+        // TODO 数据格式需要改动
+        var msg = {'ret': 1, 'data': TDRoom.getRooms()};
+        socket.emit('getRooms', msg);
+    });
+    
+    socket.on('joinRoom', function (data) {
+        var roomName = data.roomId;
+        var userInfo = data.userInfo;
+        var msg = {code:0,msg:'failed'};
+
+        if(!TDRoom.isRoomExisted(roomName)){
+            socket.emit('joinRoom', msg);
+        }else{
+            socket.roomName = roomName;
+            socket.role = 'challenger';
+            socket.join(roomName);
+
+            var game = TDRoom.getRoom(roomName);            
+            game.addPlayer(userInfo);
+            msg = {code:1,userInfos:game.userInfos};
+            socket.emit('roomInfo', msg);
+        }
+
+    });
+
+    socket.on('startGame', function() {
+        var roomName = socket.roomName;
+        var game = TDRoom.getRoom(roomName); 
+        game.startGame();
     });
 
     socket.on('playAgain', function(data) {
@@ -69,7 +81,6 @@ io.on('connection', function (socket) {
 
             var game = TDRoom.getRoom(roomName);            
             game.addPlayer(userInfo);
-            game.startGame(); 
             msg ={code:1,msg:'success'};
         }
         socket.emit('playAgain', msg);
@@ -108,10 +119,6 @@ io.on('connection', function (socket) {
         }
     });
 
-    socket.on('end', function (data) {
-        console.log("server on end");
-    });
-
     socket.on('disconnect', function(){
         TDRoom.deleteRoom(socket.roomName);
         socket.leave(socket.roomName);
@@ -120,8 +127,6 @@ io.on('connection', function (socket) {
     socket.on('error',function(){
         console.log('server websocket error');
     })
-
-    // socket.on('')
 
 });
 
