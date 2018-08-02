@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
             var game = TDRoom.getRoom(roomName);            
             game.addPlayer(userInfo);
             msg = {code:1,userInfos:game.userInfos};
-            socket.emit('roomInfo', msg);
+            game.broadcastMsg('roomInfo', msg);
         }
 
     });
