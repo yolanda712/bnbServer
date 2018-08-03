@@ -75,11 +75,21 @@ TDGame.prototype.startGame = function(){
         this.createMonster();
     }
 
+    var self = this;
+    var roleStartPointArr = this.tdMap.roleStartPointArr.map(function (point) {  
+        var newPoint = self.tdMap.convertMapIndexToCocosAxis(self.tdMap.getYLen(),point.x,point.y);
+        return newPoint;  
+    });
+    var monsterStartPointArr = this.tdMap.monsterStartPointArr.map(function (point) {  
+        var newPoint = self.tdMap.convertMapIndexToCocosAxis(self.tdMap.getYLen(),point.x,point.y);
+        return newPoint;  
+    });
+
     var mapInfo = {
         mapName:'basicMap',
         arr: this.tdMap.map,
-        roleStartPointArr: this.tdMap.roleStartPointArr,
-        monsterStartPointArr: this.tdMap.monsterStartPointArr
+        roleStartPointArr: roleStartPointArr,
+        monsterStartPointArr: monsterStartPointArr
     };
     this.broadcastMsg('start',{
         FPS: this.FPS,
