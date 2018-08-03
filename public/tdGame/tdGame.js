@@ -77,7 +77,9 @@ TDGame.prototype.startGame = function(){
 
     var mapInfo = {
         mapName:'basicMap',
-        arr: this.tdMap.map
+        arr: this.tdMap.map,
+        roleStartPointArr: this.tdMap.roleStartPointArr,
+        monsterStartPointArr: this.tdMap.monsterStartPointArr
     };
     this.broadcastMsg('start',{
         FPS: this.FPS,
@@ -111,28 +113,17 @@ TDGame.prototype.stopGameIntervals = function(){
 TDGame.prototype.stopGame = function(){
     console.log('end');
     //客户端结束
-    var winner = null;
+    var msg = {winner:0,isTied:true};
     var masterRole = this.roleArr[0];
     var challengerRole = this.roleArr[1];
     // TODO 角色不应该写死个数
     if(!challengerRole) challengerRole = masterRole;
 
-    if((masterRole.isDead && challengerRole.isDead) || 
-    (!masterRole.isDead && !challengerRole.isDead)){
-        if(masterRole.score > challengerRole.score){
-            winner = masterRole.nickName + ' 获胜!';
-        }else if(masterRole.score == challengerRole.score){
-            winner = '平局!';
-        }else{
-            winner = challengerRole.nickName + ' 获胜!';
-        }
-    }else if(!masterRole.isDead && challengerRole.isDead){
-        winner = masterRole.nickName + ' 获胜!';
-    }else if(masterRole.isDead && !challengerRole.isDead){
-        winner = challengerRole.nickName + ' 获胜!';
-    }
-    // console.log("!!!!!!!!!!"+winner);
-    this.broadcastMsg('end',winner);
+
+    
+    
+
+    this.broadcastMsg('end',msg);
 
     try{
         var socketRoom = this.io.sockets.adapter.rooms[this.roomName];
@@ -275,5 +266,21 @@ var monsterCallback = function(game){
         // console.log(monsterMsg);
     }
 };
+
+var findWinner = function(masterRole, challengerRole){
+    var winner = null;
+    
+    return winner;
+}
+
+var findWinnerByScore = function(masterRole, challengerRole){
+    var winner = null;
+    if(masterRole.score === challengerRole.score){
+        return winner;
+    }else{
+        winner = masterRole.score > challengerRole.score? masterRole : challengerRole;
+        return winner;
+    }
+}
 
 module.exports = TDGame;

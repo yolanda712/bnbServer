@@ -56,6 +56,25 @@ data = [{
             score:100
         }] 
 
+//服务端向客户端返回小怪物信息
+msg = "monsterInfo"
+data =  [{
+            monsterIndex: 0,
+            name:monster0,
+            position:{
+                x:64,
+                y:64
+            },
+        },
+        {
+            monsterIndex: 1,
+            name:monster1,
+            position:{
+                x:128,
+                y:128
+            },
+        }]
+
 // 服务端向客户端返回新放泡泡信息
 msg = "paopaoCreated"
 data = {
@@ -89,38 +108,25 @@ data = {
 // 服务端向客户端返回道具被吃信息
 msg = "itemEaten"
 data = {
-        {x:1,y:1,role:'master',itemCode:101}
+    x:1,
+    y:1,
+    role:'master',
+    itemCode:101
 }
-
-//服务端向客户端返回小怪物信息
-msg = "monsterInfo"
-data =  [{
-            monsterIndex: 0,
-            name:monster0,
-            position:{
-                x:64,
-                y:64
-            },
-        },
-        {
-            monsterIndex: 1,
-            name:monster1,
-            position:{
-                x:128,
-                y:128
-            },
-        }
 
 //服务端向客户端返回游戏结束信息
 msg = "end"
 data = {
-         {winner.nickName + ' 获胜!'}
+        winner: guid,
+        isTied: false //平局
 }
 
 //服务端向客户端返回人物被炸信息
 msg = "roleBoom"
 data = {
-        {x:1, y:1, role:'master'}
+    x:1, 
+    y:1, 
+    role:'master'
 }
 
 ```

@@ -10,6 +10,7 @@ var Role = function(roleIndex,name,game,userInfo){
     this.nickName = userInfo.nickName;
     this.gender = userInfo.gender;
     this.avatarUrl = userInfo.avatarUrl;
+    this.guid = userInfo.guid;
 
     this.currentDirection = Direction.None;
     this.isKeyDown = false;
