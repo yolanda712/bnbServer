@@ -82,22 +82,30 @@ io.on('connection', function (socket) {
 
     socket.on('playAgain', function(data) {
         var roomName = socket.roomName;
-        var userInfo = data['userInfo'];
+        var userInfo = data.userInfo;
         var msg = {code:0,msg:'failed'};
         if(!TDRoom.isRoomExisted(roomName)){
             socket.role = 'master';
-            socket.join(roomName);            
+            socket.join(roomName);
+            userInfo.isMaster = true;            
 
             var game = new TDGame(io,roomName);
             game.addPlayer(userInfo);
             msg = TDRoom.createRoom(roomName,game);
+            if(msg.code === 1){
+                msg.userInfos = game.userInfos;
+                msg.msg = 'success';
+            }
         }else{
             socket.role = 'challenger';
             socket.join(roomName);
+            userInfo['isMaster'] = false;
 
             var game = TDRoom.getRoom(roomName);            
             game.addPlayer(userInfo);
-            msg ={code:1,msg:'success'};
+            msg ={code:1,msg:'success',userInfos:game.userInfos};
+            game.broadcastMsg('playAgain',msg);
+            return;
         }
         socket.emit('playAgain', msg);
     });
