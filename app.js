@@ -113,6 +113,17 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('TouchEnd', function () {
+        var game = TDRoom.getRoom(socket.roomName);
+        if(game){
+            if (socket.role === 'master') {
+                game.stopAMobileRole(game.roleArr[0]);
+            } else {
+                game.stopAMobileRole(game.roleArr[1]);
+            }
+        }
+    });
+
     socket.on('KeyDown', function (keyCode) {
         var game = TDRoom.getRoom(socket.roomName);
         if (game) {
