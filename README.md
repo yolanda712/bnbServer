@@ -11,8 +11,68 @@ socket.on(msg,function(data){
 });
 
 ```js
+//服务端向客户端返回游戏开始信息
+msg = "start"
+data = {
+        FPS: 30,
+        mapInfo:  {
+            mapName:'basicMap',
+            arr: map[][],
+            roleStartPointArr:  [
+                new Point(18,1),
+                new Point(1,22),
+            ]
+            monsterStartPointArr:  [
+                new Point(18,22),
+                new Point(1,1),
+            ]
+        }           
+        userInfos: [
+        {
+            nickName:a,
+            avatarUrl:'a',
+            gender:1
+        }
+    ]
+}
+
+//服务端向客户端返回游戏结束信息
+msg = "end"
+data = {
+        winner: guid,
+        isTied: false //平局
+}
+
 // 删除房间，用户emit deleteRoom后，后端自动获得所在房间并删除所属房间
 msg = "deleteRoom"
+//删除成功
+data = {
+    code:1,
+    msg:'success'
+}
+//当前游戏不存在，删除失败
+data = {
+    code:0,
+    msg:'not existed'
+}
+
+
+//服务端向客户端返回房间列表信息
+msg = "getRooms"
+data = {
+    ret: 1, 
+    data:[11,21...]
+}
+
+//服务端向客户端返回所加入房间不存在，加入房间失败
+msg = "joinRoom"
+data = {
+    code:0,
+    msg:'failed'
+}
+
+//服务端向客户端发送再来一局信息
+msg = "playAgain"
 data = {
     code:1,
     msg:'success'
@@ -20,6 +80,7 @@ data = {
 
 // 广播房间信息
 msg = "roomInfo"
+//建房成功
 data = {
     code:1,
     userInfos:[
@@ -29,6 +90,11 @@ data = {
             gender:1
         }
     ]
+}
+//建房失败
+data = {
+    code:0,
+    msg:'failed'
 }
 
 // 服务端按FPS向客户端发送游戏当前信息
@@ -114,13 +180,6 @@ data = {
     itemCode:101
 }
 
-//服务端向客户端返回游戏结束信息
-msg = "end"
-data = {
-        winner: guid,
-        isTied: false //平局
-}
-
 //服务端向客户端返回人物被炸信息
 msg = "roleBoom"
 data = {
@@ -128,5 +187,14 @@ data = {
     y:1, 
     role:'master'
 }
+
+//服务端向客户端返回小怪物被炸信息
+msg = "monsterBoom"
+data = {
+    x:64,
+    y:64,
+    name:monster0
+}
+
 
 ```
