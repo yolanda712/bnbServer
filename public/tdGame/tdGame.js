@@ -102,7 +102,6 @@ TDGame.prototype.startGame = function(){
         this.monsterArr[k].currentDirection = this.monsterArr[k].findDirection();
         this.monsterArr[k].move();
     }
-    // this.monsterArr[0].move();
 }
 
 TDGame.prototype.stopGameIntervals = function(){
@@ -113,16 +112,16 @@ TDGame.prototype.stopGameIntervals = function(){
 TDGame.prototype.stopGame = function(){
     console.log('end');
     //客户端结束
-    var msg = {winner:0,isTied:true};
+    var msg = {winner:0, isTied:true};
     var masterRole = this.roleArr[0];
     var challengerRole = this.roleArr[1];
     // TODO 角色不应该写死个数
     if(!challengerRole) challengerRole = masterRole;
-
-
-    
-    
-
+    var winner = findWinner(masterRole,challengerRole);
+    if(winner){
+        msg = {winner:winner.guid, isTied:false};
+    }
+    console.log("game over" + msg);
     this.broadcastMsg('end',msg);
 
     try{
@@ -184,7 +183,6 @@ TDGame.prototype.moveARoleByKeyCode = function(key, role){
 }
 
 TDGame.prototype.stopARoleByKeyCode = function(key, role){
-    // role.mobileStop();
     switch (key) {  
         case constants.KEY_CODE.W:
             role.stop(Direction.Up);
@@ -259,7 +257,6 @@ var monsterCallback = function(game){
                         x:monster.position.x,
                         y:monster.position.y
                     },
-                   
                 })
         }
         game.broadcastMsg("monsterInfo",monsterMsg);
@@ -269,7 +266,12 @@ var monsterCallback = function(game){
 
 var findWinner = function(masterRole, challengerRole){
     var winner = null;
-    
+    if((masterRole.isDead && challengerRole.isDead)
+        || (!masterRole.isDead && !challengerRole.isDead)){
+            winner = findWinnerByScore(masterRole,challengerRole);
+    }else {
+        winner = masterRole.isDead ? challengerRole : masterRole;
+    }
     return winner;
 }
 
