@@ -192,6 +192,10 @@ TDGame.prototype.moveARoleByKeyCode = function(key, role){
     }
 }
 
+TDGame.prototype.stopAMobileRole = function(role){
+    role.mobileStop();
+}
+
 TDGame.prototype.stopARoleByKeyCode = function(key, role){
     switch (key) {  
         case constants.KEY_CODE.W:
