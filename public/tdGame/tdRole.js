@@ -5,29 +5,28 @@ var Direction = constants.Direction;
 
 
 var Role = function(roleIndex,name,game,userInfo){
-
     this.FPS = 90;
+    this.name = name;
     this.nickName = userInfo.nickName;
     this.gender = userInfo.gender;
     this.avatarUrl = userInfo.avatarUrl;
     this.guid = userInfo.guid;
 
-    this.currentDirection = Direction.None;
-    this.isKeyDown = false;
-
     this.roleIndex = roleIndex;
-    this.name = name;
     this.game = game;
+    this.tdMap = null;
     this.position = new Point(0,0);
     
-    // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border的一半，或者movestep的2倍
+    // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border
     this.threshold = 14.9;
 
-    //用来检测旁边块是否可以移动
+    // 用来检测旁边块是否可以移动
     this.roleBorder = 14.9;
     this.borderStep = 32;
 
-    this.tdMap = null;
+    // 处理移动方向
+    this.currentDirection = Direction.None;
+    this.isKeyDown = false;
 
     //角色初始信息设置
     //移动步伐大小
@@ -66,55 +65,40 @@ Role.prototype.getPosition = function(){
     return this.position;
 }
 
-//角色通过手机遥感移动
+//角色通过手机遥杆移动
 Role.prototype.mobileMove = function(angle){
     var self = this;
     this.mobileStop();
 
     //移动线程
     this.moveInterval = setInterval(function() {
-        // console.log('move');
         self.mobileMoveOneStep(angle);
     }, 1000/self.FPS);
 }
 
-Role.prototype.mobileMoveOneStep = function(angle){
-    // 角度模糊判断
-    if(60<angle && angle<120) angle = 90;
-    if(-35<angle && angle<35) angle = 0;
-    if(145<angle || angle<-145) angle = 180;
-    if(-120<angle && angle<-60) angle = -90;
-
+Role.prototype.mobileMoveOneStep = function(angle){    
+    angle = anglePreprocess(angle);
     var x_offset = Math.cos(angle * (Math.PI/180)) * this.moveStep;
     var y_offset = Math.sin(angle * (Math.PI/180)) * this.moveStep;
 
-    var x_able = false;
-    var y_able = false;
-    // 为了实现threshold，将极微小的移动置为无法移动
-    if(-0.1<x_offset && x_offset<0.1){
-        x_offset = 0;
-    } else{
-        x_able = this.mobileCheckXOffset(x_offset,0);
-    }
-    if(-0.1<y_offset && y_offset<0.1){
-        y_offset = 0;
-    } else{
-        y_able = this.mobileCheckYOffset(y_offset,0);
-    }
+    var x_able = this.mobileCheckXOffset(x_offset, 0);
+    var y_able = this.mobileCheckYOffset(y_offset, 0);
 
     if(x_able && y_able){
-        this.setPosition(this.position.x+x_offset, this.position.y+y_offset);
+        this.setPosition(this.position.x + x_offset, this.position.y + y_offset);
     }else if(x_able){
-        this.setPosition(this.position.x+x_offset, this.position.y);
+        this.setPosition(this.position.x + x_offset, this.position.y);
     }else if(y_able){
-        this.setPosition(this.position.x, this.position.y+y_offset);
+        this.setPosition(this.position.x, this.position.y + y_offset);
     }else{
         //threshold辅助玩家移动
         var mobileThreshold = this.threshold;
         if(x_offset && this.mobileCheckXOffset(x_offset,mobileThreshold)){
-            this.setPosition(this.position.x+x_offset, this.getNormPosition(this.position.x,this.position.y).y);
-        }else if(y_offset && this.mobileCheckYOffset(y_offset,mobileThreshold)){
-            this.setPosition(this.getNormPosition(this.position.x,this.position.y).x, this.position.y+y_offset);
+            var centerPoint = this.getNormPosition(this.position.x, this.position.y);
+            this.setPosition(this.position.x + x_offset, centerPoint.y);
+        }else if(y_offset && this.mobileCheckYOffset(y_offset, mobileThreshold)){
+            var centerPoint = this.getNormPosition(this.position.x,this.position.y);
+            this.setPosition(centerPoint.x, this.position.y + y_offset);
         }
     }
     
@@ -151,7 +135,6 @@ Role.prototype.mobileCheckXOffset = function(x_offset, threshold){
 // 检测是否可以沿Y轴纵向移动
 Role.prototype.mobileCheckYOffset = function(y_offset, threshold){
     var movedPos = new Point(this.position.x, this.position.y + y_offset);
-
     if(y_offset>0){
         var leftTopPos = new Point(movedPos.x - this.roleBorder + threshold, movedPos.y + this.roleBorder);
         var rightTopPos = new Point(movedPos.x + this.roleBorder - threshold, movedPos.y + this.roleBorder);
@@ -199,84 +182,97 @@ Role.prototype.move = function(directionnum) {
 }
 
 Role.prototype.moveOneStop = function(directionnum){
-    // console.log(this.getMapLocation(this.position.x,this.position.y));
-    var leftBorder,rightBorder,upBorder,downBorder;
-    var targetX,targetY;
     var threshold = this.threshold;
     switch (directionnum) {
         case Direction.Up:
-            leftBorder = this.position.x - this.roleBorder;
-            rightBorder = this.position.x + this.roleBorder;
-            targetY = this.position.y + this.roleBorder + this.moveStep;
-            // threshold检测
-            if(this.isPositionPassable(leftBorder+threshold,targetY)
-                && this.isPositionPassable(rightBorder-threshold,targetY)){
-                this.position.y += this.moveStep;
-                if(!this.isPositionPassable(leftBorder,targetY)
-                    || !this.isPositionPassable(rightBorder,targetY)){
-                    this.position.x = this.getNormPosition(this.position.x,this.position.y).x;
-                }
-                // 吃道具检测
-                if(this.isPositionAnItem(this.position.x,this.position.y)){
-                    var mapPosition = this.getMapLocation(this.position.x,this.position.y);
-                    this.getItem(mapPosition);
-                }
-            }
+            this.moveUpOneStep(threshold);
             break;
         case Direction.Down:
-            leftBorder = this.position.x - this.roleBorder;
-            rightBorder = this.position.x + this.roleBorder;
-            targetY = this.position.y - this.roleBorder - this.moveStep;
-            if(this.isPositionPassable(leftBorder+threshold,targetY)
-                && this.isPositionPassable(rightBorder-threshold,targetY)){
-                this.position.y -= this.moveStep;
-                if(!this.isPositionPassable(leftBorder,targetY)
-                    || !this.isPositionPassable(rightBorder,targetY)){
-                    this.position.x = this.getNormPosition(this.position.x,this.position.y).x;
-                }
-                if(this.isPositionAnItem(this.position.x,this.position.y)){
-                    var mapPosition = this.getMapLocation(this.position.x,this.position.y);
-                    this.getItem(mapPosition);
-                }
-            }
+            this.moveDownOneStep(threshold);
             break;
         case Direction.Left:
-            downBorder = this.position.y - this.roleBorder;
-            upBorder = this.position.y + this.roleBorder;
-            targetX = this.position.x - this.roleBorder - this.moveStep;
-            if(this.isPositionPassable(targetX, upBorder-threshold)
-                && this.isPositionPassable(targetX,downBorder+threshold)){
-                this.position.x -= this.moveStep;
-                if(!this.isPositionPassable(targetX, upBorder)
-                    || !this.isPositionPassable(targetX,downBorder)){
-                    this.position.y = this.getNormPosition(this.position.x,this.position.y).y;
-                }
-                if(this.isPositionAnItem(this.position.x,this.position.y)){
-                    var mapPosition = this.getMapLocation(this.position.x,this.position.y);
-                    this.getItem(mapPosition);
-                }
-            }
+            this.moveLeftOneStep(threshold);
             break;
         case Direction.Right:
-            downBorder = this.position.y - this.roleBorder;
-            upBorder = this.position.y + this.roleBorder;
-            targetX = this.position.x + this.roleBorder + this.moveStep;
-            if(this.isPositionPassable(targetX, upBorder-threshold)
-                && this.isPositionPassable(targetX,downBorder+threshold)){
-                this.position.x += this.moveStep;
-                if(!this.isPositionPassable(targetX, upBorder)
-                    || !this.isPositionPassable(targetX,downBorder)){
-                    this.position.y = this.getNormPosition(this.position.x,this.position.y).y;
-                }
-                if(this.isPositionAnItem(this.position.x,this.position.y)){
-                    var mapPosition = this.getMapLocation(this.position.x,this.position.y);
-                    this.getItem(mapPosition);
-                }
-            }
+            this.moveRightOneStep(threshold);
             break;
     };
 }
-    
+
+Role.prototype.moveUpOneStep = function(threshold){
+    var leftBorder = this.position.x - this.roleBorder;
+    var rightBorder = this.position.x + this.roleBorder;
+    var targetY = this.position.y + this.roleBorder + this.moveStep;
+    // threshold检测
+    if(this.isPositionPassable(leftBorder+threshold,targetY)
+        && this.isPositionPassable(rightBorder-threshold,targetY)){
+        this.position.y += this.moveStep;
+        if(!this.isPositionPassable(leftBorder,targetY)
+            || !this.isPositionPassable(rightBorder,targetY)){
+            this.position.x = this.getNormPosition(this.position.x,this.position.y).x;
+        }
+        // 吃道具检测
+        if(this.isPositionAnItem(this.position.x,this.position.y)){
+            var mapPosition = this.getMapLocation(this.position.x,this.position.y);
+            this.getItem(mapPosition);
+        }
+    }
+}
+
+Role.prototype.moveDownOneStep = function(threshold){
+    var leftBorder = this.position.x - this.roleBorder;
+    var rightBorder = this.position.x + this.roleBorder;
+    var targetY = this.position.y - this.roleBorder - this.moveStep;
+    if(this.isPositionPassable(leftBorder+threshold,targetY)
+        && this.isPositionPassable(rightBorder-threshold,targetY)){
+        this.position.y -= this.moveStep;
+        if(!this.isPositionPassable(leftBorder,targetY)
+            || !this.isPositionPassable(rightBorder,targetY)){
+            this.position.x = this.getNormPosition(this.position.x,this.position.y).x;
+        }
+        if(this.isPositionAnItem(this.position.x,this.position.y)){
+            var mapPosition = this.getMapLocation(this.position.x,this.position.y);
+            this.getItem(mapPosition);
+        }
+    }
+}
+
+Role.prototype.moveLeftOneStep = function(threshold){
+    var downBorder = this.position.y - this.roleBorder;
+    var upBorder = this.position.y + this.roleBorder;
+    var targetX = this.position.x - this.roleBorder - this.moveStep;
+    if(this.isPositionPassable(targetX, upBorder-threshold)
+        && this.isPositionPassable(targetX,downBorder+threshold)){
+        this.position.x -= this.moveStep;
+        if(!this.isPositionPassable(targetX, upBorder)
+            || !this.isPositionPassable(targetX,downBorder)){
+            this.position.y = this.getNormPosition(this.position.x,this.position.y).y;
+        }
+        if(this.isPositionAnItem(this.position.x,this.position.y)){
+            var mapPosition = this.getMapLocation(this.position.x,this.position.y);
+            this.getItem(mapPosition);
+        }
+    }
+}
+
+Role.prototype.moveRightOneStep = function(threshold){
+    var downBorder = this.position.y - this.roleBorder;
+    var upBorder = this.position.y + this.roleBorder;
+    var targetX = this.position.x + this.roleBorder + this.moveStep;
+    if(this.isPositionPassable(targetX, upBorder-threshold)
+        && this.isPositionPassable(targetX,downBorder+threshold)){
+        this.position.x += this.moveStep;
+        if(!this.isPositionPassable(targetX, upBorder)
+            || !this.isPositionPassable(targetX,downBorder)){
+            this.position.y = this.getNormPosition(this.position.x,this.position.y).y;
+        }
+        if(this.isPositionAnItem(this.position.x,this.position.y)){
+            var mapPosition = this.getMapLocation(this.position.x,this.position.y);
+            this.getItem(mapPosition);
+        }
+    }
+}
+
 //停止移动
 Role.prototype.stop = function(directionnum) {
     // console.log('stop');
@@ -352,7 +348,6 @@ Role.prototype.createPaopao = function(){
         if(!this.game.paopaoArr[position.x])
             this.game.paopaoArr[position.x]=[];
         this.game.paopaoArr[position.x][position.y] = paopao;
-        // console.log(this.game.paopaoArr);
 
         paopaoCreatedInfo = {
             name:this.name,
@@ -371,7 +366,6 @@ Role.prototype.deletePaopao = function(paopao){
     this.curPaopaoCount--;
     this.game.paopaoArr[paopao.position.x][paopao.position.y] = null;
     paopao.clearBoomTimeout();
-    // delete paopao;
     console.log(this.game.paopaoArr);
 }
 
@@ -386,8 +380,16 @@ Role.prototype.roleBoom = function(){
 }
 
 Role.prototype.die = function(){
-    // console.log('loser: '+this.name);
     this.game.stopGame();
+}
+
+var anglePreprocess = function(angle){
+    // 角度模糊判断
+    if(60<angle && angle<120) angle = 90;
+    if(-35<angle && angle<35) angle = 0;
+    if(145<angle || angle<-145) angle = 180;
+    if(-120<angle && angle<-60) angle = -90;
+    return angle;
 }
 
 module.exports = Role

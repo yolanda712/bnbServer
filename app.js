@@ -81,11 +81,12 @@ io.on('connection', function (socket) {
     });
 
     socket.on('playAgain', function(data) {
-        var roomName = socket.roomName;
+        var roomName = data.roomId;
         var userInfo = data.userInfo;
         var msg = {code:0,msg:'failed'};
         if(!TDRoom.isRoomExisted(roomName)){
             socket.role = 'master';
+            socket.roomName = roomName;
             socket.join(roomName);
             userInfo.isMaster = true;            
 
@@ -98,6 +99,7 @@ io.on('connection', function (socket) {
             }
         }else{
             socket.role = 'challenger';
+            socket.roomName = roomName;
             socket.join(roomName);
             userInfo['isMaster'] = false;
 
@@ -117,17 +119,6 @@ io.on('connection', function (socket) {
                 game.stopARoleByKeyCode(keyCode,game.roleArr[0]);
             } else {
                 game.stopARoleByKeyCode(keyCode,game.roleArr[1]);
-            }
-        }
-    });
-
-    socket.on('TouchEnd', function () {
-        var game = TDRoom.getRoom(socket.roomName);
-        if(game){
-            if (socket.role === 'master') {
-                game.stopAMobileRole(game.roleArr[0]);
-            } else {
-                game.stopAMobileRole(game.roleArr[1]);
             }
         }
     });
@@ -154,9 +145,23 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('TouchEnd', function () {
+        var game = TDRoom.getRoom(socket.roomName);
+        if(game){
+            if (socket.role === 'master') {
+                game.stopAMobileRole(game.roleArr[0]);
+            } else {
+                game.stopAMobileRole(game.roleArr[1]);
+            }
+        }
+    });
+
     socket.on('disconnect', function(){
-        TDRoom.deleteRoom(socket.roomName);
-        socket.leave(socket.roomName);
+        var game = TDRoom.getRoom(socket.roomName);
+        if(game){
+            game.broadcastMsg('deleteRoom',{code:1,msg:'success'});
+            game.stopGame(socket.role);
+        }
     })
 
     socket.on('error',function(){
