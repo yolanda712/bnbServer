@@ -356,7 +356,7 @@ Role.prototype.createPaopao = function(){
                 y:position.y
             }
         }
-        console.log(paopaoCreatedInfo);
+        // console.log(paopaoCreatedInfo);
         this.game.broadcastMsg('paopaoCreated',paopaoCreatedInfo);
     }
 
@@ -366,7 +366,7 @@ Role.prototype.deletePaopao = function(paopao){
     this.curPaopaoCount--;
     this.game.paopaoArr[paopao.position.x][paopao.position.y] = null;
     paopao.clearBoomTimeout();
-    console.log(this.game.paopaoArr);
+    // console.log(this.game.paopaoArr);
 }
 
 Role.prototype.roleBoom = function(){
