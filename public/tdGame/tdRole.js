@@ -27,6 +27,7 @@ var Role = function(roleIndex,name,game,userInfo){
     // 处理移动方向
     this.currentDirection = Direction.None;
     this.isKeyDown = false;
+    this.currentAngle = 45;
 
     //角色初始信息设置
     //移动步伐大小
@@ -67,13 +68,19 @@ Role.prototype.getPosition = function(){
 
 //角色通过手机遥杆移动
 Role.prototype.mobileMove = function(angle){
-    var self = this;
-    this.mobileStop();
+    if(Math.abs(this.currentAngle - angle) < 10 || Math.abs(this.currentAngle - angle) > 350){
+        return;
+    }else{
+        var self = this;
+        this.mobileStop();
+    
+        //移动线程
+        this.moveInterval = setInterval(function() {
+            self.mobileMoveOneStep(angle);
+        }, 1000/self.FPS);
 
-    //移动线程
-    this.moveInterval = setInterval(function() {
-        self.mobileMoveOneStep(angle);
-    }, 1000/self.FPS);
+        this.currentAngle = angle;
+    }
 }
 
 Role.prototype.mobileMoveOneStep = function(angle){    
@@ -83,6 +90,14 @@ Role.prototype.mobileMoveOneStep = function(angle){
 
     var x_able = this.mobileCheckXOffset(x_offset, 0);
     var y_able = this.mobileCheckYOffset(y_offset, 0);
+    if(Math.abs(x_offset)<0.1){
+        x_able = false;
+        x_offset = 0;
+    } 
+    if(Math.abs(y_offset)<0.1){
+        y_able = false;
+        y_offset = 0;
+    }
 
     if(x_able && y_able){
         this.setPosition(this.position.x + x_offset, this.position.y + y_offset);
