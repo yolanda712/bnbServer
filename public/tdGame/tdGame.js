@@ -109,7 +109,7 @@ TDGame.prototype.startGame = function(){
     },1000/this.FPS);
 
     for(var k=0; k<this.monsterArr.length; k++){
-        this.monsterArr[k].currentDirection = this.monsterArr[k].findDirection();
+        this.monsterArr[k].currentDirection = this.monsterArr[k].findRandomDirection();
         this.monsterArr[k].move();
     }
 }
