@@ -1,5 +1,8 @@
 var constants = require('./tdConst')
 
+/**
+ * 数组去重
+ */
 var uniquePosArray = function(arr){
     var hash = {};
     var base = 10000;
@@ -25,9 +28,7 @@ var TDPaopao = function(position, power, role){
     this.map = this.role.getMap();
     this.map.setValue(position.x,position.y,constants.PAOPAO);
     this.game = this.role.game;
-    
     console.log('paopao created at'+ this.position.x+","+this.position.y);
-
     var self = this;
     this.boomTimeout = setTimeout(function(){
         self.boom();
@@ -44,25 +45,25 @@ TDPaopao.prototype.calcItemPosibility = function(){
     return 1;
 }
 
+/**
+ * 泡泡爆炸
+ */
 TDPaopao.prototype.boom = function(){
     console.log('paopao boom  at'+this.position.x+","+this.position.y);
-    // this.role.deletePaopao(this);
-
     var result = this.findPaopaoBombXY(this.position);
     var boomPaopaoArr = result.boomPaopaoArr;
     var boomXYArr = result.boomXYArr;
     var boomBoxArr = result.boomBoxArr;
     var itemArr = [];
-
     // 终止泡泡爆炸动画
-    for(var i =0; i<boomPaopaoArr.length; i++){
+    for(var i=0; i<boomPaopaoArr.length; i++){
         var pos = boomPaopaoArr[i];
         var paopao = this.game.paopaoArr[pos.x][pos.y];
         if(paopao)
             paopao.role.deletePaopao(paopao);
     }
     // 炸掉道具
-    for(var i =0; i<boomXYArr.length; i++){
+    for(var i=0; i<boomXYArr.length; i++){
         var pos = boomXYArr[i];
         if(this.map.isPositionAnItem(pos.x,pos.y)){
             console.log("itemEaten"+ pos);
@@ -90,7 +91,7 @@ TDPaopao.prototype.boom = function(){
 
     }
     // 生成道具
-    for(var i =0; i<boomBoxArr.length; i++){
+    for(var i=0; i<boomBoxArr.length; i++){
         var pos = boomBoxArr[i];
         if(this.map.getValue(pos.x,pos.y)==constants.GIFT_WALL && this.calcItemPosibility()){
             var itemCode = 101 + parseInt(Math.random()*3);
@@ -108,6 +109,11 @@ TDPaopao.prototype.boom = function(){
 
 };
 
+/**
+ * 计算泡泡的爆炸范围
+ * @param currentMapLocation 
+ * @return {boomXYArr:boomXYArr,boomBoxArr:boomBoxArr,boomPaopaoArr:boomPaopaoArr}
+ */
 TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
     if(this.isActive){
         this.isActive = false;
@@ -128,7 +134,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                     mapValue = this.map.getValue(calcX,caclY);
                     if(0 < mapValue && mapValue < 4){
                         canGo.Left = false;
-                        // 处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
+                        //处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
                         boomBoxArr.push({x:calcX, y:caclY});
                         //炸掉盒子的得分
                         this.role.score += constants.SCORE_FOR_WALL;
@@ -137,7 +143,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                         //无法被炸毁的东西，直接过
                     }else if(mapValue == 100){
                         canGo.Left = false;
-                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
+                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在的泡泡中
                         var nextPaopao = this.game.paopaoArr[calcX][caclY];
                         var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                         if(nextResult){
@@ -158,7 +164,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                     mapValue = this.map.getValue(calcX,caclY);
                     if(0 < mapValue && mapValue < 4){
                         canGo.Right = false;
-                        // 处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
+                        //处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
                         boomBoxArr.push({x:calcX, y:caclY});
                         //炸掉盒子的得分
                         this.role.score += constants.SCORE_FOR_WALL;
@@ -167,7 +173,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                         //无法被炸毁的东西，直接过
                     }else if(mapValue == 100){
                         canGo.Right = false;
-                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
+                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在的泡泡中
                         var nextPaopao = this.game.paopaoArr[calcX][caclY];
                         var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                         if(nextResult){
@@ -188,7 +194,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                     mapValue = this.map.getValue(calcX,caclY);
                     if(0 < mapValue && mapValue < 4){
                         canGo.Up = false;
-                        // 处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
+                        //处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
                         boomBoxArr.push({x:calcX, y:caclY});
                         //炸掉盒子的得分
                         this.role.score += constants.SCORE_FOR_WALL;
@@ -197,7 +203,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                         //无法被炸毁的东西，直接过
                     }else if(mapValue == 100){
                         canGo.Up = false;
-                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
+                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在的泡泡中
                         var nextPaopao = this.game.paopaoArr[calcX][caclY];
                         var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                         if(nextResult){
@@ -218,16 +224,16 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                     mapValue = this.map.getValue(calcX,caclY);
                     if(0 < mapValue && mapValue < 4){
                         canGo.Down = false;
-                        // 处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
+                        //处理箱子爆炸 先不随机刷礼物 最后再统一刷礼物
                         boomBoxArr.push({x:calcX, y:caclY});
                         //炸掉盒子的得分
                         this.role.score += constants.SCORE_FOR_WALL;
-                    }else if(4<= mapValue && mapValue < 100){
+                    }else if(4 <= mapValue && mapValue < 100){
                         canGo.Down = false;
                         //无法被炸毁的东西，直接过
                     }else if(mapValue == 100){
                         canGo.Down = false;
-                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在
+                        //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在的泡泡中
                         var nextPaopao = this.game.paopaoArr[calcX][caclY];
                         var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
                         if(nextResult){
