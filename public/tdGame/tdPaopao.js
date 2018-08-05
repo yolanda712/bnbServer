@@ -26,7 +26,7 @@ var TDPaopao = function(position, power, role){
     this.map.setValue(position.x,position.y,constants.PAOPAO);
     this.game = this.role.game;
     
-    console.log('paopao created at'+ this.position.x+","+this.position.y);
+    // console.log('paopao created at'+ this.position.x+","+this.position.y);
 
     var self = this;
     this.boomTimeout = setTimeout(function(){
@@ -45,8 +45,7 @@ TDPaopao.prototype.calcItemPosibility = function(){
 }
 
 TDPaopao.prototype.boom = function(){
-    console.log('paopao boom  at'+this.position.x+","+this.position.y);
-    // this.role.deletePaopao(this);
+    // console.log('paopao boom  at'+this.position.x+","+this.position.y);
 
     var result = this.findPaopaoBombXY(this.position);
     var boomPaopaoArr = result.boomPaopaoArr;
@@ -65,7 +64,7 @@ TDPaopao.prototype.boom = function(){
     for(var i =0; i<boomXYArr.length; i++){
         var pos = boomXYArr[i];
         if(this.map.isPositionAnItem(pos.x,pos.y)){
-            console.log("itemEaten"+ pos);
+            // console.log("itemEaten"+ pos);
             this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y,role:'null',itemCode:itemCode});
         }
         this.map.setValue(pos.x,pos.y,constants.GROUND);
@@ -102,7 +101,7 @@ TDPaopao.prototype.boom = function(){
     }
     result['itemArr'] = itemArr;
 
-    console.log(result);
+    // console.log(result);
     var game = this.game;
     game.broadcastMsg("boomInfo",result);
 

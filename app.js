@@ -81,23 +81,33 @@ io.on('connection', function (socket) {
     });
 
     socket.on('playAgain', function(data) {
-        var roomName = socket.roomName;
-        var userInfo = data['userInfo'];
+        var roomName = data.roomId;
+        var userInfo = data.userInfo;
         var msg = {code:0,msg:'failed'};
         if(!TDRoom.isRoomExisted(roomName)){
             socket.role = 'master';
-            socket.join(roomName);            
+            socket.roomName = roomName;
+            socket.join(roomName);
+            userInfo.isMaster = true;            
 
             var game = new TDGame(io,roomName);
             game.addPlayer(userInfo);
             msg = TDRoom.createRoom(roomName,game);
+            if(msg.code === 1){
+                msg.userInfos = game.userInfos;
+                msg.msg = 'success';
+            }
         }else{
             socket.role = 'challenger';
+            socket.roomName = roomName;
             socket.join(roomName);
+            userInfo['isMaster'] = false;
 
             var game = TDRoom.getRoom(roomName);            
             game.addPlayer(userInfo);
-            msg ={code:1,msg:'success'};
+            msg ={code:1,msg:'success',userInfos:game.userInfos};
+            game.broadcastMsg('playAgain',msg);
+            return;
         }
         socket.emit('playAgain', msg);
     });
@@ -135,9 +145,23 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('TouchEnd', function () {
+        var game = TDRoom.getRoom(socket.roomName);
+        if(game){
+            if (socket.role === 'master') {
+                game.stopAMobileRole(game.roleArr[0]);
+            } else {
+                game.stopAMobileRole(game.roleArr[1]);
+            }
+        }
+    });
+
     socket.on('disconnect', function(){
-        TDRoom.deleteRoom(socket.roomName);
-        socket.leave(socket.roomName);
+        var game = TDRoom.getRoom(socket.roomName);
+        if(game){
+            game.broadcastMsg('deleteRoom',{code:1,msg:'success'});
+            game.stopGame(socket.role);
+        }
     })
 
     socket.on('error',function(){
