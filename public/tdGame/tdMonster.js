@@ -72,7 +72,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
             if(this.isPositionPassable(this.leftBorder,this.targetYUp)&& this.isPositionPassable(this.rightBorder,this.targetYUp)){
                 this.position.y += this.moveStep;
                 this.tempMoveStep += this.moveStep;
-                this.choseNewDirection(this.tempMoveStep);
+                this.chooseNewDirection(this.tempMoveStep);
             }else{
                 randomDirection = this.findRandomDirection();
                 this.startNewMovInterval(randomDirection);
@@ -83,7 +83,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
             if(this.isPositionPassable(this.leftBorder,this.targetYDown) && this.isPositionPassable(this.rightBorder,this.targetYDown)){
                 this.position.y -= this.moveStep;
                 this.tempMoveStep += this.moveStep;
-                this.choseNewDirection(this.tempMoveStep);
+                this.chooseNewDirection(this.tempMoveStep);
             }else{
                 randomDirection = this.findRandomDirection();
                 this.startNewMovInterval(randomDirection);
@@ -94,7 +94,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
             if(this.isPositionPassable(this.targetXLeft, this.upBorder)&& this.isPositionPassable(this.targetXLeft,this.downBorder)){
                 this.position.x -= this.moveStep;
                 this.tempMoveStep += this.moveStep;
-                this.choseNewDirection(this.tempMoveStep);
+                this.chooseNewDirection(this.tempMoveStep);
             }else{
                 randomDirection = this.findRandomDirection();
                 this.startNewMovInterval(randomDirection);
@@ -105,7 +105,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
             if(this.isPositionPassable(this.targetXRight, this.upBorder) && this.isPositionPassable(this.targetXRight,this.downBorder)){
                 this.position.x += this.moveStep;
                 this.tempMoveStep += this.moveStep;
-                this.choseNewDirection(this.tempMoveStep);
+                this.chooseNewDirection(this.tempMoveStep);
             }else{
                 randomDirection = this.findRandomDirection();
                 this.startNewMovInterval(randomDirection);
@@ -151,7 +151,7 @@ TDMonster.prototype.reverseDirection = function(directionnum){
     }
 }
 
-TDMonster.prototype.choseNewDirection = function(moveStep){
+TDMonster.prototype.chooseNewDirection = function(moveStep){
     //当怪物在一个方向的移动距离超过oneMoveStep时，随机寻找新方向
     if(moveStep >= this.oneMoveStep){
         randomDirection = this.findRandomDirection();
