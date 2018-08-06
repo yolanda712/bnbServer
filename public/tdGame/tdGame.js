@@ -18,7 +18,7 @@ var TDGame = function (serverSocketIO, roomName) {
     this.itemArr = [];
     this.monsterArr = [];
 
-    this.FPS = 60;
+    this.FPS = 30;
     this.playerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;
@@ -50,7 +50,6 @@ TDGame.prototype.createANewRole = function(userInfo){
        newRole.setMap(this.tdMap);
        this.roleArr.push(newRole);
     }
-    
 }
 
 TDGame.prototype.createMonster = function(){

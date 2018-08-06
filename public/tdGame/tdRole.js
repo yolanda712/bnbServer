@@ -68,7 +68,7 @@ Role.prototype.getPosition = function(){
 
 //角色通过手机遥杆移动
 Role.prototype.mobileMove = function(angle){
-    if(Math.abs(this.currentAngle - angle) < 10 || Math.abs(this.currentAngle - angle) > 350){
+    if(Math.abs(this.currentAngle - angle) < 5 || Math.abs(this.currentAngle - angle) > 355){
         return;
     }else{
         var self = this;
