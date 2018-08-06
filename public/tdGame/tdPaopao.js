@@ -1,5 +1,9 @@
 var constants = require('./tdConst')
 
+/**
+ * 数组去重
+ * @param {Array} arr 
+ */
 var uniquePosArray = function(arr){
     var hash = {};
     var base = 10000;
@@ -17,6 +21,11 @@ var uniquePosArray = function(arr){
     return resultArr;
 }
 
+/**
+ * 合并结果集
+ * @param {Object} result 
+ * @param {Object} calculateResult 
+ */
 var concatBoomResult = function(result, calculateResult){
     result.boomXYArr = uniquePosArray(result.boomXYArr.concat(calculateResult.boomXYArr));
     result.boomBoxArr = uniquePosArray(result.boomBoxArr.concat(calculateResult.boomBoxArr));
@@ -31,13 +40,7 @@ var TDPaopao = function(position, power, role){
     this.map = this.role.getMap();
     this.map.setValue(position.x,position.y,constants.PAOPAO);
     this.game = this.role.game;
-<<<<<<< HEAD
     console.log('paopao created at'+ this.position.x+","+this.position.y);
-=======
-    
-    // console.log('paopao created at'+ this.position.x+","+this.position.y);
-
->>>>>>> master
     var self = this;
     this.boomTimeout = setTimeout(function(){
         self.boom();
@@ -45,10 +48,16 @@ var TDPaopao = function(position, power, role){
 
 }
 
+/**
+ * 清除爆炸定时器
+ */
 TDPaopao.prototype.clearBoomTimeout = function(){
     clearTimeout(this.boomTimeout);
 }
 
+/**
+ * 是否生成礼物
+ */
 TDPaopao.prototype.calcItemPosibility = function(){
     // return parseInt(Math.random());
     return 1;
@@ -58,12 +67,7 @@ TDPaopao.prototype.calcItemPosibility = function(){
  * 泡泡爆炸
  */
 TDPaopao.prototype.boom = function(){
-<<<<<<< HEAD
     console.log('paopao boom  at'+this.position.x+","+this.position.y);
-=======
-    // console.log('paopao boom  at'+this.position.x+","+this.position.y);
-
->>>>>>> master
     var result = this.findPaopaoBombXY(this.position);
     var boomPaopaoArr = result.boomPaopaoArr;
     var boomXYArr = result.boomXYArr;
@@ -78,38 +82,12 @@ TDPaopao.prototype.boom = function(){
     }
     for(var i=0; i<boomXYArr.length; i++){
         var pos = boomXYArr[i];
-<<<<<<< HEAD
         //道具是否被炸掉
         this.isItemBoomed(pos);
         //角色是否被炸死
         this.isRoleBoomed(pos);
         //怪物是否被炸死
         this.isMonsterBoomed(pos);
-=======
-        if(this.map.isPositionAnItem(pos.x,pos.y)){
-            // console.log("itemEaten"+ pos);
-            this.game.broadcastMsg("itemEaten",{x:pos.x,y:pos.y,role:'null',itemCode:itemCode});
-        }
-        this.map.setValue(pos.x,pos.y,constants.GROUND);
-        //角色死亡判断
-        for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
-            var curRole = this.game.roleArr[rIndex];
-            var roleMapPos = curRole.getMapLocation(curRole.position.x, curRole.position.y);
-            if(roleMapPos.equals(pos)){
-                curRole.roleBoom();
-            }
-        }
-        //是否炸到小怪物
-        for(var mIndex=0; mIndex<this.game.monsterArr.length; mIndex++){
-            var curMonster = this.game.monsterArr[mIndex];
-            var monsterMapPos = curMonster.getMapLocation(curMonster.position.x,curMonster.position.y);
-            if(monsterMapPos.equals(pos)){
-                //炸掉小怪物的得分
-                this.role.score += constants.SCORE_FOR_MONSTER;
-                curMonster.die();
-            }
-        }
->>>>>>> master
 
     }
     // 生成道具
@@ -118,12 +96,7 @@ TDPaopao.prototype.boom = function(){
         this.creatItem(pos,itemArr);
     }
     result['itemArr'] = itemArr;
-<<<<<<< HEAD
     console.log(result);
-=======
-
-    // console.log(result);
->>>>>>> master
     var game = this.game;
     game.broadcastMsg("boomInfo",result);
 
@@ -131,8 +104,8 @@ TDPaopao.prototype.boom = function(){
 
 /**
  * 计算泡泡的爆炸范围
- * @param currentMapLocation 
- * @return {boomXYArr:boomXYArr,boomBoxArr:boomBoxArr,boomPaopaoArr:boomPaopaoArr}
+ * @param {tdPoint} currentMapLocation 泡泡的位置
+ * @return {Object} result 爆炸范围
  */
 TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
     if(this.isActive){
@@ -198,6 +171,14 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
     }
 }
 
+/**
+ * 计算泡泡在某方向的爆炸范围
+ * @param {number} calcX 目标位置的X坐标
+ * @param {number} caclY 目标位置的Y坐标
+ * @param {Object} canGo 是否可以前进
+ * @param {String} direction 移动方向
+ * @return {Object} {boomXYArr:boomXYArr,boomBoxArr:boomBoxArr,boomPaopaoArr:boomPaopaoArr}爆炸范围
+ */
 TDPaopao.prototype.oneDirectionBombArea = function(calcX,caclY,canGo,direction){
     var boomXYArr = [];
     var boomBoxArr = [];
@@ -229,6 +210,10 @@ TDPaopao.prototype.oneDirectionBombArea = function(calcX,caclY,canGo,direction){
     return {boomXYArr:boomXYArr,boomBoxArr:boomBoxArr,boomPaopaoArr:boomPaopaoArr};
 }
 
+/**
+ * 人物是否被炸到
+ * @param {tdPoint} position 当前位置
+ */
 TDPaopao.prototype.isRoleBoomed = function(position){
     for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
         var curRole = this.game.roleArr[rIndex];
@@ -240,6 +225,10 @@ TDPaopao.prototype.isRoleBoomed = function(position){
     }
 }
 
+/**
+ * 怪物是否被炸到
+ * @param {tdPoint} position 当前位置
+ */
 TDPaopao.prototype.isMonsterBoomed = function(position){
     for(var mIndex=0; mIndex<this.game.monsterArr.length; mIndex++){
         var curMonster = this.game.monsterArr[mIndex];
@@ -253,6 +242,10 @@ TDPaopao.prototype.isMonsterBoomed = function(position){
     }
 }
 
+/**
+ * 礼物是否被炸掉
+ * @param {tdPoint} position 当前位置
+ */
 TDPaopao.prototype.isItemBoomed = function(position){
     if(this.map.isPositionAnItem(position.x,position.y)){
         console.log("itemEaten"+ position);
@@ -262,6 +255,11 @@ TDPaopao.prototype.isItemBoomed = function(position){
     this.map.setValue(position.x,position.y,constants.GROUND);
 }
 
+/**
+ * 生成礼物
+ * @param {tdPoint} position 当前位置
+ * @param {number} itemArr 礼物类型编号
+ */
 TDPaopao.prototype.creatItem = function(position,itemArr){
     if(this.map.getValue(position.x,position.y)==constants.GIFT_WALL && this.calcItemPosibility()){
         var itemCode = 101 + parseInt(Math.random()*3);

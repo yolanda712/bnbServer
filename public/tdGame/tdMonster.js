@@ -63,6 +63,10 @@ TDMonster.prototype.move = function(){
     }
 }
 
+/**
+ * 按指定方向移动
+ * @param {number} directionnum 移动方向
+ */
 TDMonster.prototype.moveOneDirection = function(directionnum){
     this.calculate();
     var randomDirection = -1;
@@ -116,6 +120,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
 
 /**
  * 寻找一个随机的可行方向
+ * @returns {number} directionnum 移动方向
  */
 TDMonster.prototype.findRandomDirection = function(){
     this.calculate();
@@ -137,6 +142,8 @@ TDMonster.prototype.findRandomDirection = function(){
 
 /**
  * 计算当前运动方向的相反方向
+ * @param {number} directionnum 当前移动方向
+ * @returns {number} directionnum 当前方向的反方向
  */
 TDMonster.prototype.reverseDirection = function(directionnum){
     switch (directionnum) {
@@ -151,6 +158,10 @@ TDMonster.prototype.reverseDirection = function(directionnum){
     }
 }
 
+/**
+ * 选择一个新的移动方向
+ * @param {number} moveStep 当前方向的移动距离
+ */
 TDMonster.prototype.chooseNewDirection = function(moveStep){
     //当怪物在一个方向的移动距离超过oneMoveStep时，随机寻找新方向
     if(moveStep >= this.oneMoveStep){
@@ -162,12 +173,19 @@ TDMonster.prototype.chooseNewDirection = function(moveStep){
     }
 }
 
+/**
+ * 启动一个新的移动线程
+ * @param {number} randomDirection 随机方向
+ */
 TDMonster.prototype.startNewMovInterval = function(randomDirection){
     clearInterval(this.moveInterval);
     this.currentDirection = randomDirection;
     this.move();
 }
 
+/**
+ * 计算怪物的边界信息和位置信息
+ */
 TDMonster.prototype.calculate = function(){
     this.leftBorder = this.position.x - this.monsterBorder;
     this.rightBorder = this.position.x + this.monsterBorder;
