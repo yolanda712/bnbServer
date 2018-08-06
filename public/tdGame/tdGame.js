@@ -5,7 +5,7 @@ var Direction = constants.Direction;
 var Rooms = require('./tdRoom');
 var TDMonster = require('./tdMonster');
 var TDRoom = Rooms.TDRoom;
-
+var utils = require('../utils');
 
 //主游戏入口
 var TDGame = function (serverSocketIO, roomName) {
@@ -18,7 +18,7 @@ var TDGame = function (serverSocketIO, roomName) {
     this.itemArr = [];
     this.monsterArr = [];
 
-    this.FPS = 30;
+    this.FPS = 60;
     this.playerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;
@@ -26,6 +26,7 @@ var TDGame = function (serverSocketIO, roomName) {
 
     this.gameInfoInterval = null;
     this.timer = null;
+    this.isRunning = false;
 }
 
 TDGame.prototype.addPlayer = function(userInfo){
@@ -64,7 +65,7 @@ TDGame.prototype.createMonster = function(){
     this.monsterArr.push(newMonster);
 }
 
-TDGame.prototype.startGame = function(){
+TDGame.prototype.initRolesAndMonsters = function(){
     //create player roles
     for(var i=0; i<this.playerCount; i++){
         this.createANewRole(this.userInfos[i]);
@@ -74,7 +75,9 @@ TDGame.prototype.startGame = function(){
     for(var j=0; j<this.monsterCount; j++){
         this.createMonster();
     }
+}
 
+TDGame.prototype.broadcastGameStartMsg = function(){
     var self = this;
     var roleStartPointArr = this.tdMap.roleStartPointArr.map(function (point) {  
         var newPoint = self.tdMap.convertMapIndexToCocosAxis(self.tdMap.getYLen(),point.x,point.y);
@@ -97,6 +100,12 @@ TDGame.prototype.startGame = function(){
         userInfos: this.userInfos
     });
     console.log(mapInfo);
+}
+
+TDGame.prototype.startGame = function(){ 
+    this.isRunning = true;   
+    this.initRolesAndMonsters();
+    this.broadcastGameStartMsg();
 
     var self = this;
     this.timer = setInterval(function(){
@@ -119,35 +128,31 @@ TDGame.prototype.stopGameIntervals = function(){
     clearInterval(this.gameInfoInterval);
 }
 
-TDGame.prototype.stopGame = function(){
+TDGame.prototype.stopGame = function(loser){
     console.log('end');
     //客户端结束
     var msg = {winner:0, isTied:true};
     var masterRole = this.roleArr[0];
     var challengerRole = this.roleArr[1];
     // TODO 角色不应该写死个数
-    if(!challengerRole) challengerRole = masterRole;
-    var winner = findWinner(masterRole,challengerRole);
-    if(winner){
-        msg = {winner:winner.guid, isTied:false};
+    // 判断是否单人玩家
+    if(challengerRole){
+        // 判断是否传入失败玩家信息
+        if(loser){
+            msg.isTied = false;
+            msg.winner = loser === 'master' ? this.roleArr[1].guid : this.roleArr[0].guid;
+        }else{
+            // 正常游戏逻辑判断失败者
+            var winner = findWinner(masterRole,challengerRole);
+            if(winner){
+                msg = {winner:winner.guid, isTied:false};
+            }
+        }
     }
     console.log("game over" + msg);
     this.broadcastMsg('end',msg);
 
-    try{
-        var socketRoom = this.io.sockets.adapter.rooms[this.roomName];
-        var sockets = socketRoom.sockets;
-        var socketIds = Object.keys(sockets);
-    
-        // TODO socket退出房间，之后要换位置
-        for(var i=0;i<socketIds.length;i++){
-            var socket = this.io.sockets.sockets[socketIds[i]];
-            socket.leave(this.roomName);
-        }
-    }catch(error){
-        console.log(error);
-    }
-    
+    utils.clearSocketsByRoomName(this.io, this.roomName);
     TDRoom.deleteRoom(this.roomName);
 }
 
@@ -192,6 +197,10 @@ TDGame.prototype.moveARoleByKeyCode = function(key, role){
     }
 }
 
+TDGame.prototype.stopAMobileRole = function(role){
+    role.mobileStop();
+}
+
 TDGame.prototype.stopARoleByKeyCode = function(key, role){
     switch (key) {  
         case constants.KEY_CODE.W:
@@ -225,7 +234,7 @@ TDGame.prototype.monsterMeetRole = function(){
 }
 
 TDGame.prototype.isGameFullOfPlayers = function(){
-    return this.playerCount>=this.tdMap.roleStartPointArr.length;
+    return this.isRunning || (this.playerCount >= this.tdMap.roleStartPointArr.length);
 }
 
 // 根据FPS向客户端发送人物角色信息的回调
@@ -249,7 +258,7 @@ var clientCallback = function(game){
                 })
         }
         game.broadcastMsg("roleInfo",msg);
-        console.log(msg);
+        // console.log(msg);
     }
 };
 
