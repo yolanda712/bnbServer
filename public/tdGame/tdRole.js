@@ -4,6 +4,14 @@ var constants = require('./tdConst')
 var Direction = constants.Direction;
 
 
+/**
+ * Role类，用于控制游戏角色的所有操作
+ *
+ * @param {int} roleIndex 未来用于替换name
+ * @param {string} name 角色名称 master or challenger
+ * @param {tdGame} game 所属游戏
+ * @param {object} userInfo 用户个人资料
+ */
 var Role = function(roleIndex,name,game,userInfo){
     this.FPS = 90;
     this.name = name;
@@ -66,7 +74,12 @@ Role.prototype.getPosition = function(){
     return this.position;
 }
 
-//角色通过手机遥杆移动
+/**
+ * 角色通过手机遥杆移动，通过开启interval不断移动角色
+ *
+ * @param {float}} angle
+ * @returns
+ */
 Role.prototype.mobileMove = function(angle){
     if(Math.abs(this.currentAngle - angle) < 5 || Math.abs(this.currentAngle - angle) > 355){
         return;
@@ -83,6 +96,11 @@ Role.prototype.mobileMove = function(angle){
     }
 }
 
+/**
+ * 根据角度信息移动角色一步
+ *
+ * @param {float} angle
+ */
 Role.prototype.mobileMoveOneStep = function(angle){    
     angle = anglePreprocess(angle);
     var x_offset = Math.cos(angle * (Math.PI/180)) * this.moveStep;
@@ -122,10 +140,15 @@ Role.prototype.mobileMoveOneStep = function(angle){
         var mapPosition = this.getMapLocation(this.position.x,this.position.y);
         this.getItem(mapPosition);
     }
-
 }
 
-// 检测是否可以沿X轴横向移动
+/**
+ * 检测角色是否可以沿X轴横向移动
+ *
+ * @param {float} x_offset
+ * @param {float} threshold
+ * @returns {boolean}
+ */
 Role.prototype.mobileCheckXOffset = function(x_offset, threshold){
     var movedPos = new Point(this.position.x + x_offset, this.position.y);
     if(x_offset>0){
@@ -147,7 +170,13 @@ Role.prototype.mobileCheckXOffset = function(x_offset, threshold){
     }
 }
 
-// 检测是否可以沿Y轴纵向移动
+/**
+ * 检测是否可以沿Y轴纵向移动
+ *
+ * @param {float} y_offset
+ * @param {float} threshold
+ * @returns {boolean}
+ */
 Role.prototype.mobileCheckYOffset = function(y_offset, threshold){
     var movedPos = new Point(this.position.x, this.position.y + y_offset);
     if(y_offset>0){
@@ -169,13 +198,22 @@ Role.prototype.mobileCheckYOffset = function(y_offset, threshold){
     }
 }
 
+/**
+ * 停止移动角色
+ *
+ */
 Role.prototype.mobileStop = function(){
     this.isKeyDown = false;
     this.currentDirection = Direction.None;
     clearInterval(this.moveInterval);
 }
 
-//角色移动函数
+/**
+ * 角色根据按键移动函数
+ *
+ * @param {int} directionnum
+ * @returns
+ */
 Role.prototype.move = function(directionnum) {
     if (directionnum < 0 || directionnum > 3) return;
     // this.Stop();
@@ -192,11 +230,11 @@ Role.prototype.move = function(directionnum) {
     //移动线程
     this.moveInterval = setInterval(function() {
         // console.log('move');
-        self.moveOneStop(directionnum);
+        self.moveOneStep(directionnum);
     }, 1000/self.FPS);
 }
 
-Role.prototype.moveOneStop = function(directionnum){
+Role.prototype.moveOneStep = function(directionnum){
     var threshold = this.threshold;
     switch (directionnum) {
         case Direction.Up:
@@ -300,6 +338,13 @@ Role.prototype.stop = function(directionnum) {
     clearInterval(this.moveInterval);
 }
 
+/**
+ * 将角色坐标转化为地图index坐标 （32，32）-> （1，1）
+ *
+ * @param {int} x
+ * @param {int} y
+ * @returns {Point}
+ */
 Role.prototype.getMapLocation = function(x,y){
     var tdMap = this.getMap();
     if(tdMap ==null){
@@ -309,6 +354,13 @@ Role.prototype.getMapLocation = function(x,y){
     return new Point(tdMap.getMapLocation(x,y).x, tdMap.getMapLocation(x,y).y);
 }
 
+/**
+ * 判断某一位置是否可以通过
+ *
+ * @param {int} x
+ * @param {int} y
+ * @returns {boolean}
+ */
 Role.prototype.isPositionPassable = function(x,y){
     if(this.isDead) return false;
     var tdMap = this.getMap();
@@ -323,6 +375,11 @@ Role.prototype.isPositionPassable = function(x,y){
     return tdMap.isPositionPassable(location.x,location.y);
 }
 
+/**
+ * 判断角色当前位置是否可以放泡泡
+ *
+ * @returns {boolean}
+ */
 Role.prototype.isPositionPaopaoAble = function(){
     if(this.isDead) return false;
     var tdMap = this.getMap();
@@ -330,12 +387,24 @@ Role.prototype.isPositionPaopaoAble = function(){
     return tdMap.isPositionPassable(location.x,location.y);
 }
 
+/**
+ * 判断某一位置是否是道具
+ *
+ * @param {int} x
+ * @param {int} y
+ * @returns {boolean}
+ */
 Role.prototype.isPositionAnItem = function(x,y){
     var tdMap = this.getMap();
     var location = this.getMapLocation(x,y);
     return tdMap.isPositionAnItem(location.x,location.y);
 }
 
+/**
+ * 吃固定位置的道具
+ *
+ * @param {Point} mapPosition
+ */
 Role.prototype.getItem = function(mapPosition){
     var itemCode = this.getMap().getValue(mapPosition.x,mapPosition.y);
     this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
@@ -384,6 +453,10 @@ Role.prototype.deletePaopao = function(paopao){
     // console.log(this.game.paopaoArr);
 }
 
+/**
+ * 角色被炸到3秒后触发死亡
+ *
+ */
 Role.prototype.roleBoom = function(){
     console.log('loser: '+this.name);
     var self = this;
@@ -394,12 +467,21 @@ Role.prototype.roleBoom = function(){
     this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, role:this.name});
 }
 
+/**
+ * 角色立即死亡
+ *
+ */
 Role.prototype.die = function(){
     this.game.stopGame();
 }
 
+/**
+ * 将角度进行模糊计算，利于玩家移动
+ *
+ * @param {float} angle
+ * @returns {float} angle
+ */
 var anglePreprocess = function(angle){
-    // 角度模糊判断
     if(60<angle && angle<120) angle = 90;
     if(-35<angle && angle<35) angle = 0;
     if(145<angle || angle<-145) angle = 180;
