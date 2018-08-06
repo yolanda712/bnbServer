@@ -32,7 +32,6 @@ var TDPaopao = function(position, power, role){
     this.boomTimeout = setTimeout(function(){
         self.boom();
     },3000);
-
 }
 
 TDPaopao.prototype.clearBoomTimeout = function(){

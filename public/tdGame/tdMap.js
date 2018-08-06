@@ -104,24 +104,11 @@ var backGroundMap1 = [
     [  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1,  S_W_1 ]
  ];
 
- var roleStartPointArr = [
-     new Point(14,1),
-     new Point(1,18),
- ]
-
- var monsterStartPointArr = [
-    new Point(14,18),
-    new Point(1,1),
- ]
-
- var copyMap = function(mapArr){
-    var newMap = [];
-    for(var i=0; i<mapArr.length; i++){
-        newMap.push(mapArr[i].concat());
-    }
-    return newMap;
- }
-
+ /**
+  * TDMap类，用于构建游戏地图
+  *
+  * @param {string} mapName
+  */
  var TDMap = function(mapName){
     this.mapName = mapName;
     this.map = copyMap(backGroundMap);
@@ -174,5 +161,23 @@ TDMap.prototype.convertMapIndexToCocosAxis = function (yMapLen,x,y) {
     cocosPos.y = 32*(yMapLen-x-1);
     return cocosPos;
 };
+
+var roleStartPointArr = [
+    new Point(14,1),
+    new Point(1,18),
+]
+
+var monsterStartPointArr = [
+   new Point(14,18),
+   new Point(1,1),
+]
+
+var copyMap = function(mapArr){
+   var newMap = [];
+   for(var i=0; i<mapArr.length; i++){
+       newMap.push(mapArr[i].concat());
+   }
+   return newMap;
+}
 
  module.exports = TDMap;

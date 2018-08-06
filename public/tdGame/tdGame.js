@@ -7,7 +7,13 @@ var TDMonster = require('./tdMonster');
 var TDRoom = Rooms.TDRoom;
 var utils = require('../utils');
 
-//主游戏入口
+
+/**
+ * TDGame类，主游戏入口，所有的游戏逻辑都涵盖于此
+ *
+ * @param {ServerIO} serverSocketIO
+ * @param {string} roomName
+ */
 var TDGame = function (serverSocketIO, roomName) {
     this.io = serverSocketIO;
     this.roomName = roomName;
@@ -18,7 +24,7 @@ var TDGame = function (serverSocketIO, roomName) {
     this.itemArr = [];
     this.monsterArr = [];
 
-    this.FPS = 60;
+    this.FPS = 30;
     this.playerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;
@@ -27,6 +33,64 @@ var TDGame = function (serverSocketIO, roomName) {
     this.gameInfoInterval = null;
     this.timer = null;
     this.isRunning = false;
+}
+
+/**
+ * 开始游戏，包括初始化角色，向前台emit开始消息等
+ *
+ */
+TDGame.prototype.startGame = function(){ 
+    this.isRunning = true;   
+    this.initRolesAndMonsters();
+    this.broadcastGameStartMsg();
+
+    var self = this;
+    this.timer = setInterval(function(){
+        self.countTime();
+    }, 1000); 
+
+    this.gameInfoInterval = setInterval(function(){
+        clientCallback(self);
+        monsterCallback(self);
+    },1000/this.FPS);
+
+    for(var k=0; k<this.monsterArr.length; k++){
+        this.monsterArr[k].currentDirection = this.monsterArr[k].findDirection();
+        this.monsterArr[k].move();
+    }
+}
+
+/**
+ * 结束游戏方法，若有玩家断线会有loser参数，否则根据死亡状态和积分判断胜负
+ *
+ * @param {string} loser
+ */
+TDGame.prototype.stopGame = function(loser){
+    console.log('end');
+    //客户端结束
+    var msg = {winner:0, isTied:true};
+    var masterRole = this.roleArr[0];
+    var challengerRole = this.roleArr[1];
+    // TODO 角色不应该写死个数
+    // 判断是否单人玩家
+    if(challengerRole){
+        // 判断是否传入失败玩家信息
+        if(loser){
+            msg.isTied = false;
+            msg.winner = loser === 'master' ? this.roleArr[1].guid : this.roleArr[0].guid;
+        }else{
+            // 正常游戏逻辑判断失败者
+            var winner = findWinner(masterRole,challengerRole);
+            if(winner){
+                msg = {winner:winner.guid, isTied:false};
+            }
+        }
+    }
+    console.log("game over" + msg);
+    this.broadcastMsg('end',msg);
+
+    utils.clearSocketsByRoomName(this.io, this.roomName);
+    TDRoom.deleteRoom(this.roomName);
 }
 
 TDGame.prototype.addPlayer = function(userInfo){
@@ -50,7 +114,6 @@ TDGame.prototype.createANewRole = function(userInfo){
        newRole.setMap(this.tdMap);
        this.roleArr.push(newRole);
     }
-    
 }
 
 TDGame.prototype.createMonster = function(){
@@ -65,6 +128,10 @@ TDGame.prototype.createMonster = function(){
     this.monsterArr.push(newMonster);
 }
 
+/**
+ * 初始化游戏角色和怪物
+ *
+ */
 TDGame.prototype.initRolesAndMonsters = function(){
     //create player roles
     for(var i=0; i<this.playerCount; i++){
@@ -102,58 +169,9 @@ TDGame.prototype.broadcastGameStartMsg = function(){
     console.log(mapInfo);
 }
 
-TDGame.prototype.startGame = function(){ 
-    this.isRunning = true;   
-    this.initRolesAndMonsters();
-    this.broadcastGameStartMsg();
-
-    var self = this;
-    this.timer = setInterval(function(){
-        self.countTime();
-    }, 1000); 
-
-    this.gameInfoInterval = setInterval(function(){
-        clientCallback(self);
-        monsterCallback(self);
-    },1000/this.FPS);
-
-    for(var k=0; k<this.monsterArr.length; k++){
-        this.monsterArr[k].currentDirection = this.monsterArr[k].findDirection();
-        this.monsterArr[k].move();
-    }
-}
-
 TDGame.prototype.stopGameIntervals = function(){
     clearInterval(this.timer);
     clearInterval(this.gameInfoInterval);
-}
-
-TDGame.prototype.stopGame = function(loser){
-    console.log('end');
-    //客户端结束
-    var msg = {winner:0, isTied:true};
-    var masterRole = this.roleArr[0];
-    var challengerRole = this.roleArr[1];
-    // TODO 角色不应该写死个数
-    // 判断是否单人玩家
-    if(challengerRole){
-        // 判断是否传入失败玩家信息
-        if(loser){
-            msg.isTied = false;
-            msg.winner = loser === 'master' ? this.roleArr[1].guid : this.roleArr[0].guid;
-        }else{
-            // 正常游戏逻辑判断失败者
-            var winner = findWinner(masterRole,challengerRole);
-            if(winner){
-                msg = {winner:winner.guid, isTied:false};
-            }
-        }
-    }
-    console.log("game over" + msg);
-    this.broadcastMsg('end',msg);
-
-    utils.clearSocketsByRoomName(this.io, this.roomName);
-    TDRoom.deleteRoom(this.roomName);
 }
 
 TDGame.prototype.broadcastMsg = function(msg, data){

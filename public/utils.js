@@ -1,3 +1,9 @@
+/**
+ * 将SocketIO下的某一房间下所有sockets清空
+ *
+ * @param {SeverIO} io
+ * @param {string} roomName
+ */
 var clearSocketsByRoomName = function(io,roomName){
     try{
         var socketRoom = io.sockets.adapter.rooms[roomName];
