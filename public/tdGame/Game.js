@@ -1,24 +1,24 @@
-var TDMap = require('./tdMap');
-var Role = require('./tdRole');
-var constants = require('./tdConst')
+var Map = require('./Map');
+var Role = require('./Role');
+var constants = require('./Const')
 var Direction = constants.Direction;
-var Rooms = require('./tdRoom');
-var TDMonster = require('./tdMonster');
-var TDRoom = Rooms.TDRoom;
+var Rooms = require('./Room');
+var Monster = require('./Monster');
+var Room = Rooms.Room;
 var utils = require('../utils');
 
 
 /**
- * TDGame类，主游戏入口，所有的游戏逻辑都涵盖于此
+ * Game类，主游戏入口，所有的游戏逻辑都涵盖于此
  *
  * @param {ServerIO} serverSocketIO
  * @param {string} roomName
  */
-var TDGame = function (serverSocketIO, roomName) {
+var Game = function (serverSocketIO, roomName) {
     this.io = serverSocketIO;
     this.roomName = roomName;
     this.userInfos = [];
-    this.tdMap = new TDMap();
+    this.Map = new Map();
     this.roleArr = [];
     this.paopaoArr = [];
     this.itemArr = [];
@@ -28,7 +28,7 @@ var TDGame = function (serverSocketIO, roomName) {
     this.playerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;
-    this.monsterCount = this.tdMap.monsterStartPointArr.length;
+    this.monsterCount = this.Map.monsterStartPointArr.length;
 
     this.gameInfoInterval = null;
     this.timer = null;
@@ -39,7 +39,8 @@ var TDGame = function (serverSocketIO, roomName) {
  * 开始游戏，包括初始化角色，向前台emit开始消息等
  *
  */
-TDGame.prototype.startGame = function(){ 
+Game.prototype.startGame = function(){ 
+    if(this.isRunning) return;
     this.isRunning = true;   
     this.initRolesAndMonsters();
     this.broadcastGameStartMsg();
@@ -55,7 +56,7 @@ TDGame.prototype.startGame = function(){
     },1000/this.FPS);
 
     for(var k=0; k<this.monsterArr.length; k++){
-        this.monsterArr[k].currentDirection = this.monsterArr[k].findDirection();
+        this.monsterArr[k].currentDirection = this.monsterArr[k].findRandomDirection();
         this.monsterArr[k].move();
     }
 }
@@ -65,7 +66,8 @@ TDGame.prototype.startGame = function(){
  *
  * @param {string} loser
  */
-TDGame.prototype.stopGame = function(loser){
+Game.prototype.stopGame = function(loser){
+    if(!this.isRunning) return;
     console.log('end');
     //客户端结束
     var msg = {winner:0, isTied:true};
@@ -90,19 +92,21 @@ TDGame.prototype.stopGame = function(loser){
     this.broadcastMsg('end',msg);
 
     utils.clearSocketsByRoomName(this.io, this.roomName);
-    TDRoom.deleteRoom(this.roomName);
+    Room.deleteRoom(this.roomName);
 }
 
-TDGame.prototype.addPlayer = function(userInfo){
-    this.userInfos.push(userInfo);
-    this.playerCount++;
+Game.prototype.addPlayer = function(userInfo){
+    if(!this.isGameFullOfPlayers()){
+        this.userInfos.push(userInfo);
+        this.playerCount++;
+    }   
 }
 
-TDGame.prototype.createANewRole = function(userInfo){
+Game.prototype.createANewRole = function(userInfo){
     var existedRoleNum = this.roleArr.length;
-    if(this.tdMap.roleStartPointArr.length > existedRoleNum){
-       var startPosition = this.tdMap.roleStartPointArr[existedRoleNum];
-       var cocosPosition = this.tdMap.convertMapIndexToCocosAxis(this.tdMap.getYLen(), startPosition.x, startPosition.y);
+    if(this.Map.roleStartPointArr.length > existedRoleNum){
+       var startPosition = this.Map.roleStartPointArr[existedRoleNum];
+       var cocosPosition = this.Map.convertMapIndexToCocosAxis(this.Map.getYLen(), startPosition.x, startPosition.y);
        var role = null;
        if(existedRoleNum == 0){
            role = 'master';
@@ -111,19 +115,19 @@ TDGame.prototype.createANewRole = function(userInfo){
        }
        var newRole = new Role(existedRoleNum,role,this,userInfo);
        newRole.setPosition(cocosPosition.x, cocosPosition.y);
-       newRole.setMap(this.tdMap);
+       newRole.setMap(this.Map);
        this.roleArr.push(newRole);
     }
 }
 
-TDGame.prototype.createMonster = function(){
+Game.prototype.createMonster = function(){
     //小怪物从monster0开始命名
     var monsterIndex = this.monsterArr.length;
     var monsterName = "monster"+this.monsterArr.length;
-    var newMonster = new TDMonster(monsterIndex,monsterName,this);
-    newMonster.setMap(this.tdMap);
-    var startPosition = this.tdMap.monsterStartPointArr[monsterIndex];
-    var cocosPosition = this.tdMap.convertMapIndexToCocosAxis(this.tdMap.getYLen(), startPosition.x, startPosition.y);
+    var newMonster = new Monster(monsterIndex,monsterName,this);
+    newMonster.setMap(this.Map);
+    var startPosition = this.Map.monsterStartPointArr[monsterIndex];
+    var cocosPosition = this.Map.convertMapIndexToCocosAxis(this.Map.getYLen(), startPosition.x, startPosition.y);
     newMonster.setPosition(cocosPosition.x, cocosPosition.y);
     this.monsterArr.push(newMonster);
 }
@@ -132,7 +136,7 @@ TDGame.prototype.createMonster = function(){
  * 初始化游戏角色和怪物
  *
  */
-TDGame.prototype.initRolesAndMonsters = function(){
+Game.prototype.initRolesAndMonsters = function(){
     //create player roles
     for(var i=0; i<this.playerCount; i++){
         this.createANewRole(this.userInfos[i]);
@@ -144,20 +148,20 @@ TDGame.prototype.initRolesAndMonsters = function(){
     }
 }
 
-TDGame.prototype.broadcastGameStartMsg = function(){
+Game.prototype.broadcastGameStartMsg = function(){
     var self = this;
-    var roleStartPointArr = this.tdMap.roleStartPointArr.map(function (point) {  
-        var newPoint = self.tdMap.convertMapIndexToCocosAxis(self.tdMap.getYLen(),point.x,point.y);
+    var roleStartPointArr = this.Map.roleStartPointArr.map(function (point) {  
+        var newPoint = self.Map.convertMapIndexToCocosAxis(self.Map.getYLen(),point.x,point.y);
         return newPoint;  
     });
-    var monsterStartPointArr = this.tdMap.monsterStartPointArr.map(function (point) {  
-        var newPoint = self.tdMap.convertMapIndexToCocosAxis(self.tdMap.getYLen(),point.x,point.y);
+    var monsterStartPointArr = this.Map.monsterStartPointArr.map(function (point) {  
+        var newPoint = self.Map.convertMapIndexToCocosAxis(self.Map.getYLen(),point.x,point.y);
         return newPoint;  
     });
 
     var mapInfo = {
         mapName:'basicMap',
-        arr: this.tdMap.map,
+        arr: this.Map.map,
         roleStartPointArr: roleStartPointArr,
         monsterStartPointArr: monsterStartPointArr
     };
@@ -169,16 +173,16 @@ TDGame.prototype.broadcastGameStartMsg = function(){
     console.log(mapInfo);
 }
 
-TDGame.prototype.stopGameIntervals = function(){
+Game.prototype.stopGameIntervals = function(){
     clearInterval(this.timer);
     clearInterval(this.gameInfoInterval);
 }
 
-TDGame.prototype.broadcastMsg = function(msg, data){
+Game.prototype.broadcastMsg = function(msg, data){
     this.io.to(this.roomName).emit(msg,data);
 }
 
-TDGame.prototype.countTime = function(){
+Game.prototype.countTime = function(){
     if(this.gameTime > 0){
         console.log(this.gameTime);
         this.gameTime--;
@@ -187,11 +191,11 @@ TDGame.prototype.countTime = function(){
     }
 }
 
-TDGame.prototype.moveARoleByAngle = function(angle,role){
+Game.prototype.moveARoleByAngle = function(angle,role){
     role.mobileMove(angle);
 }
 
-TDGame.prototype.moveARoleByKeyCode = function(key, role){
+Game.prototype.moveARoleByKeyCode = function(key, role){
     switch (key) {
         //W键,向上移动     
         case constants.KEY_CODE.W:
@@ -215,11 +219,11 @@ TDGame.prototype.moveARoleByKeyCode = function(key, role){
     }
 }
 
-TDGame.prototype.stopAMobileRole = function(role){
+Game.prototype.stopAMobileRole = function(role){
     role.mobileStop();
 }
 
-TDGame.prototype.stopARoleByKeyCode = function(key, role){
+Game.prototype.stopARoleByKeyCode = function(key, role){
     switch (key) {  
         case constants.KEY_CODE.W:
             role.stop(Direction.Up);
@@ -236,7 +240,7 @@ TDGame.prototype.stopARoleByKeyCode = function(key, role){
     }
 }
 
-TDGame.prototype.monsterMeetRole = function(){
+Game.prototype.monsterMeetRole = function(){
     for(var i=0; i<this.monsterArr.length ;i++){
         for(var j=0; j<this.roleArr.length ;j++){
             var monsterPos = this.monsterArr[i].getMapLocation(this.monsterArr[i].position.x,this.monsterArr[i].position.y);
@@ -251,8 +255,8 @@ TDGame.prototype.monsterMeetRole = function(){
     }
 }
 
-TDGame.prototype.isGameFullOfPlayers = function(){
-    return this.isRunning || (this.playerCount >= this.tdMap.roleStartPointArr.length);
+Game.prototype.isGameFullOfPlayers = function(){
+    return this.isRunning || (this.playerCount >= this.Map.roleStartPointArr.length);
 }
 
 // 根据FPS向客户端发送人物角色信息的回调
@@ -322,4 +326,4 @@ var findWinnerByScore = function(masterRole, challengerRole){
     }
 }
 
-module.exports = TDGame;
+module.exports = Game;

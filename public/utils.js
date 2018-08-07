@@ -16,7 +16,7 @@ var clearSocketsByRoomName = function(io,roomName){
             socket.leave(roomName);
         }
     }catch(error){
-        console.log(error);
+        console.log('Already cleared Sockets by roomName');
     }
 }
 

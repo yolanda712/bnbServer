@@ -1,13 +1,14 @@
-// Singleton TDRoom
+// Singleton Room
 var INSTANCE = null;
 
 
 /**
- * TDRoom类，用于查找具体游戏的单例类
+ * Room类，用于查找具体游戏的单例类
  *
  */
-var TDRoom = function(){
+var Room = function(){
     this.rooms = {};
+    this.roomMasters = {};
 }
 
 /**
@@ -15,7 +16,7 @@ var TDRoom = function(){
  *
  * @returns obj{}, roomName playerCount isFull
  */
-TDRoom.prototype.getRooms = function(){
+Room.prototype.getRooms = function(){
     result = [];
     for(roomName in this.rooms){
         result.push(
@@ -36,7 +37,7 @@ TDRoom.prototype.getRooms = function(){
  * @param {string} roomName
  * @returns tdGame
  */
-TDRoom.prototype.getRoom = function(roomName){
+Room.prototype.getRoom = function(roomName){
     return this.rooms[roomName];
 }
 
@@ -47,7 +48,7 @@ TDRoom.prototype.getRoom = function(roomName){
  * @param {tdGame} game
  * @returns msg
  */
-TDRoom.prototype.createRoom = function(roomName,game){
+Room.prototype.createRoom = function(roomName,game){
     if(!this.isRoomExisted(roomName)){
         this.rooms[roomName] = game;
         return this.returnMsg(1,'success');
@@ -61,7 +62,7 @@ TDRoom.prototype.createRoom = function(roomName,game){
  * @param {string} roomName
  * @returns msg
  */
-TDRoom.prototype.deleteRoom = function(roomName){
+Room.prototype.deleteRoom = function(roomName){
     var existGame = this.rooms[roomName];
     if(existGame){
         this.rooms[roomName] = null;
@@ -80,12 +81,27 @@ TDRoom.prototype.deleteRoom = function(roomName){
  * @param {string} roomName
  * @returns bool
  */
-TDRoom.prototype.isRoomExisted = function(roomName){
+Room.prototype.isRoomExisted = function(roomName){
     var existGame = this.rooms[roomName];
     if(!existGame){
         return false;
     }
     return true;
+}
+
+/**
+ * 判断房间是否满员
+ *
+ * @param {string} roomName
+ * @returns bool
+ */
+Room.prototype.isRoomFull = function(roomName){
+    var existGame = this.rooms[roomName];
+    if(!existGame){
+        return true;
+    }else{
+        return existGame.isGameFullOfPlayers();
+    }
 }
 
 /**
@@ -95,7 +111,7 @@ TDRoom.prototype.isRoomExisted = function(roomName){
  * @param {string} msg
  * @returns msgObj
  */
-TDRoom.prototype.returnMsg = function(code,msg){
+Room.prototype.returnMsg = function(code,msg){
     return {code:code,msg:msg};
 }
 
@@ -104,14 +120,14 @@ TDRoom.prototype.returnMsg = function(code,msg){
  *
  * @returns
  */
-TDRoom.prototype.getInstance = function(){
+Room.prototype.getInstance = function(){
     if(INSTANCE === null){
-        INSTANCE = new TDRoom();
+        INSTANCE = new Room();
     }
     return INSTANCE;
 }
 
 
 module.exports = {
-    TDRoom: new TDRoom().getInstance()
+    Room: new Room().getInstance()
 }

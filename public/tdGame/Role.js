@@ -1,6 +1,6 @@
-var Point = require('./tdPoint')
-var TDPaopao = require('./tdPaopao')
-var constants = require('./tdConst')
+var Point = require('./Point')
+var Paopao = require('./Paopao')
+var constants = require('./Const')
 var Direction = constants.Direction;
 
 
@@ -22,7 +22,7 @@ var Role = function(roleIndex,name,game,userInfo){
 
     this.roleIndex = roleIndex;
     this.game = game;
-    this.tdMap = null;
+    this.Map = null;
     this.position = new Point(0,0);
     
     // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border
@@ -58,11 +58,11 @@ var Role = function(roleIndex,name,game,userInfo){
 }
 
 Role.prototype.getMap = function(){
-    return this.tdMap;
+    return this.Map;
 }
 
-Role.prototype.setMap = function(tdMap){
-    this.tdMap = tdMap;
+Role.prototype.setMap = function(Map){
+    this.Map = Map;
 }
 
 Role.prototype.setPosition = function(x, y){
@@ -346,12 +346,12 @@ Role.prototype.stop = function(directionnum) {
  * @returns {Point}
  */
 Role.prototype.getMapLocation = function(x,y){
-    var tdMap = this.getMap();
-    if(tdMap ==null){
+    var Map = this.getMap();
+    if(Map ==null){
         console.log('map not set');
         return {}
     }
-    return new Point(tdMap.getMapLocation(x,y).x, tdMap.getMapLocation(x,y).y);
+    return new Point(Map.getMapLocation(x,y).x, Map.getMapLocation(x,y).y);
 }
 
 /**
@@ -363,16 +363,16 @@ Role.prototype.getMapLocation = function(x,y){
  */
 Role.prototype.isPositionPassable = function(x,y){
     if(this.isDead) return false;
-    var tdMap = this.getMap();
+    var Map = this.getMap();
     var location = this.getMapLocation(x,y);
     // 如果要走的地方是个泡泡，且角色现在正处在泡泡上，则可以走
-    if(tdMap.isPositionAPaopao(location.x,location.y)){
+    if(Map.isPositionAPaopao(location.x,location.y)){
         roleCurLocation = this.getMapLocation(this.position.x,this.position.y);
         if(roleCurLocation.equals(location)){
             return true;
         }
     }
-    return tdMap.isPositionPassable(location.x,location.y);
+    return Map.isPositionPassable(location.x,location.y);
 }
 
 /**
@@ -382,9 +382,9 @@ Role.prototype.isPositionPassable = function(x,y){
  */
 Role.prototype.isPositionPaopaoAble = function(){
     if(this.isDead) return false;
-    var tdMap = this.getMap();
+    var Map = this.getMap();
     var location = this.getMapLocation(this.position.x,this.position.y);
-    return tdMap.isPositionPassable(location.x,location.y);
+    return Map.isPositionPassable(location.x,location.y);
 }
 
 /**
@@ -395,9 +395,9 @@ Role.prototype.isPositionPaopaoAble = function(){
  * @returns {boolean}
  */
 Role.prototype.isPositionAnItem = function(x,y){
-    var tdMap = this.getMap();
+    var Map = this.getMap();
     var location = this.getMapLocation(x,y);
-    return tdMap.isPositionAnItem(location.x,location.y);
+    return Map.isPositionAnItem(location.x,location.y);
 }
 
 /**
@@ -427,7 +427,7 @@ Role.prototype.createPaopao = function(){
     if(this.isPositionPaopaoAble(this.position.x,this.position.y) 
        && this.curPaopaoCount<this.maxPaopaoCount){
         this.curPaopaoCount++;
-        var paopao = new TDPaopao(position,this.paopaoPower,this);
+        var paopao = new Paopao(position,this.paopaoPower,this);
 
         if(!this.game.paopaoArr[position.x])
             this.game.paopaoArr[position.x]=[];
