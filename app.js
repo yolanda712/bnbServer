@@ -5,9 +5,9 @@ var io = require('socket.io')(server);
 
 var serverConfig = require('./public/config').serverConfig;
 
-var TDGame = require('./public/tdGame/tdGame');
-var Rooms = require('./public/tdGame/tdRoom');
-var TDRoom = Rooms.TDRoom;
+var Game = require('./public/tdGame/Game');
+var Rooms = require('./public/tdGame/Room');
+var Room = Rooms.Room;
 
 var utils = require('./public/utils');
 
@@ -19,14 +19,14 @@ io.on('connection', function (socket) {
         var roomName = data['name'];
         var userInfo = data['userInfo'];
         var msg = {code:0,msg:'failed'};
-        if(!TDRoom.isRoomExisted(roomName)){
+        if(!Room.isRoomExisted(roomName)){
             socket.roomName = roomName;
             socket.role = 'master';
             socket.join(roomName);            
 
-            var game = new TDGame(io,roomName);
+            var game = new Game(io,roomName);
             game.addPlayer(userInfo);
-            msg = TDRoom.createRoom(roomName,game);
+            msg = Room.createRoom(roomName,game);
             if(msg.code==1){
                 msg = {code:1,userInfos:game.userInfos};
             }
@@ -36,7 +36,7 @@ io.on('connection', function (socket) {
 
     socket.on('getRooms', function() {
         // TODO 数据格式需要改动
-        var msg = {'ret': 1, 'data': TDRoom.getRooms()};
+        var msg = {'ret': 1, 'data': Room.getRooms()};
         socket.emit('getRooms', msg);
     });
     
@@ -45,14 +45,14 @@ io.on('connection', function (socket) {
         var userInfo = data.userInfo;
         var msg = {code:0,msg:'failed'};
 
-        if(!TDRoom.isRoomExisted(roomName)){
+        if(!Room.isRoomExisted(roomName)){
             socket.emit('joinRoom', msg);
         }else{
             socket.roomName = roomName;
             socket.role = 'challenger';
             socket.join(roomName);
 
-            var game = TDRoom.getRoom(roomName);            
+            var game = Room.getRoom(roomName);            
             game.addPlayer(userInfo);
             msg = {code:1,userInfos:game.userInfos};
             game.broadcastMsg('roomInfo', msg);
@@ -64,19 +64,19 @@ io.on('connection', function (socket) {
         var roomName = socket.roomName;
         var msg = {code:0,msg:'failed'};
 
-        if(!TDRoom.isRoomExisted(roomName)){
+        if(!Room.isRoomExisted(roomName)){
             socket.emit('deleteRoom', msg);
         }else{
-            var game = TDRoom.getRoom(roomName);
+            var game = Room.getRoom(roomName);
             game.broadcastMsg('deleteRoom',{code:1,msg:'success'}); 
-            TDRoom.deleteRoom(roomName);           
+            Room.deleteRoom(roomName);           
             utils.clearSocketsByRoomName(io,roomName);
         }
     });
 
     socket.on('startGame', function() {
         var roomName = socket.roomName;
-        var game = TDRoom.getRoom(roomName); 
+        var game = Room.getRoom(roomName); 
         game.startGame();
     });
 
@@ -84,15 +84,15 @@ io.on('connection', function (socket) {
         var roomName = data.roomId;
         var userInfo = data.userInfo;
         var msg = {code:0,msg:'failed'};
-        if(!TDRoom.isRoomExisted(roomName)){
+        if(!Room.isRoomExisted(roomName)){
             socket.role = 'master';
             socket.roomName = roomName;
             socket.join(roomName);
             userInfo.isMaster = true;            
 
-            var game = new TDGame(io,roomName);
+            var game = new Game(io,roomName);
             game.addPlayer(userInfo);
-            msg = TDRoom.createRoom(roomName,game);
+            msg = Room.createRoom(roomName,game);
             if(msg.code === 1){
                 msg.userInfos = game.userInfos;
                 msg.msg = 'success';
@@ -103,7 +103,7 @@ io.on('connection', function (socket) {
             socket.join(roomName);
             userInfo['isMaster'] = false;
 
-            var game = TDRoom.getRoom(roomName);            
+            var game = Room.getRoom(roomName);            
             game.addPlayer(userInfo);
             msg ={code:1,msg:'success',userInfos:game.userInfos};
             game.broadcastMsg('playAgain',msg);
@@ -113,7 +113,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('KeyUp', function (keyCode) {
-        var game = TDRoom.getRoom(socket.roomName);
+        var game = Room.getRoom(socket.roomName);
         if(game){
             if (socket.role === 'master') {
                 game.stopARoleByKeyCode(keyCode,game.roleArr[0]);
@@ -124,7 +124,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('KeyDown', function (keyCode) {
-        var game = TDRoom.getRoom(socket.roomName);
+        var game = Room.getRoom(socket.roomName);
         if (game) {
             if (socket.role === 'master') {
                 game.moveARoleByKeyCode(keyCode,game.roleArr[0]);
@@ -135,7 +135,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('MoveByAngle', function (angle) {
-        var game = TDRoom.getRoom(socket.roomName);
+        var game = Room.getRoom(socket.roomName);
         if (game) {
             if (socket.role === 'master') {
                 game.moveARoleByAngle(angle,game.roleArr[0]);
@@ -146,7 +146,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('TouchEnd', function () {
-        var game = TDRoom.getRoom(socket.roomName);
+        var game = Room.getRoom(socket.roomName);
         if(game){
             if (socket.role === 'master') {
                 game.stopAMobileRole(game.roleArr[0]);
@@ -157,7 +157,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function(){
-        var game = TDRoom.getRoom(socket.roomName);
+        var game = Room.getRoom(socket.roomName);
         if(game){
             game.broadcastMsg('deleteRoom',{code:1,msg:'success'});
             game.stopGame(socket.role);

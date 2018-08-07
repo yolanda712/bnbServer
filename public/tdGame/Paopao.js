@@ -1,4 +1,4 @@
-var constants = require('./tdConst')
+var constants = require('./Const')
 
 /**
  * 数组去重
@@ -32,7 +32,7 @@ var concatBoomResult = function(result, calculateResult){
     result.boomPaopaoArr = uniquePosArray(result.boomPaopaoArr.concat(calculateResult.boomPaopaoArr));
 }
 
-var TDPaopao = function(position, power, role){
+var Paopao = function(position, power, role){
     this.isActive = true;
     this.position = position;
     this.power = power;
@@ -51,14 +51,14 @@ var TDPaopao = function(position, power, role){
 /**
  * 清除爆炸定时器
  */
-TDPaopao.prototype.clearBoomTimeout = function(){
+Paopao.prototype.clearBoomTimeout = function(){
     clearTimeout(this.boomTimeout);
 }
 
 /**
  * 是否生成礼物
  */
-TDPaopao.prototype.calcItemPosibility = function(){
+Paopao.prototype.calcItemPosibility = function(){
     // return parseInt(Math.random());
     return 1;
 }
@@ -66,9 +66,9 @@ TDPaopao.prototype.calcItemPosibility = function(){
 /**
  * 泡泡爆炸
  */
-TDPaopao.prototype.boom = function(){
+Paopao.prototype.boom = function(){
     console.log('paopao boom  at'+this.position.x+","+this.position.y);
-    var result = this.findPaopaoBombXY(this.position);
+    var result = this.findPaopaoPaopaoXY(this.position);
     var boomPaopaoArr = result.boomPaopaoArr;
     var boomXYArr = result.boomXYArr;
     var boomBoxArr = result.boomBoxArr;
@@ -104,10 +104,10 @@ TDPaopao.prototype.boom = function(){
 
 /**
  * 计算泡泡的爆炸范围
- * @param {tdPoint} currentMapLocation 泡泡的位置
+ * @param {Point} currentMapLocation 泡泡的位置
  * @return {Object} result 爆炸范围
  */
-TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
+Paopao.prototype.findPaopaoPaopaoXY = function(currentMapLocation){
     if(this.isActive){
         this.isActive = false;
         var boomXYArr = [];
@@ -129,7 +129,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                 if(canGo.Left){
                     var calcX = currentMapLocation.x;
                     var caclY = currentMapLocation.y-i;
-                    var leftResult = this.oneDirectionBombArea(calcX,caclY,canGo,"Left");
+                    var leftResult = this.oneDirectionPaopaoArea(calcX,caclY,canGo,"Left");
                     //合并计算结果
                     concatBoomResult(result, leftResult);
                 }
@@ -139,7 +139,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                 if(canGo.Right){
                     var calcX = currentMapLocation.x;
                     var caclY = currentMapLocation.y+i;
-                    var rightResult = this.oneDirectionBombArea(calcX,caclY,canGo,"Right");
+                    var rightResult = this.oneDirectionPaopaoArea(calcX,caclY,canGo,"Right");
                     //合并计算结果
                     concatBoomResult(result, rightResult);
                 }
@@ -149,7 +149,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                 if(canGo.Up){
                     var calcX = currentMapLocation.x-i;
                     var caclY = currentMapLocation.y;
-                    var upResult = this.oneDirectionBombArea(calcX,caclY,canGo,"Up");
+                    var upResult = this.oneDirectionPaopaoArea(calcX,caclY,canGo,"Up");
                     //合并计算结果
                     concatBoomResult(result, upResult);
                 }
@@ -159,7 +159,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
                 if(canGo.Down){
                     var calcX = currentMapLocation.x+i;
                     var caclY = currentMapLocation.y;
-                    var downResult = this.oneDirectionBombArea(calcX,caclY,canGo,"Down");
+                    var downResult = this.oneDirectionPaopaoArea(calcX,caclY,canGo,"Down");
                     //合并计算结果
                     concatBoomResult(result, downResult);
                 }
@@ -179,7 +179,7 @@ TDPaopao.prototype.findPaopaoBombXY = function(currentMapLocation){
  * @param {String} direction 移动方向
  * @return {Object} {boomXYArr:boomXYArr,boomBoxArr:boomBoxArr,boomPaopaoArr:boomPaopaoArr}爆炸范围
  */
-TDPaopao.prototype.oneDirectionBombArea = function(calcX,caclY,canGo,direction){
+Paopao.prototype.oneDirectionPaopaoArea = function(calcX,caclY,canGo,direction){
     var boomXYArr = [];
     var boomBoxArr = [];
     var boomPaopaoArr = [];
@@ -198,7 +198,7 @@ TDPaopao.prototype.oneDirectionBombArea = function(calcX,caclY,canGo,direction){
         canGo[direction] = false;
         //如果旁边是泡泡，将该泡泡的爆炸区域合并到现在的泡泡中
         var nextPaopao = this.game.paopaoArr[calcX][caclY];
-        var nextResult = nextPaopao.findPaopaoBombXY({x:calcX,y:caclY});
+        var nextResult = nextPaopao.findPaopaoPaopaoXY({x:calcX,y:caclY});
         if(nextResult){
             boomXYArr = uniquePosArray(boomXYArr.concat(nextResult.boomXYArr));
             boomBoxArr = uniquePosArray(boomBoxArr.concat(nextResult.boomBoxArr));
@@ -212,9 +212,9 @@ TDPaopao.prototype.oneDirectionBombArea = function(calcX,caclY,canGo,direction){
 
 /**
  * 人物是否被炸到
- * @param {tdPoint} position 当前位置
+ * @param {Point} position 当前位置
  */
-TDPaopao.prototype.isRoleBoomed = function(position){
+Paopao.prototype.isRoleBoomed = function(position){
     for(var rIndex=0; rIndex<this.game.roleArr.length; rIndex++){
         var curRole = this.game.roleArr[rIndex];
         var roleMapPos = curRole.getMapLocation(curRole.position.x, curRole.position.y);
@@ -227,9 +227,9 @@ TDPaopao.prototype.isRoleBoomed = function(position){
 
 /**
  * 怪物是否被炸到
- * @param {tdPoint} position 当前位置
+ * @param {Point} position 当前位置
  */
-TDPaopao.prototype.isMonsterBoomed = function(position){
+Paopao.prototype.isMonsterBoomed = function(position){
     for(var mIndex=0; mIndex<this.game.monsterArr.length; mIndex++){
         var curMonster = this.game.monsterArr[mIndex];
         var monsterMapPos = curMonster.getMapLocation(curMonster.position.x,curMonster.position.y);
@@ -244,9 +244,9 @@ TDPaopao.prototype.isMonsterBoomed = function(position){
 
 /**
  * 礼物是否被炸掉
- * @param {tdPoint} position 当前位置
+ * @param {Point} position 当前位置
  */
-TDPaopao.prototype.isItemBoomed = function(position){
+Paopao.prototype.isItemBoomed = function(position){
     if(this.map.isPositionAnItem(position.x,position.y)){
         console.log("itemEaten"+ position);
         //礼物被炸掉
@@ -257,10 +257,10 @@ TDPaopao.prototype.isItemBoomed = function(position){
 
 /**
  * 生成礼物
- * @param {tdPoint} position 当前位置
+ * @param {Point} position 当前位置
  * @param {number} itemArr 礼物类型编号
  */
-TDPaopao.prototype.creatItem = function(position,itemArr){
+Paopao.prototype.creatItem = function(position,itemArr){
     if(this.map.getValue(position.x,position.y)==constants.GIFT_WALL && this.calcItemPosibility()){
         var itemCode = 101 + parseInt(Math.random()*3);
         this.map.setValue(position.x,position.y,itemCode);
@@ -270,4 +270,4 @@ TDPaopao.prototype.creatItem = function(position,itemArr){
     }
 }
 
-module.exports = TDPaopao
+module.exports = Paopao

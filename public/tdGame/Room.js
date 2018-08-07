@@ -1,11 +1,12 @@
-// Singleton TDRoom
+// Singleton Room
 var INSTANCE = null;
 
-var TDRoom = function(){
+var Room = function(){
     this.rooms = {};
+    this.roomMasters = {};
 }
 
-TDRoom.prototype.getRooms = function(){
+Room.prototype.getRooms = function(){
     result = [];
     for(roomName in this.rooms){
         result.push(
@@ -20,11 +21,11 @@ TDRoom.prototype.getRooms = function(){
     return result;
 }
 
-TDRoom.prototype.getRoom = function(roomName){
+Room.prototype.getRoom = function(roomName){
     return this.rooms[roomName];
 }
 
-TDRoom.prototype.createRoom = function(roomName,game){
+Room.prototype.createRoom = function(roomName,game){
     if(!this.isRoomExisted(roomName)){
         this.rooms[roomName] = game;
         return this.returnMsg(1,'success');
@@ -32,7 +33,7 @@ TDRoom.prototype.createRoom = function(roomName,game){
     return this.returnMsg(0,'existed');
 }
 
-TDRoom.prototype.deleteRoom = function(roomName){
+Room.prototype.deleteRoom = function(roomName){
     var existGame = this.rooms[roomName];
     if(existGame){
         this.rooms[roomName] = null;
@@ -45,7 +46,7 @@ TDRoom.prototype.deleteRoom = function(roomName){
     }
 }
 
-TDRoom.prototype.isRoomExisted = function(roomName){
+Room.prototype.isRoomExisted = function(roomName){
     var existGame = this.rooms[roomName];
     if(!existGame){
         return false;
@@ -53,18 +54,18 @@ TDRoom.prototype.isRoomExisted = function(roomName){
     return true;
 }
 
-TDRoom.prototype.returnMsg = function(code,msg){
+Room.prototype.returnMsg = function(code,msg){
     return {code:code,msg:msg};
 }
 
-TDRoom.prototype.getInstance = function(){
+Room.prototype.getInstance = function(){
     if(INSTANCE === null){
-        INSTANCE = new TDRoom();
+        INSTANCE = new Room();
     }
     return INSTANCE;
 }
 
 
 module.exports = {
-    TDRoom: new TDRoom().getInstance()
+    Room: new Room().getInstance()
 }

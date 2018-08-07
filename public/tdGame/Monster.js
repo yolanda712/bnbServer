@@ -1,11 +1,11 @@
-var Point = require('./tdPoint')
-var constants = require('./tdConst')
+var Point = require('./Point')
+var constants = require('./Const')
 var Direction = constants.Direction;
 
-var TDMonster = function(monsterIndex,name,game){
+var Monster = function(monsterIndex,name,game){
     this.currentDirection = Direction.None;
     this.game = game;
-    this.tdMap = null;
+    this.Map = null;
     this.position = new Point(0,0);
     this.FPS = 90;
     this.monsterIndex = monsterIndex;
@@ -32,27 +32,27 @@ var TDMonster = function(monsterIndex,name,game){
     this.targetXRight = 0; 
 }
 
-TDMonster.prototype.getMap = function(){
-    return this.tdMap;
+Monster.prototype.getMap = function(){
+    return this.Map;
 }
 
-TDMonster.prototype.setMap = function(tdMap){
-    this.tdMap = tdMap;
+Monster.prototype.setMap = function(Map){
+    this.Map = Map;
 }
 
-TDMonster.prototype.setPosition = function(x, y){
+Monster.prototype.setPosition = function(x, y){
     this.position.x = x;
     this.position.y = y;
 }
 
-TDMonster.prototype.getPosition = function(){
+Monster.prototype.getPosition = function(){
     return this.position;
 }
 
 /**
  * 小怪物移动
  */
-TDMonster.prototype.move = function(){
+Monster.prototype.move = function(){
     if(!this.isDead){
         var self = this;
         this.tempMoveStep = 0;
@@ -67,7 +67,7 @@ TDMonster.prototype.move = function(){
  * 按指定方向移动
  * @param {number} directionnum 移动方向
  */
-TDMonster.prototype.moveOneDirection = function(directionnum){
+Monster.prototype.moveOneDirection = function(directionnum){
     this.calculate();
     var randomDirection = -1;
     switch (directionnum) {
@@ -122,7 +122,7 @@ TDMonster.prototype.moveOneDirection = function(directionnum){
  * 寻找一个随机的可行方向
  * @returns {number} directionnum 移动方向
  */
-TDMonster.prototype.findRandomDirection = function(){
+Monster.prototype.findRandomDirection = function(){
     this.calculate();
     var direcArr = [];
     if(this.confirmYDirection(this.leftBorder,this.rightBorder,this.targetYUp,Direction.Up))
@@ -145,7 +145,7 @@ TDMonster.prototype.findRandomDirection = function(){
  * @param {number} directionnum 当前移动方向
  * @returns {number} directionnum 当前方向的反方向
  */
-TDMonster.prototype.reverseDirection = function(directionnum){
+Monster.prototype.reverseDirection = function(directionnum){
     switch (directionnum) {
         case Direction.Up:
              return Direction.Down;
@@ -162,7 +162,7 @@ TDMonster.prototype.reverseDirection = function(directionnum){
  * 选择一个新的移动方向
  * @param {number} moveStep 当前方向的移动距离
  */
-TDMonster.prototype.chooseNewDirection = function(moveStep){
+Monster.prototype.chooseNewDirection = function(moveStep){
     //当怪物在一个方向的移动距离超过oneMoveStep时，随机寻找新方向
     if(moveStep >= this.oneMoveStep){
         randomDirection = this.findRandomDirection();
@@ -177,7 +177,7 @@ TDMonster.prototype.chooseNewDirection = function(moveStep){
  * 启动一个新的移动线程
  * @param {number} randomDirection 随机方向
  */
-TDMonster.prototype.startNewMovInterval = function(randomDirection){
+Monster.prototype.startNewMovInterval = function(randomDirection){
     clearInterval(this.moveInterval);
     this.currentDirection = randomDirection;
     this.move();
@@ -186,7 +186,7 @@ TDMonster.prototype.startNewMovInterval = function(randomDirection){
 /**
  * 计算怪物的边界信息和位置信息
  */
-TDMonster.prototype.calculate = function(){
+Monster.prototype.calculate = function(){
     this.leftBorder = this.position.x - this.monsterBorder;
     this.rightBorder = this.position.x + this.monsterBorder;
     this.downBorder = this.position.y - this.monsterBorder;
@@ -197,7 +197,7 @@ TDMonster.prototype.calculate = function(){
     this.targetXRight = this.position.x + this.monsterBorder + this.moveStep;
 }
 
-TDMonster.prototype.confirmYDirection = function(firstBorder,sencondBorder,targetY,direction){
+Monster.prototype.confirmYDirection = function(firstBorder,sencondBorder,targetY,direction){
     var canchose = true;
     if(!this.isPositionPassable(firstBorder,targetY)) canchose = false;
     if(!this.isPositionPassable(sencondBorder,targetY)) canchose = false;
@@ -205,7 +205,7 @@ TDMonster.prototype.confirmYDirection = function(firstBorder,sencondBorder,targe
     return canchose;
 }
 
-TDMonster.prototype.confirmXDirection = function(firstBorder,sencondBorder,targetX,direction){
+Monster.prototype.confirmXDirection = function(firstBorder,sencondBorder,targetX,direction){
     var canchose = true;
     if(!this.isPositionPassable(targetX,firstBorder)) canchose = false;
     if(!this.isPositionPassable(targetX,sencondBorder)) canchose = false;
@@ -213,31 +213,31 @@ TDMonster.prototype.confirmXDirection = function(firstBorder,sencondBorder,targe
     return canchose;
 }
 
-TDMonster.prototype.isPositionPassable = function(x,y){
+Monster.prototype.isPositionPassable = function(x,y){
     if(this.isDead) return false;
-    var tdMap = this.getMap();
+    var Map = this.getMap();
     var location = this.getMapLocation(x,y);
-    return tdMap.isPositionPassable(location.x,location.y);
+    return Map.isPositionPassable(location.x,location.y);
 }
 
 /**
  * 怪物死亡
  */
-TDMonster.prototype.die = function(){
+Monster.prototype.die = function(){
     this.isDead = true;
     clearInterval(this.moveInterval);
     this.game.broadcastMsg("monsterBoom",{x:this.position.x,y:this.position.y,name:this.name});
 }
 
-TDMonster.prototype.getMapLocation = function(x,y){
-    var tdMap = this.getMap();
-    if(tdMap ==null){
+Monster.prototype.getMapLocation = function(x,y){
+    var Map = this.getMap();
+    if(Map ==null){
         console.log('map not set');
         return {}
     }
-    return new Point(tdMap.getMapLocation(x,y).x, tdMap.getMapLocation(x,y).y);
+    return new Point(Map.getMapLocation(x,y).x, Map.getMapLocation(x,y).y);
 }
 
-module.exports = TDMonster;
+module.exports = Monster;
 
     
