@@ -4,9 +4,10 @@ var constants = require('./Const')
 var Direction = constants.Direction;
 var Rooms = require('./Room');
 var Monster = require('./Monster');
+var Box = require('./Box');
+var Point = require('./Point')
 var Room = Rooms.Room;
 var utils = require('../utils');
-
 
 /**
  * Game类，主游戏入口，所有的游戏逻辑都涵盖于此
@@ -23,6 +24,7 @@ var Game = function (serverSocketIO, roomName) {
     this.paopaoArr = [];
     this.itemArr = [];
     this.monsterArr = [];
+    this.boxArr = [];
 
     this.FPS = 30;
     this.playerCount = 0;
@@ -44,6 +46,7 @@ Game.prototype.startGame = function(){
     this.isRunning = true;   
     this.initRolesAndMonsters();
     this.broadcastGameStartMsg();
+    this.generateBox();
 
     var self = this;
     this.timer = setInterval(function(){
@@ -130,6 +133,20 @@ Game.prototype.createMonster = function(){
     var cocosPosition = this.Map.convertMapIndexToCocosAxis(this.Map.getYLen(), startPosition.x, startPosition.y);
     newMonster.setPosition(cocosPosition.x, cocosPosition.y);
     this.monsterArr.push(newMonster);
+}
+
+Game.prototype.generateBox = function(){
+    for(var i=0; i<this.Map.map.length; i++){
+        for(var j=0; j<this.Map.map[i].length; j++){
+            var mapValue = this.Map.getValue(i,j);
+            if(!this.boxArr[i])
+                this.boxArr[i]=[];
+            if(0 < mapValue && mapValue < 4){
+                var newBox = new Box(mapValue,new Point(i,j),this.Map);
+                this.boxArr[i][j] = newBox;
+            }
+        }
+    }
 }
 
 /**

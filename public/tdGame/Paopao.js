@@ -37,7 +37,7 @@ var Paopao = function(position, power, role){
     this.position = position;
     this.power = power;
     this.role = role;
-    this.map = this.role.getMap();
+    this.map = this.role.getMap(); 
     this.map.setValue(position.x,position.y,constants.PAOPAO);
     this.game = this.role.game;
     console.log('paopao created at'+ this.position.x+","+this.position.y);
@@ -53,14 +53,6 @@ var Paopao = function(position, power, role){
  */
 Paopao.prototype.clearBoomTimeout = function(){
     clearTimeout(this.boomTimeout);
-}
-
-/**
- * 是否生成礼物
- */
-Paopao.prototype.calcItemPosibility = function(){
-    // return parseInt(Math.random());
-    return 1;
 }
 
 /**
@@ -90,11 +82,16 @@ Paopao.prototype.boom = function(){
         this.isMonsterBoomed(pos);
 
     }
-    // 生成道具
+    //盒子爆炸
     for(var i=0; i<boomBoxArr.length; i++){
         var pos = boomBoxArr[i];
-        this.creatItem(pos,itemArr);
+        var box = this.game.boxArr[pos.x][pos.y];
+        var item = box.boxBoom(this.game.boxArr);
+        if(item != null){
+            itemArr.push(item);
+        }
     }
+
     result['itemArr'] = itemArr;
     console.log(result);
     var game = this.game;
@@ -253,21 +250,6 @@ Paopao.prototype.isItemBoomed = function(position){
         this.game.broadcastMsg("itemEaten",{x:position.x,y:position.y,role:'null'});
     }
     this.map.setValue(position.x,position.y,constants.GROUND);
-}
-
-/**
- * 生成礼物
- * @param {Point} position 当前位置
- * @param {number} itemArr 礼物类型编号
- */
-Paopao.prototype.creatItem = function(position,itemArr){
-    if(this.map.getValue(position.x,position.y)==constants.GIFT_WALL && this.calcItemPosibility()){
-        var itemCode = 101 + parseInt(Math.random()*3);
-        this.map.setValue(position.x,position.y,itemCode);
-        itemArr.push({x:position.x,y:position.y,itemCode:itemCode});
-    }else{
-        this.map.setValue(position.x,position.y,constants.GROUND);
-    }
 }
 
 module.exports = Paopao
