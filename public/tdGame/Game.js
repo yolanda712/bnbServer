@@ -24,7 +24,7 @@ var Game = function (serverSocketIO, roomName) {
     this.itemArr = [];
     this.monsterArr = [];
 
-    this.FPS = 30;
+    this.FPS = constants.FPS.GAME_FPS;
     this.playerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;

@@ -13,7 +13,7 @@ var Direction = constants.Direction;
  * @param {object} userInfo 用户个人资料
  */
 var Role = function(roleIndex,name,game,userInfo){
-    this.FPS = 90;
+    this.FPS = constants.FPS.ROLE_FPS;
     this.name = name;
     this.nickName = userInfo.nickName;
     this.gender = userInfo.gender;
@@ -463,7 +463,7 @@ Role.prototype.roleBoom = function(){
     this.isDead = true;
     var roleBoomTime = setTimeout(function(){
         self.die();
-    },3000);
+    },constants.GAME_DELAY.ROLE_BOOM_DELAY);
     this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, role:this.name});
 }
 

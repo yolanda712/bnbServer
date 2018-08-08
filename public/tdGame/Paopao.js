@@ -40,11 +40,12 @@ var Paopao = function(position, power, role){
     this.map = this.role.getMap();
     this.map.setValue(position.x,position.y,constants.PAOPAO);
     this.game = this.role.game;
+
     console.log('paopao created at'+ this.position.x+","+this.position.y);
     var self = this;
     this.boomTimeout = setTimeout(function(){
         self.boom();
-    },3000);
+    },constants.GAME_DELAY.PAOPAO_BOOM_DELAY);
 
 }
 

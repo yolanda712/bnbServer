@@ -39,6 +39,16 @@ const Direction = {
     Right: 3
 }
 
+const GAME_DELAY = {
+    ROLE_BOOM_DELAY: 3000,
+    PAOPAO_BOOM_DELAY: 3000
+}
+
+const FPS = {
+    GAME_FPS: 30,
+    ROLE_FPS: 90
+}
+
 
 module.exports = {
     GROUND:GROUND,
@@ -64,5 +74,7 @@ module.exports = {
     SCORE_FOR_MONSTER:SCORE_FOR_MONSTER,
     KEY_CODE:KEY_CODE,
     Direction:Direction,
+    GAME_DELAY:GAME_DELAY,
+    FPS:FPS
 
 }
