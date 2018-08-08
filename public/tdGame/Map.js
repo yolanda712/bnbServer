@@ -1,5 +1,5 @@
-var constants = require('./tdConst')
-var Point = require('./tdPoint')
+var constants = require('./Const')
+var Point = require('./Point')
 
 var GROUND = constants.GROUND;
 var NG_W_1 = constants.NO_GIFT_WALL_1;
@@ -105,49 +105,49 @@ var backGroundMap1 = [
  ];
 
  /**
-  * TDMap类，用于构建游戏地图
+  * Map类，用于构建游戏地图
   *
   * @param {string} mapName
   */
- var TDMap = function(mapName){
+ var Map = function(mapName){
     this.mapName = mapName;
     this.map = copyMap(backGroundMap);
     this.roleStartPointArr = roleStartPointArr.concat();
     this.monsterStartPointArr = monsterStartPointArr.concat();
  }
 
-TDMap.prototype.getXLen = function(){
+Map.prototype.getXLen = function(){
     return this.map[0].length;
 }
 
-TDMap.prototype.getYLen = function(){
+Map.prototype.getYLen = function(){
     return this.map.length;
 }
 
-TDMap.prototype.getValue = function(x,y){
+Map.prototype.getValue = function(x,y){
     return this.map[x][y];
 }
 
-TDMap.prototype.setValue = function(x,y,value){
+Map.prototype.setValue = function(x,y,value){
     this.map[x][y] = value;
 }
 
-TDMap.prototype.isPositionPassable = function(x,y){
+Map.prototype.isPositionPassable = function(x,y){
     if(this.getValue(x,y)==0 || this.getValue(x,y)>100) return true;
     return false;
 }
 
-TDMap.prototype.isPositionAnItem = function(x,y){
+Map.prototype.isPositionAnItem = function(x,y){
     if(this.getValue(x,y)>100) return true;
     return false;
 }
 
-TDMap.prototype.isPositionAPaopao = function(x,y){
+Map.prototype.isPositionAPaopao = function(x,y){
     if(this.getValue(x,y)==100) return true;
     return false;
 }
 
-TDMap.prototype.getMapLocation = function(x,y){
+Map.prototype.getMapLocation = function(x,y){
 
     xIndex = Math.round(x/32);
     yIndex = Math.round(y/32);
@@ -155,7 +155,7 @@ TDMap.prototype.getMapLocation = function(x,y){
 }
 
 // 将二维地图索引转换为cocos坐标
-TDMap.prototype.convertMapIndexToCocosAxis = function (yMapLen,x,y) {
+Map.prototype.convertMapIndexToCocosAxis = function (yMapLen,x,y) {
     var cocosPos ={};
     cocosPos.x = 32*y;
     cocosPos.y = 32*(yMapLen-x-1);
@@ -180,4 +180,4 @@ var copyMap = function(mapArr){
    return newMap;
 }
 
- module.exports = TDMap;
+ module.exports = Map;
