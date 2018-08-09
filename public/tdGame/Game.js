@@ -67,7 +67,7 @@ Game.prototype.startGame = function(){
  * @param {string} loser
  */
 Game.prototype.stopGame = function(loser){
-    if(!this.isRunning) return;
+    // if(!this.isRunning) return;
     console.log('end');
     //客户端结束
     var msg = {winner:0, isTied:true};
