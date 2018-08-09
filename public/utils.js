@@ -13,6 +13,7 @@ var clearSocketsByRoomName = function(io,roomName){
         for(var i=0;i<socketIds.length;i++){
             var socket = io.sockets.sockets[socketIds[i]];
             socket.roomName = null;
+            socket.userInfo = null;
             socket.leave(roomName);
         }
     }catch(error){

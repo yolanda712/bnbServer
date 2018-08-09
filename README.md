@@ -44,14 +44,14 @@ data = {
         isTied: false //平局
 }
 
-// 删除房间，用户emit deleteRoom后，后端自动获得所在房间并删除所属房间
+// 删除房间，用户emit deleteRoom后，后端自动获得所在房间并删除所属房间 传入参数{userInfo: {guid:ssss, ...}}
 msg = "deleteRoom"
 //删除成功
 data = {
     code:1,
     msg:'success'
 }
-//当前游戏不存在，删除失败
+//当前用户不属于任何房间，删除失败
 data = {
     code:0,
     msg:'not existed'
@@ -65,14 +65,14 @@ data = {
     data:[11,21...]
 }
 
-//服务端向客户端返回所加入房间不存在，加入房间失败
+//服务端向客户端返回所加入房间不存在，加入房间失败 传入{roomid, userInfo}
 msg = "joinRoom"
 data = {
     code:0,
     msg:'failed'
 }
 
-//服务端向客户端发送再来一局信息
+//服务端向客户端发送再来一局信息 传入{roomid, userInfo}
 msg = "playAgain"
 data = {
     code:1,
@@ -96,7 +96,7 @@ data = {
         }
     ]
 }
-//建房失败
+//建房失败 传入{name, userInfo}    name:roomName
 data = {
     code:0,
     msg:'failed'

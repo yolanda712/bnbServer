@@ -1,11 +1,10 @@
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
+var serverio = require('./public/serverio')
+var server = serverio.server;
+var io = serverio.io;
 
 var serverConfig = require('./public/config').serverConfig;
 
-var Game = require('./public/tdGame/Game');
+// var Game = require('./public/tdGame/Game');
 var Rooms = require('./public/tdGame/Room');
 var Room = Rooms.Room;
 
@@ -22,14 +21,12 @@ io.on('connection', function (socket) {
         if(!Room.isRoomExisted(roomName)){
             utils.clearSocketsByRoomName(io,roomName);
             socket.roomName = roomName;
-            socket.role = 'master';
+            socket.userInfo = userInfo;
             socket.join(roomName);            
 
-            var game = new Game(io,roomName);
-            game.addPlayer(userInfo);
-            msg = Room.createRoom(roomName,game);
+            msg = Room.createRoom(roomName,userInfo);
             if(msg.code==1){
-                msg = {code:1,userInfos:game.userInfos};
+                msg = {code:1,userInfos:Room.getRoom(roomName).userInfos};
             }
         }
         socket.emit('roomInfo', msg);
@@ -44,35 +41,34 @@ io.on('connection', function (socket) {
     socket.on('joinRoom', function (data) {
         var roomName = data.roomId;
         var userInfo = data.userInfo;
-        var msg = {code:0,msg:'failed'};
+        var msg = Room.joinRoom(roomName, userInfo);
 
-        if(!Room.isRoomExisted(roomName) || Room.isRoomFull(roomName)){
+        if(msg.code !== 1){
             socket.emit('joinRoom', msg);
         }else{
             socket.roomName = roomName;
-            socket.role = 'challenger';
+            socket.userInfo = userInfo;
             socket.join(roomName);
-
-            var game = Room.getRoom(roomName);            
-            game.addPlayer(userInfo);
+            var game = Room.getRoom(roomName);
             msg = {code:1,userInfos:game.userInfos};
+            console.log(game.userInfos);
             game.broadcastMsg('roomInfo', msg);
         }
-
     });
 
     socket.on('deleteRoom', function () {
         var roomName = socket.roomName;
-        var msg = {code:0,msg:'failed'};
-
-        if(!Room.isRoomExisted(roomName)){
-            socket.emit('deleteRoom', msg);
+        var userInfo = socket.userInfo;
+        var msg = Room.removeRoomPlayer(roomName,userInfo);
+        var game = Room.getRoom(roomName);
+        if(game){
+            game.broadcastMsg('deleteRoom',{code:1,msg:'success',userInfos:game.userInfos}); 
         }else{
-            var game = Room.getRoom(roomName);
-            game.broadcastMsg('deleteRoom',{code:1,msg:'success'}); 
-            Room.deleteRoom(roomName);           
-            utils.clearSocketsByRoomName(io,roomName);
+            socket.emit('deleteRoom', msg);
         }
+        socket.roomName = null;
+        socket.userInfo = null;
+        socket.leave(roomName); 
     });
 
     socket.on('startGame', function() {
@@ -88,40 +84,43 @@ io.on('connection', function (socket) {
         var userInfo = data.userInfo;
         var msg = {code:0,msg:'failed'};
         if(!Room.isRoomExisted(roomName)){
-            socket.role = 'master';
+            utils.clearSocketsByRoomName(io,roomName);
             socket.roomName = roomName;
-            socket.join(roomName);
-            userInfo.isMaster = true;
+            socket.userInfo = userInfo;
+            socket.join(roomName);            
 
-            var game = new Game(io,roomName);
-            game.addPlayer(userInfo);
-            msg = Room.createRoom(roomName,game);
-            if(msg.code === 1){
-                msg.userInfos = game.userInfos;
-                msg.msg = 'success';
+            msg = Room.createRoom(roomName,userInfo);
+            if(msg.code==1){
+                msg = {code:1,userInfos:Room.getRoom(roomName).userInfos};
             }
-        }else if(!Room.isRoomFull(roomName)){
-            socket.role = 'challenger';
-            socket.roomName = roomName;
-            socket.join(roomName);
-            userInfo['isMaster'] = false;
+            socket.emit('playAgain', msg);  
 
-            var game = Room.getRoom(roomName);            
-            game.addPlayer(userInfo);
-            msg ={code:1,msg:'success',userInfos:game.userInfos};
-            game.broadcastMsg('playAgain',msg);
-            return;
+        }else if(!Room.isRoomFull(roomName)){
+            socket.userInfo = userInfo;
+            socket.roomName = roomName;
+            var msg = Room.joinRoom(roomName, userInfo);
+
+            if(msg.code !== 1){
+                socket.emit('playAgain', msg);
+            }else{
+                socket.roomName = roomName;
+                socket.userInfo = userInfo;
+                socket.join(roomName);
+                var game = Room.getRoom(roomName);
+                msg = {code:1,userInfos:game.userInfos};
+                console.log(game.userInfos);
+                game.broadcastMsg('playAgain', msg);
+            }
         }
-        socket.emit('playAgain', msg);
     });
 
     socket.on('KeyUp', function (keyCode) {
         var game = Room.getRoom(socket.roomName);
         if(game){
-            if (socket.role === 'master') {
-                game.stopARoleByKeyCode(keyCode,game.roleArr[0]);
-            } else {
-                game.stopARoleByKeyCode(keyCode,game.roleArr[1]);
+            var guid = socket.userInfo.guid;
+            var roleIndex = game.userGuidRoleIndexMap[guid];
+            if(roleIndex >= 0){
+                game.stopARoleByKeyCode(keyCode,game.roleArr[roleIndex]);
             }
         }
     });
@@ -129,10 +128,10 @@ io.on('connection', function (socket) {
     socket.on('KeyDown', function (keyCode) {
         var game = Room.getRoom(socket.roomName);
         if (game) {
-            if (socket.role === 'master') {
-                game.moveARoleByKeyCode(keyCode,game.roleArr[0]);
-            } else {
-                game.moveARoleByKeyCode(keyCode,game.roleArr[1]);
+            var guid = socket.userInfo.guid;
+            var roleIndex = game.userGuidRoleIndexMap[guid];
+            if(roleIndex >= 0){
+                game.moveARoleByKeyCode(keyCode,game.roleArr[roleIndex]);
             }
         }
     });
@@ -140,10 +139,10 @@ io.on('connection', function (socket) {
     socket.on('MoveByAngle', function (angle) {
         var game = Room.getRoom(socket.roomName);
         if (game) {
-            if (socket.role === 'master') {
-                game.moveARoleByAngle(angle,game.roleArr[0]);
-            } else {
-                game.moveARoleByAngle(angle,game.roleArr[1]);
+            var guid = socket.userInfo.guid;
+            var roleIndex = game.userGuidRoleIndexMap[guid];
+            if(roleIndex >= 0){
+                game.moveARoleByAngle(angle,game.roleArr[roleIndex]);
             }
         }
     });
@@ -151,19 +150,33 @@ io.on('connection', function (socket) {
     socket.on('TouchEnd', function () {
         var game = Room.getRoom(socket.roomName);
         if(game){
-            if (socket.role === 'master') {
-                game.stopAMobileRole(game.roleArr[0]);
-            } else {
-                game.stopAMobileRole(game.roleArr[1]);
+            var guid = socket.userInfo.guid;
+            var roleIndex = game.userGuidRoleIndexMap[guid];
+            if(roleIndex >= 0){
+                game.stopAMobileRole(game.roleArr[roleIndex]);
             }
         }
     });
 
     socket.on('disconnect', function(){
+        var roomName = socket.roomName;
+        var userInfo = socket.userInfo;
         var game = Room.getRoom(socket.roomName);
         if(game){
-            game.broadcastMsg('deleteRoom',{code:1,msg:'success'});
-            game.stopGame(socket.role);
+            if(!game.isRunning){             
+                var msg = Room.removeRoomPlayer(roomName,userInfo);
+                var game = Room.getRoom(roomName);
+                if(game){
+                    game.broadcastMsg('deleteRoom',{code:1,msg:'success',userInfos:game.userInfos}); 
+                }else{
+                    socket.emit('deleteRoom', msg);
+                }
+                socket.roomName = null;
+                socket.userInfo = null;
+                socket.leave(roomName);
+            }else{
+                socket.leave(roomName);
+            }
         }
     })
 
