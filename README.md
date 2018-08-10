@@ -32,7 +32,8 @@ data = {
             nickName:a,
             guid: 'adfafdfasdfaf',
             avatarUrl:'a',
-            gender:1
+            gender:1,
+            roleIndex: 0
         }
     ]
 }

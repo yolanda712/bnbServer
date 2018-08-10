@@ -71,7 +71,7 @@ Game.prototype.startGame = function(){
  *
  * @param {string} loser
  */
-Game.prototype.stopGame = function(loser){
+Game.prototype.stopGame = function(){
     // if(!this.isRunning) return;
     console.log('end');
     //客户端结束
@@ -82,7 +82,7 @@ Game.prototype.stopGame = function(loser){
 
     var playGuidArr = Object.keys(this.userGuidRoleIndexMap);
     if(this.dieSequenceArr.length >= gameOverNum){
-        
+
     }
 
     this.broadcastMsg('end',msg);
@@ -123,6 +123,9 @@ Game.prototype.removePlayer = function(userInfo){
 }
 
 Game.prototype.createANewRole = function(userInfo){
+    if(!userInfo){
+        return;
+    }
     var existedRoleNum = this.roleArr.length;
     if(this.map.roleStartPointArr.length > existedRoleNum){
        var startPosition = this.map.roleStartPointArr[existedRoleNum];
@@ -132,6 +135,7 @@ Game.prototype.createANewRole = function(userInfo){
        newRole.setMap(this.map);
        this.roleArr.push(newRole);
        this.userGuidRoleIndexMap[userInfo.guid] = existedRoleNum;
+       userInfo.roleIndex = existedRoleNum;
     }
 }
 
@@ -167,7 +171,7 @@ Game.prototype.generateBox = function(){
  */
 Game.prototype.initRolesAndMonsters = function(){
     //create player roles
-    for(var i=0; i<this.playerCount; i++){
+    for(var i=0; i<this.userInfos.length; i++){
         this.createANewRole(this.userInfos[i]);
     }
 
