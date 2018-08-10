@@ -82,7 +82,7 @@ Game.prototype.stopGame = function(){
 
     var playGuidArr = Object.keys(this.userGuidRoleIndexMap);
     var aliveArr = diffTwoArray(playGuidArr, this.dieSequenceArr);
-    var msg = findWinner(aliveArr, this.dieSequenceArr);    
+    var msg = this.findWinner(aliveArr, this.dieSequenceArr);    
 
     this.broadcastMsg('end',msg);
 
@@ -360,7 +360,7 @@ var monsterCallback = function(game){
     }
 };
 
-var findWinner = function(aliveArr, diedArr){
+Game.prototype.findWinner = function(aliveArr, diedArr){
     var winnerArr = [];
     var loserArr = [];
     var tiedArr = [];
@@ -391,7 +391,7 @@ var findWinner = function(aliveArr, diedArr){
     return msg;
 }
 
-var findWinnerByScore = function(aliveArr){
+Game.prototype.findWinnerByScore = function(aliveArr){
     var winnerArr = [];
     var loserArr = [];
     var tiedArr = [];
