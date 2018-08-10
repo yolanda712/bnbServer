@@ -41,8 +41,9 @@ data = {
 //服务端向客户端返回游戏结束信息
 msg = "end"
 data = {
-        winner: guid,
-        isTied: false //平局
+        winnerArr:['guid1','guid2'],
+        loserArr:['guid3','guid4'],
+        tiedArr:[]
 }
 
 // 删除房间，用户emit deleteRoom后，后端自动获得所在房间并删除所属房间 传入参数{userInfo: {guid:ssss, ...}}

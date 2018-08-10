@@ -3,6 +3,7 @@ var Role = require('./Role');
 var constants = require('./Const')
 var Direction = constants.Direction;
 var Rooms = require('./Room');
+console.log(Rooms);
 var Monster = require('./Monster');
 var Box = require('./Box');
 var Point = require('./Point')

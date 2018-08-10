@@ -2,7 +2,6 @@
 var INSTANCE = null;
 var serverio = require('../serverio')
 var io = serverio.io;
-var Game = require('./Game');
 
 /**
  * Room类，用于查找具体游戏的单例类
@@ -52,6 +51,7 @@ Room.prototype.getRoom = function(roomName){
  */
 Room.prototype.createRoom = function(roomName,userInfo){
     if(!this.isRoomExisted(roomName)){
+        var Game = require('./Game');
         var game = new Game(io,roomName);
         game.addPlayer(userInfo);
         this.rooms[roomName] = game;
