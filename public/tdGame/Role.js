@@ -1,5 +1,4 @@
 var Point = require('./Point')
-var Paopao = require('./Paopao')
 var constants = require('./Const')
 var Direction = constants.Direction;
 
@@ -402,7 +401,7 @@ Role.prototype.isPositionAnItem = function(x,y){
 
 /**
  * 吃固定位置的道具
- *
+ * 
  * @param {Point} mapPosition
  */
 Role.prototype.getItem = function(mapPosition){
@@ -427,8 +426,8 @@ Role.prototype.createPaopao = function(){
     if(this.isPositionPaopaoAble(this.position.x,this.position.y) 
        && this.curPaopaoCount<this.maxPaopaoCount){
         this.curPaopaoCount++;
-        var paopao = new Paopao(position,this.paopaoPower,this);
-
+        // var paopao = new Paopao(position,this.paopaoPower,this);
+        var paopao = this.game.paopaoPool.getOne(this);
         if(!this.game.paopaoArr[position.x])
             this.game.paopaoArr[position.x]=[];
         this.game.paopaoArr[position.x][position.y] = paopao;
@@ -449,6 +448,7 @@ Role.prototype.createPaopao = function(){
 Role.prototype.deletePaopao = function(paopao){
     this.curPaopaoCount--;
     this.game.paopaoArr[paopao.position.x][paopao.position.y] = null;
+    this.game.paopaoPool.freeOne(paopao);
     paopao.clearBoomTimeout();
     // console.log(this.game.paopaoArr);
 }

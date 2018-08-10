@@ -8,6 +8,7 @@ var Box = require('./Box');
 var Point = require('./Point')
 var Room = Rooms.Room;
 var utils = require('../utils');
+var ObjectPool = require('./ObjectPool');
 
 /**
  * Game类，主游戏入口，所有的游戏逻辑都涵盖于此
@@ -35,6 +36,9 @@ var Game = function (serverSocketIO, roomName) {
     this.gameInfoInterval = null;
     this.timer = null;
     this.isRunning = false;
+    
+    //泡泡对象池
+    this.paopaoPool = null;
 }
 
 /**
@@ -62,6 +66,9 @@ Game.prototype.startGame = function(){
         this.monsterArr[k].currentDirection = this.monsterArr[k].findRandomDirection();
         this.monsterArr[k].move();
     }
+
+    //初始化泡泡对象池
+    this.paopaoPool = new ObjectPool();
 }
 
 /**
@@ -93,7 +100,7 @@ Game.prototype.stopGame = function(loser){
     }
     console.log("game over" + msg);
     this.broadcastMsg('end',msg);
-
+    this.paopaoPool.destroy();
     utils.clearSocketsByRoomName(this.io, this.roomName);
     Room.deleteRoom(this.roomName);
 }
@@ -133,6 +140,7 @@ Game.prototype.createMonster = function(){
     var cocosPosition = this.Map.convertMapIndexToCocosAxis(this.Map.getYLen(), startPosition.x, startPosition.y);
     newMonster.setPosition(cocosPosition.x, cocosPosition.y);
     this.monsterArr.push(newMonster);
+    console.log("monster created at"+cocosPosition);
 }
 
 Game.prototype.generateBox = function(){
@@ -317,8 +325,9 @@ var monsterCallback = function(game){
                     },
                 })
         }
-        game.broadcastMsg("monsterInfo",monsterMsg);
-        // console.log(monsterMsg);
+        if(this.monsterCount!=0){
+            game.broadcastMsg("monsterInfo",monsterMsg);
+        }
     }
 };
 

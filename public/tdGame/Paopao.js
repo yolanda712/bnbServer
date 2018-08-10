@@ -1,4 +1,5 @@
 var constants = require('./Const')
+var Point = require('./Point')
 
 /**
  * 数组去重
@@ -32,20 +33,28 @@ var concatBoomResult = function(result, calculateResult){
     result.boomPaopaoArr = uniquePosArray(result.boomPaopaoArr.concat(calculateResult.boomPaopaoArr));
 }
 
-var Paopao = function(position, power, role){
+var Paopao = function(){
     this.isActive = true;
-    this.position = position;
-    this.power = power;
-    this.role = role;
-    this.map = this.role.getMap(); 
-    this.map.setValue(position.x,position.y,constants.PAOPAO);
-    this.game = this.role.game;
+    this.position = new Point(0,0);
+    this.power = 0;
+    this.role = null;
+    this.map = null;
+    this.game = null;
+    this.boomTimeout = null;
     console.log('paopao created at'+ this.position.x+","+this.position.y);
+}
+
+Paopao.prototype.configPaopao = function(role){
+    this.role = role;
+    this.position = role.getMapLocation(role.position.x,role.position.y);
+    this.power = this.role.paopaoPower;
+    this.map = this.role.getMap();
+    this.game = this.role.game;
+    this.map.setValue(this.position.x,this.position.y,constants.PAOPAO);
     var self = this;
     this.boomTimeout = setTimeout(function(){
         self.boom();
     },3000);
-
 }
 
 /**
