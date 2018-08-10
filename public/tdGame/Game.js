@@ -75,20 +75,35 @@ Game.prototype.stopGame = function(){
     // if(!this.isRunning) return;
     console.log('end');
     //客户端结束
-    var msg = {winner:0, isTied:true};
-
-    var gameOverNum = 1;
-    if(this.playerCount > 1) gameOverNum = this.playerCount - 1;
+    var winnerArr = [];
+    var loserArr = [];
+    var tiedArr = [];
 
     var playGuidArr = Object.keys(this.userGuidRoleIndexMap);
-    if(this.dieSequenceArr.length >= gameOverNum){
-
-    }
+    var aliveArr = diffTwoArray(playGuidArr, this.dieSequenceArr);
+    var msg = findWinner(aliveArr, this.dieSequenceArr);    
 
     this.broadcastMsg('end',msg);
 
     utils.clearSocketsByRoomName(this.io, this.roomName);
     Room.deleteRoom(this.roomName);
+}
+
+/**
+ * arr1包含arr2所有对象，获取arr1中多于arr2的元素
+ *
+ * @param {Array[String]} arr1
+ * @param {Array[String]} arr2
+ * @returns Array[String]
+ */
+var diffTwoArray = function(arr1, arr2){
+    var diffArr = [];
+    for(var i=0; i<arr1.length; i++){
+        if(arr2.indexOf(arr1[i]) === -1){
+            diffArr.push(arr1[i]);
+        }
+    }
+    return diffArr;
 }
 
 Game.prototype.addPlayer = function(userInfo){
@@ -344,24 +359,66 @@ var monsterCallback = function(game){
     }
 };
 
-var findWinner = function(masterRole, challengerRole){
-    var winner = null;
-    if((masterRole.isDead && challengerRole.isDead)
-        || (!masterRole.isDead && !challengerRole.isDead)){
-            winner = findWinnerByScore(masterRole,challengerRole);
-    }else {
-        winner = masterRole.isDead ? challengerRole : masterRole;
+var findWinner = function(aliveArr, diedArr){
+    var winnerArr = [];
+    var loserArr = [];
+    var tiedArr = [];
+    var msg = {
+        winnerArr:winnerArr,
+        loserArr:loserArr,
+        tiedArr:tiedArr
     }
-    return winner;
+    if(this.playerCount === 1){
+        msg.tiedArr.push(this.roleArr[0].guid);
+    }else if(aliveArr.length !== 0 && diedArr.length !== 0){
+        msg.loserArr = msg.loserArr.concat(diedArr);
+        var scoreMsg = findWinnerByScore(aliveArr);
+        msg.loserArr = msg.loserArr.concat(scoreMsg.loserArr);
+        msg.winnerArr = msg.winnerArr.concat(scoreMsg.winnerArr);
+    }else if(diedArr.length === 0){
+        msg = findWinnerByScore(aliveArr);
+        if(msg.winnerArr.length === this.playerCount){
+            msg.tiedArr = [].concat(msg.winnerArr);
+            msg.winnerArr = [];
+        }
+    }else if(aliveArr.length === 0){
+        msg.winnerArr.push(diedArr[diedArr.length-1]);
+        for(var i = 0; i<diedArr.length - 1; i++){
+            msg.loserArr.push(diedArr[i]);
+        }
+    }
+    return msg;
 }
 
-var findWinnerByScore = function(masterRole, challengerRole){
-    var winner = null;
-    if(masterRole.score === challengerRole.score){
-        return winner;
+var findWinnerByScore = function(aliveArr){
+    var winnerArr = [];
+    var loserArr = [];
+    var tiedArr = [];
+    var msg = {
+        winnerArr:winnerArr,
+        loserArr:loserArr,
+        tiedArr:tiedArr
+    }
+    if(aliveArr.length === 1){
+        msg.winnerArr = msg.winnerArr.concat(aliveArr);
+        return msg;
     }else{
-        winner = masterRole.score > challengerRole.score? masterRole : challengerRole;
-        return winner;
+        var maxScore = -1;
+        for(var i=0; i<aliveArr.length; i++){
+            var guid = aliveArr[i];
+            var roleIndex = this.userGuidRoleIndexMap[guid];
+            var score = this.roleArr[roleIndex].score;
+            if(score > maxScore){
+                maxScore = score;
+                msg.loserArr = msg.loserArr.concat(msg.winnerArr);
+                msg.winnerArr = [].push(guid);
+            }else if(score === maxScore){
+                msg.winnerArr = msg.winnerArr.concat(guid);
+            }else{
+                msg.loserArr = msg.loserArr.concat(guid);
+            }
+        }
+        return msg;
     }
 }
 
