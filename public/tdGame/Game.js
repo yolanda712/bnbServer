@@ -373,11 +373,11 @@ Game.prototype.findWinner = function(aliveArr, diedArr){
         msg.tiedArr.push(this.roleArr[0].guid);
     }else if(aliveArr.length !== 0 && diedArr.length !== 0){
         msg.loserArr = msg.loserArr.concat(diedArr);
-        var scoreMsg = findWinnerByScore(aliveArr);
+        var scoreMsg = this.findWinnerByScore(aliveArr);
         msg.loserArr = msg.loserArr.concat(scoreMsg.loserArr);
         msg.winnerArr = msg.winnerArr.concat(scoreMsg.winnerArr);
     }else if(diedArr.length === 0){
-        msg = findWinnerByScore(aliveArr);
+        msg = this.findWinnerByScore(aliveArr);
         if(msg.winnerArr.length === this.playerCount){
             msg.tiedArr = [].concat(msg.winnerArr);
             msg.winnerArr = [];
