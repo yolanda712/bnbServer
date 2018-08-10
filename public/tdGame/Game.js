@@ -27,7 +27,7 @@ var Game = function (serverSocketIO, roomName) {
     this.monsterArr = [];
     this.boxArr = [];
 
-    this.FPS = 30;
+    this.FPS = constants.FPS.GAME_FPS;
     this.playerCount = 0;
     this.winner = null;
     this.gameTime = constants.GAME_TIME;
@@ -77,7 +77,7 @@ Game.prototype.startGame = function(){
  * @param {string} loser
  */
 Game.prototype.stopGame = function(loser){
-    if(!this.isRunning) return;
+    // if(!this.isRunning) return;
     console.log('end');
     //客户端结束
     var msg = {winner:0, isTied:true};
