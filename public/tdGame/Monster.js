@@ -226,7 +226,7 @@ Monster.prototype.isPositionPassable = function(x,y){
 Monster.prototype.die = function(){
     this.isDead = true;
     clearInterval(this.moveInterval);
-    this.game.broadcastMsg("monsterBoom",{x:this.position.x,y:this.position.y,name:this.name});
+    this.game.broadcastMsg("monsterBoom",{x:this.position.x,y:this.position.y,monsterIndex:this.monsterIndex});
 }
 
 Monster.prototype.getMapLocation = function(x,y){

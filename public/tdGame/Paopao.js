@@ -256,7 +256,7 @@ Paopao.prototype.isItemBoomed = function(position){
     if(this.map.isPositionAnItem(position.x,position.y)){
         console.log("itemEaten"+ position);
         //礼物被炸掉
-        this.game.broadcastMsg("itemEaten",{x:position.x,y:position.y,role:'null'});
+        this.game.broadcastMsg("itemEaten",{x:position.x,y:position.y,roleGuid:null});
     }
     this.map.setValue(position.x,position.y,constants.GROUND);
 }
