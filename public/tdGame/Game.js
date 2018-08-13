@@ -412,7 +412,8 @@ Game.prototype.findWinnerByScore = function(aliveArr){
             if(score > maxScore){
                 maxScore = score;
                 msg.loserArr = msg.loserArr.concat(msg.winnerArr);
-                msg.winnerArr = [].push(guid);
+                msg.winnerArr = [];
+                msg.winnerArr.push(guid);
             }else if(score === maxScore){
                 msg.winnerArr = msg.winnerArr.concat(guid);
             }else{
