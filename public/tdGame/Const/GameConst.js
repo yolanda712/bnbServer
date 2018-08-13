@@ -16,8 +16,6 @@ const ITEM_ADD_SPEED  = 102;
 const ITEM_ADD_POWER  = 103;
 const ITEM_ADD_SCORE  = 104;
 
-const GAME_TIME  = 1200;
-
 const SCORE_FOR_WALL = 10;
 const SCORE_FOR_MAN = 50;
 const SCORE_FOR_MONSTER = 100;
@@ -39,16 +37,17 @@ const Direction = {
     Right: 3
 }
 
-const GAME_DELAY = {
-    ROLE_BOOM_DELAY: 3000,
-    PAOPAO_BOOM_DELAY: 3000
-}
+//前后端通信频率
+const GAME_FPS =  30;
 
-const FPS = {
-    GAME_FPS: 30,
-    ROLE_FPS: 90
-}
+//游戏时间
+const GAME_TIME  = 1200;
 
+//泡泡爆炸延迟时间
+const PAOPAO_BOOM_DELAY = 3000;
+
+//泡泡对象池最小对象数
+const MIN_OBJECT_COUNT = 8;
 
 module.exports = {
     GROUND:GROUND,
@@ -74,7 +73,7 @@ module.exports = {
     SCORE_FOR_MONSTER:SCORE_FOR_MONSTER,
     KEY_CODE:KEY_CODE,
     Direction:Direction,
-    GAME_DELAY:GAME_DELAY,
-    FPS:FPS
-
+    PAOPAO_BOOM_DELAY:PAOPAO_BOOM_DELAY,
+    GAME_FPS:GAME_FPS,
+    MIN_OBJECT_COUNT:MIN_OBJECT_COUNT
 }

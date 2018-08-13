@@ -1,6 +1,6 @@
 var Map = require('./Map');
 var Role = require('./Role');
-var constants = require('./Const')
+var constants = require('./Const/GameConst')
 var Direction = constants.Direction;
 var Rooms = require('./Room');
 console.log(Rooms);
@@ -29,7 +29,7 @@ var Game = function (serverSocketIO, roomName) {
     this.monsterArr = [];
     this.boxArr = [];
 
-    this.FPS = constants.FPS.GAME_FPS;
+    this.FPS = constants.GAME_FPS;
     this.playerCount = 0;
     this.winner = null;
     this.dieSequenceArr = [];

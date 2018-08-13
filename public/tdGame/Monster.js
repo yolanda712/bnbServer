@@ -1,5 +1,6 @@
 var Point = require('./Point')
-var constants = require('./Const')
+var MonsterConstants = require('./Const/MonsterConst')
+var constants = require('./Const/GameConst')
 var Direction = constants.Direction;
 
 var Monster = function(monsterIndex,name,game){
@@ -7,20 +8,20 @@ var Monster = function(monsterIndex,name,game){
     this.game = game;
     this.Map = null;
     this.position = new Point(0,0);
-    this.FPS = 90;
+    this.FPS = MonsterConstants.MONSTER_FPS;
     this.monsterIndex = monsterIndex;
     this.name = name;
     //判断怪物是否死亡
     this.isDead = false;
     //怪物每步的移动距离
-    this.moveStep = 0.5;
+    this.moveStep = MonsterConstants.MOVE_STEP;
     //怪物移动Interval
     this.moveInterval = null;
     //用于怪物每一大步后改变方向
-    this.oneMoveStep = 30;
+    this.oneMoveStep = MonsterConstants.ONE_MOVE_STEP;
     this.tempMoveStep = 0;
     //怪物的边界
-    this.monsterBorder = 15.9;
+    this.monsterBorder = MonsterConstants.MONSTER_BORDER;
     this.leftBorder = 0;
     this.rightBorder = 0;
     this.upBorder = 0;

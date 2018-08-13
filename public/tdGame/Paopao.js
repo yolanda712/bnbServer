@@ -1,4 +1,4 @@
-var constants = require('./Const')
+var constants = require('./Const/GameConst')
 var Point = require('./Point')
 
 /**
@@ -54,7 +54,7 @@ Paopao.prototype.configPaopao = function(role){
     var self = this;
     this.boomTimeout = setTimeout(function(){
         self.boom();
-    },constants.GAME_DELAY.PAOPAO_BOOM_DELAY);
+    },constants.PAOPAO_BOOM_DELAY);
 }
 
 /**

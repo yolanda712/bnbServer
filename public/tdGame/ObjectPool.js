@@ -1,4 +1,5 @@
 var Paopao = require('./Paopao')
+var constants = require('./Const/GameConst')
 
 var remove = function(Array,element){
     var elementIndex = Array.indexOf(element);
@@ -9,7 +10,7 @@ var remove = function(Array,element){
 
 var ObjectPool = function (){
     this.totalObjCount = 0;
-    this.minCount = 8;
+    this.minCount = constants.MIN_OBJECT_COUNT;
     this.ObjectPool={
         free:[],
         busy:[]

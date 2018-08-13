@@ -1,5 +1,6 @@
 var Point = require('./Point')
-var constants = require('./Const')
+var RoleConstants = require('./Const/RoleConst')
+var constants = require('./Const/GameConst')
 var Direction = constants.Direction;
 
 
@@ -10,7 +11,7 @@ var Direction = constants.Direction;
  * @param {object} userInfo 用户个人资料
  */
 var Role = function(game,userInfo){
-    this.FPS = constants.FPS.ROLE_FPS;
+    this.FPS = RoleConstants.ROLE_FPS;
     this.nickName = userInfo.nickName;
     this.gender = userInfo.gender;
     this.avatarUrl = userInfo.avatarUrl;
@@ -21,11 +22,10 @@ var Role = function(game,userInfo){
     this.position = new Point(0,0);
     
     // threshold用于辅助玩家操作，如果太大的话可能有bug最好不要超过role border
-    this.threshold = 14.9;
+    this.threshold = RoleConstants.THRESHOD;
 
     // 用来检测旁边块是否可以移动
-    this.roleBorder = 14.9;
-    this.borderStep = 32;
+    this.roleBorder = RoleConstants.ROLE_BODER;
 
     // 处理移动方向
     this.currentDirection = Direction.None;
@@ -34,17 +34,16 @@ var Role = function(game,userInfo){
 
     //角色初始信息设置
     //移动步伐大小
-    this.moveStep = 1.3;
-    this.maxPaopaoCount = 2;
+    this.moveStep = RoleConstants.MOVE_STEP;
+    this.maxPaopaoCount = RoleConstants.MAX_PAOPAO_COUNT;
+    this.paopaoPower = RoleConstants.PAOPAO_POWER;
+    this.itemMoveStep = RoleConstants.ITEM_MOVE_STEP;
     this.curPaopaoCount = 0;
-    this.paopaoPower = 1;
     this.score = 0;
-    this.itemMoveStep = 0.3;
-
     //最大道具限制
-    this.limitPaopaoCount = 5;
-    this.limitMoveStep = 2;
-    this.limitPaopaoPower = 5;
+    this.limitPaopaoCount = RoleConstants.LIMIT_PAOPAO_COUNT;
+    this.limitMoveStep = RoleConstants.ITEM_MOVE_STEP;
+    this.limitPaopaoPower = RoleConstants.LIMIT_PAOPAO_POWER;
 
     //角色是否死亡
     this.isDead = false;
@@ -459,7 +458,7 @@ Role.prototype.roleBoom = function(){
     this.isDead = true;
     var roleBoomTime = setTimeout(function(){
         self.die();
-    },constants.GAME_DELAY.ROLE_BOOM_DELAY);
+    },RoleConstants.ROLE_BOOM_DELAY);
     this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, roleGuid:this.guid});
 }
 

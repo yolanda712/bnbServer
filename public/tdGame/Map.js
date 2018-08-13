@@ -1,4 +1,4 @@
-var constants = require('./Const')
+var constants = require('./Const/GameConst')
 var Point = require('./Point')
 
 var GROUND = constants.GROUND;

@@ -1,4 +1,4 @@
-var constants = require('./Const');
+var constants = require('./Const/GameConst');
 
 var Box = function(boxType,position,map){
     this.boxType = boxType;
