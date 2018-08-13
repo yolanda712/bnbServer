@@ -54,7 +54,7 @@ Paopao.prototype.configPaopao = function(role){
     var self = this;
     this.boomTimeout = setTimeout(function(){
         self.boom();
-    },3000);
+    },constants.GAME_DELAY.PAOPAO_BOOM_DELAY);
 }
 
 /**
