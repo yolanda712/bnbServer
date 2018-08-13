@@ -1,6 +1,7 @@
 // Singleton Room
 var INSTANCE = null;
-
+var serverio = require('../serverio')
+var io = serverio.io;
 
 /**
  * Room类，用于查找具体游戏的单例类
@@ -27,7 +28,7 @@ Room.prototype.getRooms = function(){
             }
         );
     }
-    console.log(result);
+    // console.log(result);
     return result;
 }
 
@@ -48,12 +49,40 @@ Room.prototype.getRoom = function(roomName){
  * @param {tdGame} game
  * @returns msg
  */
-Room.prototype.createRoom = function(roomName,game){
+Room.prototype.createRoom = function(roomName,userInfo){
     if(!this.isRoomExisted(roomName)){
+        var Game = require('./Game');
+        var game = new Game(io,roomName);
+        game.addPlayer(userInfo);
         this.rooms[roomName] = game;
         return this.returnMsg(1,'success');
     }
     return this.returnMsg(0,'existed');
+}
+
+Room.prototype.joinRoom = function(roomName,userInfo){
+    if(!this.isRoomExisted(roomName) || this.isRoomFull(roomName)){
+        return this.returnMsg(0,'failed');
+    }else{
+        var game = this.getRoom(roomName);            
+        game.addPlayer(userInfo);
+        return this.returnMsg(1,'success');
+    }
+}
+
+Room.prototype.removeRoomPlayer = function(roomName,userInfo){
+    if(this.isRoomExisted(roomName)){
+        var game = this.getRoom(roomName);
+        if(game.removePlayer(userInfo)){
+            if(isUserInfosArrNull(game.userInfos)){
+                this.deleteRoom(roomName);
+            }
+            return this.returnMsg(1,'success');
+        }else{
+            return this.returnMsg(0,'failed');
+        }
+    }
+    return this.returnMsg(0,'failed');
 }
 
 /**
@@ -64,13 +93,14 @@ Room.prototype.createRoom = function(roomName,game){
  */
 Room.prototype.deleteRoom = function(roomName){
     var existGame = this.rooms[roomName];
-    if(existGame){
-        this.rooms[roomName] = null;
-        delete this.rooms[roomName];
+    if(existGame){        
         existGame.stopGameIntervals();
         existGame = null;
+        this.rooms[roomName] = null;
+        delete this.rooms[roomName];
         return this.returnMsg(1,'success');
     }else{
+        delete this.rooms[roomName];
         return this.returnMsg(0,'not existed');
     }
 }
@@ -127,6 +157,15 @@ Room.prototype.getInstance = function(){
     return INSTANCE;
 }
 
+var isUserInfosArrNull = function(arr){
+    if(!arr || arr.length === 0) return true;
+    else{
+        for(var i = 0; i < arr.length; i++){
+            if(arr[i]) return false;
+        }
+        return true;
+    }
+}
 
 module.exports = {
     Room: new Room().getInstance()

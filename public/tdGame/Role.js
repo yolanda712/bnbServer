@@ -6,20 +6,16 @@ var Direction = constants.Direction;
 /**
  * Role类，用于控制游戏角色的所有操作
  *
- * @param {int} roleIndex 未来用于替换name
- * @param {string} name 角色名称 master or challenger
  * @param {tdGame} game 所属游戏
  * @param {object} userInfo 用户个人资料
  */
-var Role = function(roleIndex,name,game,userInfo){
+var Role = function(game,userInfo){
     this.FPS = constants.FPS.ROLE_FPS;
-    this.name = name;
     this.nickName = userInfo.nickName;
     this.gender = userInfo.gender;
     this.avatarUrl = userInfo.avatarUrl;
     this.guid = userInfo.guid;
 
-    this.roleIndex = roleIndex;
     this.game = game;
     this.Map = null;
     this.position = new Point(0,0);
@@ -407,7 +403,7 @@ Role.prototype.isPositionAnItem = function(x,y){
 Role.prototype.getItem = function(mapPosition){
     var itemCode = this.getMap().getValue(mapPosition.x,mapPosition.y);
     this.getMap().setValue(mapPosition.x,mapPosition.y,constants.GROUND);
-    this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,role:this.name,itemCode:itemCode});
+    this.game.broadcastMsg("itemEaten",{x:mapPosition.x,y:mapPosition.y,roleGuid:this.guid,itemCode:itemCode});
 
     if(itemCode == constants.ITEM_ADD_PAOPAO && this.maxPaopaoCount<this.limitPaopaoCount) this.maxPaopaoCount++;
     else if(itemCode == constants.ITEM_ADD_POWER && this.paopaoPower<this.limitPaopaoPower) this.paopaoPower++;
@@ -433,7 +429,7 @@ Role.prototype.createPaopao = function(){
         this.game.paopaoArr[position.x][position.y] = paopao;
 
         paopaoCreatedInfo = {
-            name:this.name,
+            roleGuid:this.guid,
             position:{
                 x:position.x,
                 y:position.y
@@ -458,13 +454,13 @@ Role.prototype.deletePaopao = function(paopao){
  *
  */
 Role.prototype.roleBoom = function(){
-    console.log('loser: '+this.name);
+    console.log('loser: '+this.guid);
     var self = this;
     this.isDead = true;
     var roleBoomTime = setTimeout(function(){
         self.die();
     },constants.GAME_DELAY.ROLE_BOOM_DELAY);
-    this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, role:this.name});
+    this.game.broadcastMsg("roleBoom",{x:this.position.x, y:this.position.y, roleGuid:this.guid});
 }
 
 /**
@@ -472,7 +468,7 @@ Role.prototype.roleBoom = function(){
  *
  */
 Role.prototype.die = function(){
-    this.game.stopGame();
+    this.game.dieSequenceArr.push(this.guid);
 }
 
 /**

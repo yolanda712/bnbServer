@@ -30,8 +30,10 @@ data = {
         userInfos: [
         {
             nickName:a,
+            guid: 'adfafdfasdfaf',
             avatarUrl:'a',
-            gender:1
+            gender:1,
+            roleIndex: 0
         }
     ]
 }
@@ -39,18 +41,19 @@ data = {
 //服务端向客户端返回游戏结束信息
 msg = "end"
 data = {
-        winner: guid,
-        isTied: false //平局
+        winnerArr:['guid1','guid2'],
+        loserArr:['guid3','guid4'],
+        tiedArr:[]
 }
 
-// 删除房间，用户emit deleteRoom后，后端自动获得所在房间并删除所属房间
+// 删除房间，用户emit deleteRoom后，后端自动获得所在房间并删除所属房间 传入参数{userInfo: {guid:ssss, ...}}
 msg = "deleteRoom"
 //删除成功
 data = {
     code:1,
     msg:'success'
 }
-//当前游戏不存在，删除失败
+//当前用户不属于任何房间，删除失败
 data = {
     code:0,
     msg:'not existed'
@@ -64,18 +67,21 @@ data = {
     data:[11,21...]
 }
 
-//服务端向客户端返回所加入房间不存在，加入房间失败
+//服务端向客户端返回所加入房间不存在，加入房间失败 传入{roomid, userInfo}
 msg = "joinRoom"
 data = {
     code:0,
     msg:'failed'
 }
 
-//服务端向客户端发送再来一局信息
+//服务端向客户端发送再来一局信息 传入{roomid, userInfo}
 msg = "playAgain"
 data = {
     code:1,
-    msg:'success'
+    msg:'success',
+    userInfos: [
+        {}
+    ]
 }
 
 // 广播房间信息
@@ -86,12 +92,13 @@ data = {
     userInfos:[
         {
             nickName:a,
+            guid:'12312313',
             avatarUrl:'a',
             gender:1
         }
     ]
 }
-//建房失败
+//建房失败 传入{name, userInfo}    name:roomName
 data = {
     code:0,
     msg:'failed'
@@ -100,9 +107,7 @@ data = {
 // 服务端按FPS向客户端发送游戏当前信息
 msg = "roleInfo"
 data = [{
-            roleIndex:0，
-            name:'master',
-            nickName:'XXX'
+            roleGuid: '123123123123',
             position:{
                 x:32,
                 y:32
@@ -111,9 +116,7 @@ data = [{
             score:100
         },
         {
-            roleIndex:0，
-            name:'challenger',
-            nickName:'XXX'
+            roleGuid: '123123123123',
             position:{
                 x:128,
                 y:128
@@ -144,7 +147,7 @@ data =  [{
 // 服务端向客户端返回新放泡泡信息
 msg = "paopaoCreated"
 data = {
-    name:'master',
+    roleGuid: 'asdfadsfasdfa',
     position:{
         x:32,
         y:32
@@ -176,7 +179,7 @@ msg = "itemEaten"
 data = {
     x:1,
     y:1,
-    role:'master',
+    roleGuid:'adfadfasdfads',
     itemCode:101
 }
 
@@ -185,7 +188,7 @@ msg = "roleBoom"
 data = {
     x:1, 
     y:1, 
-    role:'master'
+    roleGuid:'asdfkjads;fajldfj'
 }
 
 //服务端向客户端返回小怪物被炸信息

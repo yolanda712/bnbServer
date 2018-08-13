@@ -3,6 +3,7 @@ var Role = require('./Role');
 var constants = require('./Const')
 var Direction = constants.Direction;
 var Rooms = require('./Room');
+console.log(Rooms);
 var Monster = require('./Monster');
 var Box = require('./Box');
 var Point = require('./Point')
@@ -20,7 +21,8 @@ var Game = function (serverSocketIO, roomName) {
     this.io = serverSocketIO;
     this.roomName = roomName;
     this.userInfos = [];
-    this.Map = new Map();
+    this.userGuidRoleIndexMap = {};
+    this.map = new Map();
     this.roleArr = [];
     this.paopaoArr = [];
     this.itemArr = [];
@@ -30,8 +32,9 @@ var Game = function (serverSocketIO, roomName) {
     this.FPS = constants.FPS.GAME_FPS;
     this.playerCount = 0;
     this.winner = null;
+    this.dieSequenceArr = [];
     this.gameTime = constants.GAME_TIME;
-    this.monsterCount = this.Map.monsterStartPointArr.length;
+    this.monsterCount = this.map.monsterStartPointArr.length;
 
     this.gameInfoInterval = null;
     this.timer = null;
@@ -76,57 +79,86 @@ Game.prototype.startGame = function(){
  *
  * @param {string} loser
  */
-Game.prototype.stopGame = function(loser){
+Game.prototype.stopGame = function(){
     // if(!this.isRunning) return;
     console.log('end');
     //客户端结束
-    var msg = {winner:0, isTied:true};
-    var masterRole = this.roleArr[0];
-    var challengerRole = this.roleArr[1];
-    // TODO 角色不应该写死个数
-    // 判断是否单人玩家
-    if(challengerRole){
-        // 判断是否传入失败玩家信息
-        if(loser){
-            msg.isTied = false;
-            msg.winner = loser === 'master' ? this.roleArr[1].guid : this.roleArr[0].guid;
-        }else{
-            // 正常游戏逻辑判断失败者
-            var winner = findWinner(masterRole,challengerRole);
-            if(winner){
-                msg = {winner:winner.guid, isTied:false};
-            }
-        }
-    }
-    console.log("game over" + msg);
+    var winnerArr = [];
+    var loserArr = [];
+    var tiedArr = [];
+
+    var playGuidArr = Object.keys(this.userGuidRoleIndexMap);
+    var aliveArr = diffTwoArray(playGuidArr, this.dieSequenceArr);
+    var msg = this.findWinner(aliveArr, this.dieSequenceArr);    
+
     this.broadcastMsg('end',msg);
     this.paopaoPool.destroy();
     utils.clearSocketsByRoomName(this.io, this.roomName);
     Room.deleteRoom(this.roomName);
 }
 
+/**
+ * arr1包含arr2所有对象，获取arr1中多于arr2的元素
+ *
+ * @param {Array[String]} arr1
+ * @param {Array[String]} arr2
+ * @returns Array[String]
+ */
+var diffTwoArray = function(arr1, arr2){
+    var diffArr = [];
+    for(var i=0; i<arr1.length; i++){
+        if(arr2.indexOf(arr1[i]) === -1){
+            diffArr.push(arr1[i]);
+        }
+    }
+    return diffArr;
+}
+
 Game.prototype.addPlayer = function(userInfo){
     if(!this.isGameFullOfPlayers()){
-        this.userInfos.push(userInfo);
+        if(this.userInfos.length < this.map.roleStartPointArr.length){
+            this.userInfos.push(userInfo);
+        }else{
+            for(var i = 0; i < this.userInfos.length; i++){
+                if(this.userInfos[i] === null){
+                    this.userInfos[i] = userInfo;
+                    break;
+                }
+            }
+        }
         this.playerCount++;
+        return true;
     }   
+    return false;
+}
+
+Game.prototype.removePlayer = function(userInfo){
+    var guid = userInfo.guid;
+    for(var i = 0; i < this.userInfos.length; i++){
+        if(!this.userInfos[i]) continue;
+        if(this.userInfos[i].guid === guid){
+            this.userInfos[i] = null;
+            this.playerCount--;
+            return true;
+        }
+    }
+    return false;
 }
 
 Game.prototype.createANewRole = function(userInfo){
+    if(!userInfo){
+        return;
+    }
     var existedRoleNum = this.roleArr.length;
-    if(this.Map.roleStartPointArr.length > existedRoleNum){
-       var startPosition = this.Map.roleStartPointArr[existedRoleNum];
-       var cocosPosition = this.Map.convertMapIndexToCocosAxis(this.Map.getYLen(), startPosition.x, startPosition.y);
-       var role = null;
-       if(existedRoleNum == 0){
-           role = 'master';
-       }else{
-           role = 'challenger';
-       }
-       var newRole = new Role(existedRoleNum,role,this,userInfo);
+    if(this.map.roleStartPointArr.length > existedRoleNum){
+       var startPosition = this.map.roleStartPointArr[existedRoleNum];
+       var cocosPosition = this.map.convertMapIndexToCocosAxis(this.map.getYLen(), startPosition.x, startPosition.y);
+       var newRole = new Role(this,userInfo);
        newRole.setPosition(cocosPosition.x, cocosPosition.y);
-       newRole.setMap(this.Map);
+       newRole.setMap(this.map);
        this.roleArr.push(newRole);
+       this.userGuidRoleIndexMap[userInfo.guid] = existedRoleNum;
+       userInfo.roleIndex = existedRoleNum;
     }
 }
 
@@ -135,22 +167,22 @@ Game.prototype.createMonster = function(){
     var monsterIndex = this.monsterArr.length;
     var monsterName = "monster"+this.monsterArr.length;
     var newMonster = new Monster(monsterIndex,monsterName,this);
-    newMonster.setMap(this.Map);
-    var startPosition = this.Map.monsterStartPointArr[monsterIndex];
-    var cocosPosition = this.Map.convertMapIndexToCocosAxis(this.Map.getYLen(), startPosition.x, startPosition.y);
+    newMonster.setMap(this.map);
+    var startPosition = this.map.monsterStartPointArr[monsterIndex];
+    var cocosPosition = this.map.convertMapIndexToCocosAxis(this.map.getYLen(), startPosition.x, startPosition.y);
     newMonster.setPosition(cocosPosition.x, cocosPosition.y);
     this.monsterArr.push(newMonster);
     console.log("monster created at"+cocosPosition);
 }
 
 Game.prototype.generateBox = function(){
-    for(var i=0; i<this.Map.map.length; i++){
-        for(var j=0; j<this.Map.map[i].length; j++){
-            var mapValue = this.Map.getValue(i,j);
+    for(var i=0; i<this.map.map.length; i++){
+        for(var j=0; j<this.map.map[i].length; j++){
+            var mapValue = this.map.getValue(i,j);
             if(!this.boxArr[i])
                 this.boxArr[i]=[];
             if(0 < mapValue && mapValue < 4){
-                var newBox = new Box(mapValue,new Point(i,j),this.Map);
+                var newBox = new Box(mapValue,new Point(i,j),this.map);
                 this.boxArr[i][j] = newBox;
             }
         }
@@ -163,7 +195,7 @@ Game.prototype.generateBox = function(){
  */
 Game.prototype.initRolesAndMonsters = function(){
     //create player roles
-    for(var i=0; i<this.playerCount; i++){
+    for(var i=0; i<this.userInfos.length; i++){
         this.createANewRole(this.userInfos[i]);
     }
 
@@ -175,18 +207,18 @@ Game.prototype.initRolesAndMonsters = function(){
 
 Game.prototype.broadcastGameStartMsg = function(){
     var self = this;
-    var roleStartPointArr = this.Map.roleStartPointArr.map(function (point) {  
-        var newPoint = self.Map.convertMapIndexToCocosAxis(self.Map.getYLen(),point.x,point.y);
+    var roleStartPointArr = this.map.roleStartPointArr.map(function (point) {  
+        var newPoint = self.map.convertMapIndexToCocosAxis(self.map.getYLen(),point.x,point.y);
         return newPoint;  
     });
-    var monsterStartPointArr = this.Map.monsterStartPointArr.map(function (point) {  
-        var newPoint = self.Map.convertMapIndexToCocosAxis(self.Map.getYLen(),point.x,point.y);
+    var monsterStartPointArr = this.map.monsterStartPointArr.map(function (point) {  
+        var newPoint = self.map.convertMapIndexToCocosAxis(self.map.getYLen(),point.x,point.y);
         return newPoint;  
     });
 
     var mapInfo = {
         mapName:'basicMap',
-        arr: this.Map.map,
+        arr: this.map.map,
         roleStartPointArr: roleStartPointArr,
         monsterStartPointArr: monsterStartPointArr
     };
@@ -211,7 +243,16 @@ Game.prototype.countTime = function(){
     if(this.gameTime > 0){
         console.log(this.gameTime);
         this.gameTime--;
+        this.checkGameOver();
     }else{
+        this.stopGame();
+    }
+}
+
+Game.prototype.checkGameOver = function(){
+    var gameOverNum = 1;
+    if(this.playerCount > 1) gameOverNum = this.playerCount - 1;
+    if(this.dieSequenceArr.length >= gameOverNum){
         this.stopGame();
     }
 }
@@ -281,7 +322,7 @@ Game.prototype.monsterMeetRole = function(){
 }
 
 Game.prototype.isGameFullOfPlayers = function(){
-    return this.isRunning || (this.playerCount >= this.Map.roleStartPointArr.length);
+    return this.isRunning || (this.playerCount >= this.map.roleStartPointArr.length);
 }
 
 // 根据FPS向客户端发送人物角色信息的回调
@@ -292,10 +333,7 @@ var clientCallback = function(game){
             role = game.roleArr[index];
             msg.push(
                 {
-                    roleIndex: role.roleIndex,
-                    name: role.name,
-                    nickName: role.nickName,
-                    // avatarUrl: role.avatarUrl,
+                    roleGuid: role.guid,
                     position:{
                         x:role.position.x,
                         y:role.position.y
@@ -331,24 +369,67 @@ var monsterCallback = function(game){
     }
 };
 
-var findWinner = function(masterRole, challengerRole){
-    var winner = null;
-    if((masterRole.isDead && challengerRole.isDead)
-        || (!masterRole.isDead && !challengerRole.isDead)){
-            winner = findWinnerByScore(masterRole,challengerRole);
-    }else {
-        winner = masterRole.isDead ? challengerRole : masterRole;
+Game.prototype.findWinner = function(aliveArr, diedArr){
+    var winnerArr = [];
+    var loserArr = [];
+    var tiedArr = [];
+    var msg = {
+        winnerArr:winnerArr,
+        loserArr:loserArr,
+        tiedArr:tiedArr
     }
-    return winner;
+    if(this.playerCount === 1){
+        msg.tiedArr.push(this.roleArr[0].guid);
+    }else if(aliveArr.length !== 0 && diedArr.length !== 0){
+        msg.loserArr = msg.loserArr.concat(diedArr);
+        var scoreMsg = this.findWinnerByScore(aliveArr);
+        msg.loserArr = msg.loserArr.concat(scoreMsg.loserArr);
+        msg.winnerArr = msg.winnerArr.concat(scoreMsg.winnerArr);
+    }else if(diedArr.length === 0){
+        msg = this.findWinnerByScore(aliveArr);
+        if(msg.winnerArr.length === this.playerCount){
+            msg.tiedArr = [].concat(msg.winnerArr);
+            msg.winnerArr = [];
+        }
+    }else if(aliveArr.length === 0){
+        msg.winnerArr.push(diedArr[diedArr.length-1]);
+        for(var i = 0; i<diedArr.length - 1; i++){
+            msg.loserArr.push(diedArr[i]);
+        }
+    }
+    return msg;
 }
 
-var findWinnerByScore = function(masterRole, challengerRole){
-    var winner = null;
-    if(masterRole.score === challengerRole.score){
-        return winner;
+Game.prototype.findWinnerByScore = function(aliveArr){
+    var winnerArr = [];
+    var loserArr = [];
+    var tiedArr = [];
+    var msg = {
+        winnerArr:winnerArr,
+        loserArr:loserArr,
+        tiedArr:tiedArr
+    }
+    if(aliveArr.length === 1){
+        msg.winnerArr = msg.winnerArr.concat(aliveArr);
+        return msg;
     }else{
-        winner = masterRole.score > challengerRole.score? masterRole : challengerRole;
-        return winner;
+        var maxScore = -1;
+        for(var i=0; i<aliveArr.length; i++){
+            var guid = aliveArr[i];
+            var roleIndex = this.userGuidRoleIndexMap[guid];
+            var score = this.roleArr[roleIndex].score;
+            if(score > maxScore){
+                maxScore = score;
+                msg.loserArr = msg.loserArr.concat(msg.winnerArr);
+                msg.winnerArr = [];
+                msg.winnerArr.push(guid);
+            }else if(score === maxScore){
+                msg.winnerArr = msg.winnerArr.concat(guid);
+            }else{
+                msg.loserArr = msg.loserArr.concat(guid);
+            }
+        }
+        return msg;
     }
 }
 

@@ -164,7 +164,9 @@ Map.prototype.convertMapIndexToCocosAxis = function (yMapLen,x,y) {
 
 var roleStartPointArr = [
     new Point(14,1),
+    new Point(14,2),
     new Point(1,18),
+    new Point(1,17),
 ]
 
 var monsterStartPointArr = [
