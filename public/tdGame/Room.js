@@ -2,13 +2,17 @@
 var INSTANCE = null;
 var serverio = require('../serverio')
 var io = serverio.io;
+var constants = require('./Const/RoomConst')
 
 /**
  * Room类，用于查找具体游戏的单例类
  *
  */
 var Room = function(){
+    //  所有房间
     this.rooms = {};
+
+    // 为后续房主功能做准备
     this.roomMasters = {};
 }
 
@@ -50,14 +54,16 @@ Room.prototype.getRoom = function(roomName){
  * @returns msg
  */
 Room.prototype.createRoom = function(roomName,userInfo){
-    if(!this.isRoomExisted(roomName)){
+    if(Object.keys(this.rooms).length > constants.MAX_ROOM_COUNT){
+        return this.returnMsg(0,'Rooms are full.');
+    }else if(!this.isRoomExisted(roomName)){
         var Game = require('./Game');
         var game = new Game(io,roomName);
         game.addPlayer(userInfo);
         this.rooms[roomName] = game;
-        return this.returnMsg(1,'success');
+        return this.returnMsg(1,'Success');
     }
-    return this.returnMsg(0,'existed');
+    return this.returnMsg(0,'Existed');
 }
 
 Room.prototype.joinRoom = function(roomName,userInfo){

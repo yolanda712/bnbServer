@@ -3,7 +3,6 @@ var Role = require('./Role');
 var constants = require('./Const/GameConst')
 var Direction = constants.Direction;
 var Rooms = require('./Room');
-console.log(Rooms);
 var Monster = require('./Monster');
 var Box = require('./Box');
 var Point = require('./Point')
@@ -31,6 +30,8 @@ var Game = function (serverSocketIO, roomName) {
 
     this.FPS = constants.GAME_FPS;
     this.playerCount = 0;
+    // 处理断线玩家计数
+    this.playingPlayerCount = 0;
     this.winner = null;
     this.dieSequenceArr = [];
     this.gameTime = constants.GAME_TIME;
@@ -82,6 +83,7 @@ Game.prototype.startGame = function(){
 Game.prototype.stopGame = function(){
     // if(!this.isRunning) return;
     console.log('end');
+    this.stopGameIntervals();
     //客户端结束
     var winnerArr = [];
     var loserArr = [];
@@ -159,6 +161,7 @@ Game.prototype.createANewRole = function(userInfo){
        this.roleArr.push(newRole);
        this.userGuidRoleIndexMap[userInfo.guid] = existedRoleNum;
        userInfo.roleIndex = existedRoleNum;
+       this.playingPlayerCount++;
     }
 }
 
@@ -251,6 +254,10 @@ Game.prototype.countTime = function(){
 
 Game.prototype.checkGameOver = function(){
     var gameOverNum = 1;
+    if(this.playingPlayerCount < 1){
+        this.stopGame();
+        return;
+    }
     if(this.playerCount > 1) gameOverNum = this.playerCount - 1;
     if(this.dieSequenceArr.length >= gameOverNum){
         this.stopGame();
@@ -287,6 +294,12 @@ Game.prototype.moveARoleByKeyCode = function(key, role){
 
 Game.prototype.stopAMobileRole = function(role){
     role.mobileStop();
+}
+
+Game.prototype.removeAPlayingPlayer = function(){
+    if(this.playingPlayerCount > 0){
+        this.playingPlayerCount--;
+    }
 }
 
 Game.prototype.stopARoleByKeyCode = function(key, role){
