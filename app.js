@@ -174,12 +174,12 @@ io.on('connection', function (socket) {
                 }else{
                     socket.emit('deleteRoom', msg);
                 }
-                socket.roomName = null;
-                socket.userInfo = null;
-                socket.leave(roomName);
             }else{
-                socket.leave(roomName);
+                game.removeAPlayingPlayer();
             }
+            socket.roomName = null;
+            socket.userInfo = null;
+            socket.leave(roomName);
         }
     })
 
