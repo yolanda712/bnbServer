@@ -27,6 +27,8 @@ io.on('connection', function (socket) {
             msg = Room.createRoom(roomName,userInfo);
             if(msg.code==1){
                 msg = {code:1,userInfos:Room.getRoom(roomName).userInfos};
+            }else{
+                socket.leave(roomName);
             }
         }
         socket.emit('roomInfo', msg);
@@ -88,10 +90,11 @@ io.on('connection', function (socket) {
             socket.roomName = roomName;
             socket.userInfo = userInfo;
             socket.join(roomName);            
-
             msg = Room.createRoom(roomName,userInfo);
             if(msg.code==1){
                 msg = {code:1,userInfos:Room.getRoom(roomName).userInfos};
+            }else{
+                socket.leave(roomName);
             }
             socket.emit('playAgain', msg);  
 

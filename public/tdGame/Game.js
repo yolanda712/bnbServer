@@ -39,9 +39,12 @@ var Game = function (serverSocketIO, roomName) {
     this.gameInfoInterval = null;
     this.timer = null;
     this.isRunning = false;
+    this.isRoomValidInterval  = null;
     
     //泡泡对象池
     this.paopaoPool = null;
+    //删除失效的房间
+    this.isRoomValid(roomName);
 }
 
 /**
@@ -233,6 +236,7 @@ Game.prototype.broadcastGameStartMsg = function(){
 Game.prototype.stopGameIntervals = function(){
     clearInterval(this.timer);
     clearInterval(this.gameInfoInterval);
+    clearInterval(this.isRoomValidInterval);
 }
 
 Game.prototype.broadcastMsg = function(msg, data){
@@ -431,6 +435,21 @@ Game.prototype.findWinnerByScore = function(aliveArr){
         }
         return msg;
     }
+}
+
+Game.prototype.isRoomValid = function(roomName){
+    var self = this;
+    this.isRoomValidInterval = setInterval(function(){
+        try{
+            var socketRoom = self.io.sockets.adapter.rooms[roomName];
+            if(!socketRoom || Object.keys(socketRoom.sockets).length == 0){
+                Room.deleteRoom(roomName);
+            }
+        }catch(error){
+            console.log(error);
+        }
+        
+    },constants.DELET_INVALID_ROOM);
 }
 
 module.exports = Game;
