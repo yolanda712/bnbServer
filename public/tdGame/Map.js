@@ -23,14 +23,14 @@ var backGroundMap = [
     [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND,  GROUND, GROUND,  S_W_1,  GROUND,  GROUND,   S_W_1,GROUND,  GROUND, GROUND,GROUND,    G_W, GROUND,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND,  S_W_1,    G_W,    G_W,    G_W,  GROUND, GROUND,    G_W,  GROUND,  GROUND,    G_W, GROUND,  GROUND,   G_W,    G_W,    G_W,  S_W_1,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND, GROUND,    G_W,  S_W_1, GROUND,   S_W_1,    G_W,    G_W,     G_W,     G_W,    G_W,    G_W,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
-    [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND,   S_W_1, GROUND, GROUND,  GROUND,  GROUND, GROUND, GROUND,  S_W_1, GROUND, GROUND,    G_W, GROUND,     G_W,  S_W_1 ],
+    [  S_W_1,    G_W, GROUND,    G_W, GROUND, GROUND,   S_W_1, GROUND, GROUND,  GROUND,  GROUND, GROUND, GROUND,  S_W_1, GROUND, GROUND,    G_W, GROUND,     G_W,  S_W_1 ],
     [  S_W_1, GROUND,  S_W_1,    G_W, GROUND,    G_W,  GROUND,    G_W,  S_W_1,     G_W,     G_W,  S_W_1,    G_W, GROUND,    G_W, GROUND,    G_W,  S_W_1,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND, GROUND,    G_W,    G_W, GROUND,   S_W_1, GROUND,    G_W,  GROUND,  GROUND,    G_W, GROUND,  S_W_1, GROUND,    G_W,    G_W, GROUND,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND, GROUND,    G_W,  S_W_1, GROUND,   S_W_1, GROUND,    G_W,  GROUND,  GROUND,    G_W, GROUND,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND, GROUND,    G_W,    G_W, GROUND,   S_W_1, GROUND,    G_W,  GROUND,  GROUND,    G_W, GROUND,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND, GROUND,    G_W,  S_W_1, GROUND,   S_W_1, GROUND,    G_W,  GROUND,  GROUND,    G_W, GROUND,  S_W_1, GROUND,    G_W,    G_W, GROUND,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND,  S_W_1,    G_W, GROUND,    G_W,  GROUND,    G_W,  S_W_1,     G_W,     G_W,  S_W_1, GROUND, GROUND,    G_W, GROUND,    G_W,  S_W_1,  GROUND,  S_W_1 ],
-    [  S_W_1,    G_W, GROUND,    G_W, GROUND, GROUND,   S_W_1, GROUND, GROUND,  GROUND,  GROUND, GROUND,    G_W,  S_W_1, GROUND, GROUND,    G_W, GROUND,  GROUND,  S_W_1 ],
+    [  S_W_1,    G_W, GROUND,    G_W, GROUND, GROUND,   S_W_1, GROUND, GROUND,  GROUND,  GROUND, GROUND,    G_W,  S_W_1, GROUND, GROUND,    G_W, GROUND,     G_W,  S_W_1 ],
     [  S_W_1, GROUND, GROUND,    G_W,    G_W, GROUND,   S_W_1,    G_W,    G_W,     G_W,     G_W,    G_W, GROUND,  S_W_1, GROUND,  S_W_1,    G_W, GROUND,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND,  S_W_1,    G_W,  S_W_1,    G_W,  GROUND, GROUND,    G_W,  GROUND,  GROUND,    G_W,    G_W, GROUND,    G_W,    G_W,    G_W,  S_W_1,  GROUND,  S_W_1 ],
     [  S_W_1, GROUND, GROUND,    G_W, GROUND, GROUND,  GROUND, GROUND,  S_W_1,  GROUND,  GROUND,  S_W_1, GROUND, GROUND, GROUND, GROUND,    G_W, GROUND,  GROUND,  S_W_1 ],
@@ -164,14 +164,14 @@ Map.prototype.convertMapIndexToCocosAxis = function (yMapLen,x,y) {
 
 var roleStartPointArr = [
     new Point(14,1),
-    new Point(14,2),
+    new Point(14,18),
     new Point(1,18),
-    new Point(1,17),
+    new Point(1,1),
 ]
 
 var monsterStartPointArr = [
-   new Point(14,18),
-   new Point(1,1),
+   new Point(7,18),
+   new Point(7,1),
 ]
 
 var copyMap = function(mapArr){
