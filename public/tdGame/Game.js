@@ -39,8 +39,10 @@ var Game = function (serverSocketIO, roomName) {
 
     this.gameInfoInterval = null;
     this.timer = null;
+
     this.isRunning = false;
     this.isRoomValidInterval  = null;
+    this.randomRoleIndexArr = [0,1,2,3].sort(randomsort);
     
     //泡泡对象池
     this.paopaoPool = null;
@@ -156,7 +158,8 @@ Game.prototype.createANewRole = function(userInfo){
     }
     var existedRoleNum = this.roleArr.length;
     if(this.map.roleStartPointArr.length > existedRoleNum){
-       var startPosition = this.map.roleStartPointArr[existedRoleNum];
+       var randomRoleIndex = this.randomRoleIndexArr[existedRoleNum];
+       var startPosition = this.map.roleStartPointArr[randomRoleIndex];
        var cocosPosition = this.map.convertMapIndexToCocosAxis(this.map.getYLen(), startPosition.x, startPosition.y);
        var newRole = new Role(this,userInfo);
        newRole.setPosition(cocosPosition.x, cocosPosition.y);
@@ -467,6 +470,18 @@ Game.prototype.isRoomValid = function(roomName){
         }
         
     },constants.DELET_INVALID_ROOM);
+}
+
+/**
+ * 随机打乱一个数组的sort
+ *
+ * @param {int} a
+ * @param {int} b
+ * @returns
+ */
+function randomsort(a, b) {
+    return Math.random()>.5 ? -1 : 1;
+    //用Math.random()函数生成0~1之间的随机数与0.5比较，返回-1或1
 }
 
 module.exports = Game;
