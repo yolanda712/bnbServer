@@ -1,14 +1,33 @@
 var serverio = require('./public/serverio')
+var app = serverio.app;
 var server = serverio.server;
 var io = serverio.io;
+var swig = require('swig');
+
+swig.setDefaults({
+  cache: false
+})
+app.set('view cache', false);
+
+app.set('views','./views/pages/');
+app.set('view engine','html');
+app.engine('html', swig.renderFile);
+
+
 
 var serverConfig = require('./public/config').serverConfig;
 
-// var Game = require('./public/tdGame/Game');
 var Rooms = require('./public/tdGame/Room');
 var Room = Rooms.Room;
-
 var utils = require('./public/utils');
+
+//index page
+app.get('/',function(req, res){
+    res.render('index',{
+        title:'首页 ',
+        content: 'hello swig'
+    })
+})
 
 io.on('connection', function (socket) {
     var clientIp = socket.request.connection.remoteAddress;

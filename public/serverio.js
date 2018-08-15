@@ -5,5 +5,6 @@ var io = require('socket.io')(server);
 
 module.exports = {
     server:server,
-    io:io
+    io:io,
+    app:app
 };
