@@ -225,6 +225,7 @@ Monster.prototype.isPositionPassable = function(x,y){
  * 怪物死亡
  */
 Monster.prototype.die = function(){
+    if(this.isDead) return ;
     this.isDead = true;
     clearInterval(this.moveInterval);
     this.game.broadcastMsg("monsterBoom",{x:this.position.x,y:this.position.y,monsterIndex:this.monsterIndex});

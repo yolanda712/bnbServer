@@ -454,6 +454,7 @@ Role.prototype.deletePaopao = function(paopao){
  */
 Role.prototype.roleBoom = function(){
     console.log('loser: '+this.guid);
+    if(this.isDead) return ;
     var self = this;
     this.isDead = true;
     var roleBoomTime = setTimeout(function(){
