@@ -166,7 +166,7 @@ Game.prototype.createANewRole = function(userInfo){
        newRole.setMap(this.map);
        this.roleArr.push(newRole);
        this.userGuidRoleIndexMap[userInfo.guid] = existedRoleNum;
-       userInfo.roleIndex = existedRoleNum;
+       userInfo.roleIndex = randomRoleIndex;
        this.playingPlayerCount++;
     }
 }
