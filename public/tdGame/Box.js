@@ -20,8 +20,7 @@ Box.prototype.boxBoom = function(boxArr){
  * 是否生成礼物
  */
 Box.prototype.calcItemPosibility = function(){
-    // return parseInt(Math.random());
-    return 1;
+    return Math.round(Math.random());
 }
 
 /**
