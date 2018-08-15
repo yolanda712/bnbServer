@@ -2,7 +2,7 @@
 const ROLE_BOOM_DELAY = 3000;
 
 //角色初始移动速度
-const MOVE_STEP = 1.3;
+const MOVE_STEP = 1.1;
 
 //角色初始可放的泡泡数
 const MAX_PAOPAO_COUNT = 2;
@@ -11,7 +11,7 @@ const MAX_PAOPAO_COUNT = 2;
 const PAOPAO_POWER = 1;
 
 //每个加速礼物的增加速度
-const ITEM_MOVE_STEP = 0.3;
+const ITEM_MOVE_STEP = 0.2;
 
 //角色可放泡泡数的最大限度
 const LIMIT_PAOPAO_COUNT = 5;
