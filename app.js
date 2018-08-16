@@ -32,6 +32,9 @@ io.on('connection', function (socket) {
     socket.on('newRoom', function(data) {
         var roomName = data['name'];
         var userInfo = data['userInfo'];
+        var oldRoomName = socket.roomName;
+        if(oldRoomName)
+            Room.removeRoomPlayer(oldRoomName,userInfo);
         var msg = {code:0,msg:'failed'};
         if(!Room.isRoomExisted(roomName)){
             utils.clearSocketsByRoomName(io,roomName);
@@ -58,6 +61,9 @@ io.on('connection', function (socket) {
     socket.on('joinRoom', function (data) {
         var roomName = data.roomId;
         var userInfo = data.userInfo;
+        var oldRoomName = socket.roomName;
+        if(oldRoomName)
+            Room.removeRoomPlayer(oldRoomName,userInfo);
         var msg = Room.joinRoom(roomName, userInfo);
 
         if(msg.code !== 1){
