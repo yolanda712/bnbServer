@@ -243,6 +243,7 @@ Game.prototype.stopGameIntervals = function(){
     clearInterval(this.timer);
     clearInterval(this.gameInfoInterval);
     clearInterval(this.isRoomValidInterval);
+    this.stopMonsterInterval();
 }
 
 Game.prototype.broadcastMsg = function(msg, data){
@@ -332,12 +333,15 @@ Game.prototype.monsterMeetRole = function(){
             var monsterPos = this.monsterArr[i].getMapLocation(this.monsterArr[i].position.x,this.monsterArr[i].position.y);
             var rolePos = this.roleArr[j].getMapLocation(this.roleArr[j].position.x,this.roleArr[j].position.y);
             if(!this.monsterArr[i].isDead && monsterPos.equals(rolePos)){
-                 for(var k=0; k<this.monsterArr.length; k++){
-                        clearInterval(this.monsterArr[k].moveInterval)
-                    }
                 this.roleArr[j].roleBoom();
             }
         }
+    }
+}
+
+Game.prototype.stopMonsterInterval = function(){
+    for(var k=0; k<this.monsterArr.length; k++){
+        clearInterval(this.monsterArr[k].moveInterval);
     }
 }
 
