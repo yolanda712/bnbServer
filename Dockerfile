@@ -1,4 +1,4 @@
- # 指定我们的基础镜像是node，版本是v8.0.0
+ # 指定我们的基础镜像是node，版本是v10.8.0
  FROM node:10.8-slim
  # 指定制作我们的镜像的联系人信息（镜像创建者）
  MAINTAINER tiandi_xie@qq.com
