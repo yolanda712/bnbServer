@@ -8,15 +8,11 @@ swig.setDefaults({
   cache: false
 })
 app.set('view cache', false);
-
 app.set('views','./views/pages/');
 app.set('view engine','html');
 app.engine('html', swig.renderFile);
 
-
-
 var serverConfig = require('./public/config').serverConfig;
-
 var Rooms = require('./public/tdGame/Room');
 var Room = Rooms.Room;
 var utils = require('./public/utils');
@@ -24,8 +20,8 @@ var utils = require('./public/utils');
 //index page
 app.get('/',function(req, res){
     res.render('index',{
-        title:'首页 ',
-        content: 'hello swig'
+        title:'天帝泡泡堂',
+        content: '这里是 天帝泡泡堂~'
     })
 })
 
