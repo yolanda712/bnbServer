@@ -241,7 +241,7 @@ Paopao.prototype.isMonsterBoomed = function(position){
         var monsterMapPos = curMonster.getMapLocation(curMonster.position.x,curMonster.position.y);
         if(monsterMapPos.equals(position)){
             //炸掉小怪物的得分
-            this.role.score += constants.SCORE_FOR_MONSTER;
+            if(!curMonster.isDead) this.role.score += constants.SCORE_FOR_MONSTER;
             //怪物被炸
             curMonster.die();
         }

@@ -43,7 +43,7 @@ const Direction = {
 const GAME_FPS =  30;
 
 //游戏时间
-const GAME_TIME  = 1200;
+const GAME_TIME  = 300;
 
 //泡泡爆炸延迟时间
 const PAOPAO_BOOM_DELAY = 3000;
