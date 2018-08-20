@@ -218,6 +218,7 @@ NodeJS作为后端，实现了所有的游戏业务逻辑，如游戏角色的�
 ## 原型部署
 
 Front-end using cocos-creator: [https://github.com/leviscar/bnb](https://github.com/leviscar/bnb)
+
 Back-end using nodejs & socket.io: [https://github.com/yolanda712/bnbServer](https://github.com/yolanda712/bnbServer)
 
 原型实现后，我们将前端游戏界面发布到了微信公众平台和Web端上，用户可以扫码进行试玩（暂时需要管理员设置体验者权限，微信号：xietiandi93），也可以直接登录 https://www.x-lab.ac 进行体验，网页版和微信端可以一起进行对战。
