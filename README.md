@@ -215,6 +215,30 @@ NodeJS作为后端，实现了所有的游戏业务逻辑，如游戏角色的�
 
 除此之外，我们还接入了微信官方提供的API来获得用户信息，如昵称、头像、性别等信息。调用微信的开放数据域接口来存储用户的胜场信息并以此来计算排行榜。用户在游戏中可以看到自己在所有好友中的游戏排名。
 
+1. 微信授权
+
+    [https://developers.weixin.qq.com/minigame/dev/document/open-api/authorize/wx.authorize.html](https://developers.weixin.qq.com/minigame/dev/document/open-api/authorize/wx.authorize.html)  
+
+    `wx.authorize(Object object)`
+
+    提前向用户发起授权请求。调用后会立刻弹窗询问用户是否同意授权小程序使用某项功能或获取用户的某些数据。
+
+2. 微信登陆
+
+    [https://developers.weixin.qq.com/minigame/dev/document/open-api/login/wx.login.html](https://developers.weixin.qq.com/minigame/dev/document/open-api/login/wx.login.html)  
+
+    `wx.login(Object object)`
+
+    调用接口获取登录凭证（code）进而换取用户登录态信息
+
+3. 通过微信开放域获得好友数据
+
+    [https://developers.weixin.qq.com/minigame/dev/tutorial/open-ability/open-data.html?search-key=%E6%8E%92%E8%A1%8C](https://developers.weixin.qq.com/minigame/dev/tutorial/open-ability/open-data.html?search-key=%E6%8E%92%E8%A1%8C)
+
+    `wx.getFriendCloudStorage()`
+
+    获取当前用户也玩该小游戏的好友的用户数据
+
 ## 原型部署
 
 Front-end using cocos-creator: [https://github.com/leviscar/bnb](https://github.com/leviscar/bnb)
