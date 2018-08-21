@@ -69,7 +69,8 @@
    - 按钮组下方为**胜场排行榜**
 8. 微信分享界面
    
-   ![](./doc/image/shareWexin.jpg)
+   <img src="./doc/image/shareWexin.jpg" style="width:40%;object-position:center;">
+
    - 可以通过分享按钮分享给微信好友
    - 微信好友收到上图的分享链接,点击链接可以加入游戏，即直接跳转到**4.游戏等待**面板
 ## 架构概要设计
