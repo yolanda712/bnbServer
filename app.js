@@ -21,13 +21,13 @@ var utils = require('./public/utils');
 var myProm = require('./public/prom');
 var Register = require('prom-client').register; 
 
-app.get('/metrics', (req, res) => {
+app.get('/metrics', function(req, res) {
     res.set('Content-Type', Register.contentType);
     res.end(Register.metrics());
 });
 
 //index page
-app.get('/',function(req, res){
+app.get('/',function(req, res) {
     res.render('index',{
         title:'天帝泡泡堂',
         content: '这里是 天帝泡泡堂~'
