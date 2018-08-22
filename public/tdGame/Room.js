@@ -1,8 +1,9 @@
 // Singleton Room
 var INSTANCE = null;
-var serverio = require('../serverio')
+var serverio = require('../serverio');
 var io = serverio.io;
-var constants = require('./Const/RoomConst')
+var constants = require('./Const/RoomConst');
+var myProm = require('../prom');
 
 /**
  * Room类，用于查找具体游戏的单例类
@@ -61,6 +62,7 @@ Room.prototype.createRoom = function(roomName,userInfo){
         var game = new Game(io,roomName);
         game.addPlayer(userInfo);
         this.rooms[roomName] = game;
+        myProm.bnb_room_gauge.set(Object.keys(this.rooms).length);
         return this.returnMsg(1,'Success');
     }
     return this.returnMsg(0,'Existed');
@@ -104,9 +106,11 @@ Room.prototype.deleteRoom = function(roomName){
         existGame = null;
         this.rooms[roomName] = null;
         delete this.rooms[roomName];
+        myProm.bnb_room_gauge.set(Object.keys(this.rooms).length);
         return this.returnMsg(1,'success');
     }else{
         delete this.rooms[roomName];
+        myProm.bnb_room_gauge.set(Object.keys(this.rooms).length);
         return this.returnMsg(0,'not existed');
     }
 }
