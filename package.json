@@ -13,6 +13,7 @@
     "body-parser": "^1.14.2",
     "express": "^4.13.4",
     "socket.io": "^1.4.5",
-    "swig": "^1.4.2"
+    "swig": "^1.4.2",
+    "prom-client": "11.1.1"
   }
 }

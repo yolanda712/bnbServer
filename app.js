@@ -17,8 +17,17 @@ var Rooms = require('./public/tdGame/Room');
 var Room = Rooms.Room;
 var utils = require('./public/utils');
 
+// prometheus collector
+var myProm = require('./public/prom');
+var Register = require('prom-client').register; 
+
+app.get('/metrics', function(req, res) {
+    res.set('Content-Type', Register.contentType);
+    res.end(Register.metrics());
+});
+
 //index page
-app.get('/',function(req, res){
+app.get('/',function(req, res) {
     res.render('index',{
         title:'天帝泡泡堂',
         content: '这里是 天帝泡泡堂~'
@@ -28,6 +37,7 @@ app.get('/',function(req, res){
 io.on('connection', function (socket) {
     var clientIp = socket.request.connection.remoteAddress;
     console.log('New connection from ' + clientIp);
+    myProm.bnb_connection_gauge.inc();
 
     socket.on('newRoom', function(data) {
         var roomName = data['name'];
@@ -183,6 +193,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', function(){
+        myProm.bnb_connection_gauge.dec();
         var roomName = socket.roomName;
         var userInfo = socket.userInfo;
         var game = Room.getRoom(socket.roomName);
@@ -210,6 +221,6 @@ io.on('connection', function (socket) {
 
 });
 
-server.listen(4000, function(){
+server.listen(serverConfig.port, function(){
     console.log('App listening at http://%s:%s', serverConfig.host, serverConfig.port);
 });
