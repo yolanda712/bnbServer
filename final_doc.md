@@ -82,24 +82,24 @@ CocosCreator是Cocos游戏团队与微信团队合作推出的一款微信小游
 
 NodeJS作为后端，实现了所有的游戏业务逻辑，如游戏角色的移动、泡泡的放置与爆炸、地图及道具信息管理等。后端接收到前台用户传来的上、下、左、右及泡泡按键信息后，实时地运算最新游戏数据，并返回给前台渲染。游戏过程如下图所示。
 
-![avatar](/doc/createRoom.png)
-![avatar](/doc/userControl.png)
+![avatar](./doc/createRoom.png)
+![avatar](./doc/userControl.png)
 
 ### 时序图
 
 用户创建房间、加入房间时序图：
-![avatar](/doc/room_sq.png)
+![avatar](./doc/room_sq.png)
 
 后台响应开始游戏请求时序图：
-![avatar](/doc/start_sq.png)
+![avatar](./doc/start_sq.png)
 
 ### 活动图
 
 后台响应前端操作过程如下图所示：
-![avatar](/doc/key_activity.png)
+![avatar](./doc/key_activity.png)
 
 游戏角色放置泡泡炸弹过程如下图所示：
-![avatar](/doc/paopao_activity.png)
+![avatar](./doc/paopao_activity.png)
 
 ### 微信API
 除此之外，我们还接入了微信官方提供的API来获得用户信息，如昵称、头像、性别等信息。调用微信的开放数据域接口来存储用户的胜场信息并以此来计算排行榜。用户在游戏中可以看到自己在所有好友中的游戏排名。
@@ -136,8 +136,8 @@ Back-end using nodejs & socket.io: [https://github.com/yolanda712/bnbServer](htt
 
 原型实现后，我们将前端游戏界面发布到了微信公众平台和Web端上，用户可以扫码进行试玩（暂时需要管理员设置体验者权限，微信号：xietiandi93），也可以直接登录 https://www.x-lab.ac 进行体验，网页版和微信端可以一起进行对战。
 
-![avatar](/doc/deploy.png)
+![avatar](./doc/deploy.png)
 
 NodeJS后端被打包成了Docker镜像，部署在了远程腾讯云服务器上（1核，1M带宽，2G内存）。通过域名访问，我们的微信端和网页端均可成功连接到后台服务器。为了监控后台服务器的实时性能消耗，我们还搭建了一套开源Docker性能监控工具（cAdvisor + Prometheus + Grafana），可以通过 https://www.x-lab.ac/monitor 进行访问，首次进入较慢，用户名密码 admin/admin。整体部署图如下所示：
 
-![avatar](/doc/grafana.png)
+![avatar](./doc/grafana.png)
